@@ -6,7 +6,7 @@ load('Data/CHL.mat','CHL');
 % Convert longitude
 CHL.lon = convert_lon(CHL.lon);
 
-% Convert reorder according to longitude
+% Reorder according to longitude
 [CHL.lon,lonidx] = sort(CHL.lon);
 CHL.chl = CHL.chl(:,lonidx,:);
 

@@ -1,7 +1,7 @@
 % Import ECCO2 SSS
 function SSS = import_SSS_ECCO(lat,lon,ocean_mask)
 
-load('Data/ECCO2_SSS_monthly_averaged_data.mat','ECCO_SSS');
+load('Data/ECCO_SSS.mat','ECCO_SSS');
 
 % Format latitude and longitude
 ECCO_SSS.latitude = repmat(ECCO_SSS.lat',size(ECCO_SSS.sss_mon,1),1,size(ECCO_SSS.sss_mon,3));
