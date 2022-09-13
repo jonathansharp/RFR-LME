@@ -1,4 +1,4 @@
-% Load Vars
+% Load Variables
 % 
 % This script grids loads satellite variables for five US large Marine
 % Ecosystems (Alaska, California Current, Insular Pacific / Hawaii, Gulf of
@@ -6,14 +6,17 @@
 % for clustering and machine learning algorithm fits.
 % 
 % Written by J.D. Sharp: 8/19/22
-% Last updated by J.D. Sharp: 8/25/22
+% Last updated by J.D. Sharp: 8/30/22
 % 
 
 % load gridded pCO2 if necessary
-if ~exist('SOCAT','var'); load('gridded_pco2','SOCAT'); end
+if ~exist('SOCAT_grid','var'); load('gridded_pco2','SOCAT_grid'); end
 
 % define regions of interest
 region = {'CCS' 'AK' 'EastCoast' 'GoM_Car' 'Hawaii'};
+
+% define path
+path = pwd;
 
 for n = 1:length(region)
 
@@ -21,25 +24,31 @@ for n = 1:length(region)
     disp(['Loading predictor variables (' region{n} ')']);
 
     %% Duplicate SOCAT grid
-    Preds_grid.(region{n}).lon = SOCAT.([region{n} '_grid']).lon;
-    Preds_grid.(region{n}).lat = SOCAT.([region{n} '_grid']).lat;
-    Preds_grid.(region{n}).lim = SOCAT.([region{n} '_grid']).lim;
-    Preds_grid.(region{n}).dim = SOCAT.([region{n} '_grid']).dim;
-    Preds_grid.(region{n}).month = SOCAT.([region{n} '_grid']).month;
-    Preds_grid.(region{n}).year = SOCAT.([region{n} '_grid']).year;
-    Preds_grid.(region{n}).month_of_year = SOCAT.([region{n} '_grid']).month_of_year;
+    Preds_grid.(region{n}).lon = SOCAT_grid.(region{n}).lon;
+    Preds_grid.(region{n}).lat = SOCAT_grid.(region{n}).lat;
+    Preds_grid.(region{n}).lim = SOCAT_grid.(region{n}).lim;
+    Preds_grid.(region{n}).dim = SOCAT_grid.(region{n}).dim;
+    Preds_grid.(region{n}).month = SOCAT_grid.(region{n}).month;
+    Preds_grid.(region{n}).year = SOCAT_grid.(region{n}).year;
+    Preds_grid.(region{n}).month_of_year = SOCAT_grid.(region{n}).month_of_year;
 
-    %% Ocean mask
+    %% Determine ocean mask
     lon_tmp = repmat(Preds_grid.(region{n}).lon,1,Preds_grid.(region{n}).dim.y);
     lon_tmp(lon_tmp > 180) = lon_tmp(lon_tmp > 180) - 360;
     lat_tmp = repmat(Preds_grid.(region{n}).lat',Preds_grid.(region{n}).dim.x,1);
-    ocean_mask = ~landmask(lat_tmp,lon_tmp);
+    Preds_grid.(region{n}).ocean_mask = ~landmask(lat_tmp,lon_tmp);
     clear lat_tmp lon_tmp
+
+    %% Calculate distance from coast
+    Preds_grid.(region{n}).Dist = ...
+        dist2coast(repmat(Preds_grid.(region{n}).lat',Preds_grid.(region{n}).dim.x,1),...
+        repmat(Preds_grid.(region{n}).lon,1,Preds_grid.(region{n}).dim.y));
 
     %% Obtain sea surface salinity from ECCO reanalysis
     Preds_grid.(region{n}).SSS = ...
         import_SSS_ECCO(Preds_grid.(region{n}).lat,...
-                        Preds_grid.(region{n}).lon,ocean_mask);
+                        Preds_grid.(region{n}).lon,...
+                        Preds_grid.(region{n}).ocean_mask,path);
     
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -50,7 +59,8 @@ for n = 1:length(region)
     %% Obtain sea surface height from ECCO reanalysis
     Preds_grid.(region{n}).SSH = ...
         import_SSH_ECCO(Preds_grid.(region{n}).lat,...
-                        Preds_grid.(region{n}).lon,ocean_mask);
+                        Preds_grid.(region{n}).lon,...
+                        Preds_grid.(region{n}).ocean_mask,path);
 
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -61,7 +71,8 @@ for n = 1:length(region)
     %% Obtain sea surface temperature from OISSTv2
     Preds_grid.(region{n}).SST = ...
         import_SST_OISST(Preds_grid.(region{n}).lat,...
-                        Preds_grid.(region{n}).lon,ocean_mask);
+                        Preds_grid.(region{n}).lon,...
+                        Preds_grid.(region{n}).ocean_mask,path);
 
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -73,12 +84,8 @@ for n = 1:length(region)
     Preds_grid.(region{n}).CHL = ...
         import_CHL_OSU(Preds_grid.(region{n}).lat,...
                         Preds_grid.(region{n}).lon,...
-                        Preds_grid.(region{n}).month,ocean_mask);
-
-    % replace negatives with zero
-    Preds_grid.(region{n}).CHL(Preds_grid.(region{n}).CHL<0) = 0;
-    % replace zero with very small number
-    Preds_grid.(region{n}).CHL(Preds_grid.(region{n}).CHL==0) = 0.00001;
+                        Preds_grid.(region{n}).month,...
+                        Preds_grid.(region{n}).ocean_mask,path);
 
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -90,7 +97,8 @@ for n = 1:length(region)
     Preds_grid.(region{n}).WindSpeed = ...
         import_Winds_ERA5(Preds_grid.(region{n}).lat,...
                         Preds_grid.(region{n}).lon,...
-                        Preds_grid.(region{n}).month);
+                        Preds_grid.(region{n}).month,...
+                        Preds_grid.(region{n}).ocean_mask,path);
     
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -101,7 +109,8 @@ for n = 1:length(region)
     %% Obtain bathymetry from ETOPO2
     Preds_grid.(region{n}).Bathy = ...
         import_Bathy_ETOPO2(Preds_grid.(region{n}).lat,...
-                        Preds_grid.(region{n}).lon);
+                        Preds_grid.(region{n}).lon,...
+                        Preds_grid.(region{n}).ocean_mask,path);
     
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -112,8 +121,10 @@ for n = 1:length(region)
     %% Obtain mixed layer depth from HYCOM model
     Preds_grid.(region{n}).MLD = ...
         import_MLD_HYCOM(Preds_grid.(region{n}).lat,...
-                        Preds_grid.(region{n}).lon,...
-                        Preds_grid.(region{n}).month,ocean_mask);
+                         Preds_grid.(region{n}).lon,...
+                         Preds_grid.(region{n}).month,...
+                        Preds_grid.(region{n}).ocean_mask,path);
+    Preds_grid.(region{n}).MLD(Preds_grid.(region{n}).MLD<0) = 10;
     
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -124,8 +135,9 @@ for n = 1:length(region)
     %% Obtain atmospheric pressure from NCEP
     Preds_grid.(region{n}).mslp = ...
         import_mslp_NCEP(Preds_grid.(region{n}).lat,...
-                        Preds_grid.(region{n}).lon,...
-                        Preds_grid.(region{n}).month);
+                         Preds_grid.(region{n}).lon,...
+                         Preds_grid.(region{n}).month,...
+                        Preds_grid.(region{n}).ocean_mask,path);
     
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -140,7 +152,7 @@ for n = 1:length(region)
                         Preds_grid.(region{n}).month,...
                         Preds_grid.(region{n}).SSS,...
                         Preds_grid.(region{n}).SST,...
-                        Preds_grid.(region{n}).mslp);
+                        Preds_grid.(region{n}).mslp,path);
     
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
