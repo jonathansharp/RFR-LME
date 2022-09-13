@@ -1,4 +1,4 @@
-% Grid LMEs
+% Grid pCO2
 % 
 % This script grids observations of fCO2 and ancillary variables from five
 % US large Marine Ecosystems (Alaska, California Current, Insular Pacific /
@@ -10,6 +10,10 @@
 
 % define regions of interest
 region = {'CCS' 'AK' 'EastCoast' 'GoM_Car' 'Hawaii'};
+% region_lim_files = {'E01_Southeastern_US' 'E02_Northeastern_US' 'E03_Scotian_Shelf' ...
+%     'E04_Labrador_Newfoundland' 'GOM_Gulf_of_Mexico' 'W01_California_Current' ...
+%     'W02_Gulf_of_Alaska' 'W03_East_Bering_Sea' 'W04_Northern_Bering_Chukchi_Seas' 'W05_Beaufort Sea'};
+% lim_idx = [3 3 3 3 4 1 2 2 2 2];
 
 for n = 1:length(region)
 
@@ -22,7 +26,17 @@ for n = 1:length(region)
     %% assemble regional variables into a structure
     SOCAT_struct;
     
-    %% remove observations before 1998
+    %% remove observations outside refined limits
+%     for l = find(lim_idx == n)
+%         limits.(['l' num2str(l)]) = readtable(['Data/LMEs/' (region_lim_files{l}) '.xlsx']);
+%     end
+%     idxspc = inpolygon(limits.Var1,limits.Var2,...
+%         SOCAT.(region{n}).longitude,SOCAT.(region{n}).latitude);
+    
+    %% remove observations before 1998 and outside refined limits
+%     limits = readtable(['Data/LMEs/' '.xlsx']);
+%     idxspc = inpolygon(SOCAT.(region{n}).longitude,SOCAT.(region{n}).latitude,...
+%         limits.Var1,limits.Var2);
     idxyr = SOCAT.(region{n}).year >= 1998;
     vars = fieldnames(SOCAT.(region{n}));
     for v = 1:numel(vars)
@@ -61,7 +75,8 @@ for n = 1:length(region)
     %% visualize number of observations
     time = datetime(SOCAT.(region{n}).year,...
         SOCAT.(region{n}).month,SOCAT.(region{n}).day);
-    figure; histogram(time);
+    figure('visible','off');
+    histogram(time);
     ylabel('Number of observations');
     xlabel('Year');
     clear time
@@ -210,7 +225,7 @@ for n = 1:length(region)
     end
     
     clear a b c idx cruises cruiselist fco2 temperature salinity
-    clear fco22 std22 temperature2 salinity2 k cruiseidx
+    clear fco22 std22 temperature2 salinity2 k cruiseidx SOCAT
     
     %% Count number of months with at least one observation in each grid cell
     SOCAT_grid.(region{n}).num_months = ...
@@ -252,10 +267,11 @@ for n = 1:length(region)
     clear ETOPO2 lonidx latidx a b
     
     %% Plot the percentage of grid cells with data
-    figure; worldmap([SOCAT_grid.(region{n}).lim.latmin ...
-                      SOCAT_grid.(region{n}).lim.latmax],...
-                     [SOCAT_grid.(region{n}).lim.lonmin ...
-                      SOCAT_grid.(region{n}).lim.lonmax]);
+    figure('visible','off');
+    worldmap([SOCAT_grid.(region{n}).lim.latmin ...
+        SOCAT_grid.(region{n}).lim.latmax],...
+       [SOCAT_grid.(region{n}).lim.lonmin ...
+        SOCAT_grid.(region{n}).lim.lonmax]);
     set(gca,'fontsize',16);
     pcolorm(repmat(SOCAT_grid.(region{n}).lat',SOCAT_grid.(region{n}).dim.x,1),...
             repmat(SOCAT_grid.(region{n}).lon,1,SOCAT_grid.(region{n}).dim.y),...
@@ -306,10 +322,11 @@ for n = 1:length(region)
     SOCAT_grid.(region{n}).fco2_dom_mean_detrend(SOCAT_grid.(region{n}).fco2_dom_mean_detrend == 0) = NaN;
 
     %% Plot detrended gridded mean pCO2
-    figure; worldmap([SOCAT_grid.(region{n}).lim.latmin ...
-                      SOCAT_grid.(region{n}).lim.latmax],...
-                     [SOCAT_grid.(region{n}).lim.lonmin ...
-                      SOCAT_grid.(region{n}).lim.lonmax]);
+    figure('visible','off');
+    worldmap([SOCAT_grid.(region{n}).lim.latmin ...
+        SOCAT_grid.(region{n}).lim.latmax],...
+       [SOCAT_grid.(region{n}).lim.lonmin ...
+        SOCAT_grid.(region{n}).lim.lonmax]);
     set(gca,'fontsize',16);
     pcolorm(repmat(SOCAT_grid.(region{n}).lat',SOCAT_grid.(region{n}).dim.x,1),...
             repmat(SOCAT_grid.(region{n}).lon,1,SOCAT_grid.(region{n}).dim.y),...
@@ -335,4 +352,4 @@ end
 % Save gridded pco2 data for all LMEs
 save('gridded_pco2','SOCAT_grid','-v7.3');
 
-clear n
+clear n m x yf yr area_weights
