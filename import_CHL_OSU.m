@@ -1,7 +1,7 @@
 % Import CHL
-function Chlor_a = import_CHL_OSU(lat,lon,month,ocean_mask)
+function Chlor_a = import_CHL_OSU(lat,lon,month,ocean_mask,path)
 
-load('Data/CHL.mat','CHL');
+load([path '/Data/CHL.mat'],'CHL');
 
 % Convert longitude
 CHL.lon = convert_lon(CHL.lon);
@@ -14,6 +14,9 @@ CHL.chl = CHL.chl(:,lonidx,:);
 CHL.latitude = repmat(CHL.lat',1,size(CHL.chl,2),size(CHL.chl,3));
 CHL.longitude = repmat(CHL.lon,size(CHL.chl,1),1,size(CHL.chl,3));
 
+% Replace -9999 with NaN
+CHL.chl(CHL.chl<0) = NaN;
+
 % Cut down dataset to limits of LME
 lonidx = CHL.lon >= min(lon) & CHL.lon <= max(lon);
 latidx = CHL.lat >= min(lat) & CHL.lat <= max(lat);
@@ -21,41 +24,51 @@ CHL.chl = double(CHL.chl(latidx,lonidx,:));
 CHL.latitude = CHL.latitude(latidx,lonidx,:);
 CHL.longitude = CHL.longitude(latidx,lonidx,:);
 
-% % Create climatology
-% for m = 1:12
-%     chl_clim(:,:,m) = mean(CHL.chl(:,:,m:12:end),3,'omitnan');
-% end
-
 % Pre-allocate
 Chlor_a = nan(length(lon),length(lat),length(month));
 
-% Interpolate onto quarter degree grid
-for t = 1:length(month)
-    interp = griddedInterpolant(flipud(CHL.longitude(:,:,t))',...
-        flipud(CHL.latitude(:,:,t))',flipud(CHL.chl(:,:,t))');
-    lon_tmp = repmat(lon,1,length(lat));
-    lat_tmp = repmat(lat',length(lon),1);
-    Chlor_a(:,:,t) = interp(lon_tmp,lat_tmp);
-end
-
 % Interpolate over some gaps in CHL dataset (linear, 1-D, time), then
 % remaining gaps at either end (nearest, 1-D, time)
-for g = 1:length(lon)
-    for h = 1:length(lat)
-        if sum(~isnan(Chlor_a(g,h,:))) >= 100 % check for "too many" NaNs
+for g = 1:size(CHL.longitude,1)
+    for h = 1:size(CHL.latitude,2)
+        if sum(~isnan(CHL.chl(g,h,:))) >= 100 % check for "too many" NaNs
             % linear interpolation
-            chl_tmp = squeeze(Chlor_a(g,h,:));
+            chl_tmp = squeeze(CHL.chl(g,h,:));
             idx = ~isnan(chl_tmp);
             Chlfit = interp1(month(idx),chl_tmp(idx),month,'linear');
             % nearest neighbor interpolation
             chl_tmp = Chlfit;
             idx = ~isnan(chl_tmp);
             Chlfit = interp1(month(idx),chl_tmp(idx),month,'nearest','extrap');
-            Chlor_a(g,h,:) = Chlfit;
+            CHL.chl(g,h,:) = Chlfit;
         else
-            Chlor_a(g,h,:) = NaN;
+            CHL.chl(g,h,:) = NaN;
         end
     end
+end
+
+% Interpolate onto quarter degree grid
+for t = 1:length(month)
+    % Index where CHL is both true
+    idx = ~isnan(CHL.chl(:,:,t));
+    % Get teporary lat, lon, CHL
+    lon_tmp = CHL.longitude(:,:,t);
+    lat_tmp = CHL.latitude(:,:,t);
+    chl_tmp = CHL.chl(:,:,t);
+    % Create interpolant over than range
+    interp = scatteredInterpolant(lon_tmp(idx),lat_tmp(idx),chl_tmp(idx));
+    % Get teporary lat and lon
+    lon_tmp = repmat(lon,1,length(lat));
+    lat_tmp = repmat(lat',length(lon),1);
+    % interpolate to grid
+    Chlor_a(:,:,t) = interp(lon_tmp,lat_tmp);
+end
+
+% Remove values outside of ocean mask
+for t = 1:length(month)
+    chl_tmp = Chlor_a(:,:,t);
+    chl_tmp(~ocean_mask) = NaN;
+    Chlor_a(:,:,t) = chl_tmp;
 end
 
 end

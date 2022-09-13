@@ -1,7 +1,7 @@
 % Import ECCO2 SSH
-function SSH = import_SSH_ECCO(lat,lon,ocean_mask)
+function SSH = import_SSH_ECCO(lat,lon,ocean_mask,path)
 
-load('Data/ECCO_SSH.mat','ECCO_SSH');
+load([path '/Data/ECCO_SSH.mat'],'ECCO_SSH');
 
 % Format latitude and longitude
 ECCO_SSH.latitude = repmat(ECCO_SSH.lat',size(ECCO_SSH.ssh_mon,1),1,size(ECCO_SSH.ssh_mon,3));
@@ -24,10 +24,12 @@ for t = 1:length(ECCO_SSH.year_mon)
     ssh_tmp = ECCO_SSH.ssh_mon(:,:,t);
     % Create interpolant over than range
     interp = scatteredInterpolant(lon_tmp(idx),lat_tmp(idx),ssh_tmp(idx));
-    % Index where SSH is nan but ocean mask is true
-    idx = isnan(ECCO_SSH.ssh_mon(:,:,t)) & ocean_mask;
+    % Index where SSH is nan
+    idx = isnan(ECCO_SSH.ssh_mon(:,:,t));
     % Fill that area with interpolated SSH
     ssh_tmp(idx) = interp(lon_tmp(idx),lat_tmp(idx));
+    % Remove values outside of ocean mask
+    ssh_tmp(~ocean_mask) = NaN;
     ECCO_SSH.ssh_mon(:,:,t) = ssh_tmp;
 end
 

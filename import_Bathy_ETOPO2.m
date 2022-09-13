@@ -1,7 +1,7 @@
 % Obtain bathymetry from ETOPO2
-function Bathy = import_Bathy_ETOPO2(lat,lon,month)
+function Bathy = import_Bathy_ETOPO2(lat,lon,ocean_mask,path)
 
-load('Data/ETOPO2.mat','ETOPO2');
+load([path '/Data/ETOPO2.mat'],'ETOPO2');
 
 % Convert longitude
 ETOPO2.lon = convert_lon(ETOPO2.lon);
@@ -26,5 +26,8 @@ interp = griddedInterpolant(ETOPO2.longitude,ETOPO2.latitude,ETOPO2.bottomdepth)
 lon_tmp = repmat(lon,1,length(lat));
 lat_tmp = repmat(lat',length(lon),1);
 Bathy = interp(lon_tmp,lat_tmp);
+
+% Remove values outside of ocean mask
+Bathy(~ocean_mask) = NaN;
 
 end

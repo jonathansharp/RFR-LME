@@ -1,8 +1,8 @@
 % Obtain atmospheric pCO2 from NOAA MBL product
-function pCO2_atm = import_pCO2_MBL(lat,lon,month,SSS,SST,mslp)
+function pCO2_atm = import_pCO2_MBL(lat,lon,month,SSS,SST,mslp,path)
 
 % Open and scan file
-file = fopen('Data/MBL_1998_2020.txt');
+file = fopen([path '/Data/MBL_1998_2020.txt']);
 NOAA_MBL = textscan(file,'%f','Delimiter',',','CommentStyle','#');
 fclose(file);
 
@@ -56,7 +56,7 @@ xCO2_atm = repmat(permute(xCO2_atm,[3 1 2]),length(lon),1,1);
 
 % Calculate pCO2 from xCO2 (with vapor pressure correction)
 % Also inherently eliminates land values
-vapor_pressure = vpress(SSS(:,:,1:276),SST(:,:,1:276));
-pCO2_atm = xCO2_atm(:,:,1:276).*(mslp(:,:,1:276)-vapor_pressure);
+vapor_pressure = vpress(SSS,SST);
+pCO2_atm = xCO2_atm.*(mslp-vapor_pressure);
 
 end

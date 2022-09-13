@@ -1,7 +1,7 @@
 % Import ERA5 Winds
-function Wind_Speed = import_Winds_ERA5(lat,lon,month)
+function Wind_Speed = import_Winds_ERA5(lat,lon,month,ocean_mask,path)
 
-load('Data/ERA5.mat','ERA5');
+load([path '/Data/ERA5.mat'],'ERA5');
 
 % Format latitude and longitude
 ERA5.latitude = repmat(ERA5.lat',size(ERA5.speed,1),1,size(ERA5.speed,3));
@@ -24,6 +24,13 @@ for t = 1:length(ERA5.date)
     lon_tmp = repmat(lon,1,length(lat));
     lat_tmp = repmat(lat',length(lon),1);
     Wind_Speed(:,:,t) = interp(lon_tmp,lat_tmp);
+end
+
+% Remove values outside of ocean mask
+for t = 1:length(month)
+    speed_tmp = Wind_Speed(:,:,t);
+    speed_tmp(~ocean_mask) = NaN;
+    Wind_Speed(:,:,t) = speed_tmp;
 end
 
 end

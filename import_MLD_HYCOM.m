@@ -1,7 +1,7 @@
 % Obtain mixed layer depth from HYCOM model
-function Mixed_Layer = import_MLD_HYCOM(lat,lon,month,ocean_mask)
+function Mixed_Layer = import_MLD_HYCOM(lat,lon,month,ocean_mask,path)
 
-load('Data/MLD.mat','MLD');
+load([path '/Data/MLD.mat'],'MLD');
 
 % Convert longitude
 MLD.lon = convert_lon(MLD.lon);
@@ -26,9 +26,19 @@ Mixed_Layer = nan(length(lon),length(lat),length(month));
 
 % Interpolate onto quarter degree grid
 for t = 1:size(MLD.mld,3)
-    interp = griddedInterpolant(flipud(MLD.longitude)',...
-        flipud(MLD.latitude)',flipud(MLD.mld(:,:,t))');
+    % Index where MLD is true
+    idx = ~isnan(MLD.mld(:,:,t));
+    % Get teporary MLD
+    mld_tmp = MLD.mld(:,:,t);
+    % Create interpolant over than range
+    interp = scatteredInterpolant(MLD.longitude(idx),MLD.latitude(idx),mld_tmp(idx));
+    % Fill grid with interpolated SSS
     lon_tmp = repmat(lon,1,length(lat));
     lat_tmp = repmat(lat',length(lon),1);
-    Mixed_Layer(:,:,t) = interp(lon_tmp,lat_tmp);
+    mld_tmp = interp(lon_tmp,lat_tmp);
+    % Remove values outside of ocean mask
+    mld_tmp(~ocean_mask) = NaN;
+    Mixed_Layer(:,:,t) = mld_tmp;
+end
+
 end

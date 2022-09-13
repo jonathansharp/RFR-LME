@@ -1,7 +1,7 @@
 % Import ECCO2 SSS
-function SSS = import_SSS_ECCO(lat,lon,ocean_mask)
+function SSS = import_SSS_ECCO(lat,lon,ocean_mask,path)
 
-load('Data/ECCO_SSS.mat','ECCO_SSS');
+load([path '/Data/ECCO_SSS.mat'],'ECCO_SSS');
 
 % Format latitude and longitude
 ECCO_SSS.latitude = repmat(ECCO_SSS.lat',size(ECCO_SSS.sss_mon,1),1,size(ECCO_SSS.sss_mon,3));
@@ -24,10 +24,12 @@ for t = 1:length(ECCO_SSS.year_mon)
     sss_tmp = ECCO_SSS.sss_mon(:,:,t);
     % Create interpolant over than range
     interp = scatteredInterpolant(lon_tmp(idx),lat_tmp(idx),sss_tmp(idx));
-    % Index where SSS is nan but ocean mask is true
-    idx = isnan(ECCO_SSS.sss_mon(:,:,t)) & ocean_mask;
+    % Index where SSS is nan
+    idx = isnan(ECCO_SSS.sss_mon(:,:,t));
     % Fill that area with interpolated SSS
     sss_tmp(idx) = interp(lon_tmp(idx),lat_tmp(idx));
+    % Remove values outside of ocean mask
+    sss_tmp(~ocean_mask) = NaN;
     ECCO_SSS.sss_mon(:,:,t) = sss_tmp;
 end
 

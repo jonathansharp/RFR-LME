@@ -1,7 +1,7 @@
 % Import OISSTv2
-function SST = import_SST_OISST(lat,lon,ocean_mask)
+function SST = import_SST_OISST(lat,lon,ocean_mask,path)
 
-load('Data/OISSTv2.mat','OISST');
+load([path '/Data/OISSTv2.mat'],'OISST');
 
 % Format latitude and longitude
 OISST.latitude = repmat(OISST.lat',size(OISST.sst_mon,1),1,size(OISST.sst_mon,3));
@@ -25,9 +25,11 @@ for t = 1:length(OISST.year_mon)
     % Create interpolant over than range
     interp = scatteredInterpolant(lon_tmp(idx),lat_tmp(idx),sst_tmp(idx));
     % Index where SST is nan but ocean mask is true
-    idx = isnan(OISST.sst_mon(:,:,t)) & ocean_mask;
+    idx = isnan(OISST.sst_mon(:,:,t));
     % Fill that area with interpolated SST
     sst_tmp(idx) = interp(lon_tmp(idx),lat_tmp(idx));
+    % Remove values outside of ocean mask
+    sst_tmp(~ocean_mask) = NaN;
     OISST.sst_mon(:,:,t) = sst_tmp;
 end
 

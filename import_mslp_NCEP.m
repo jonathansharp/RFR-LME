@@ -1,7 +1,7 @@
 % Import NCEP atmospheric pressure
-function mslp = import_Pres_NCEP(lat,lon,month)
+function mslp = import_Pres_NCEP(lat,lon,month,ocean_mask,path)
 
-load('Data/NCEP.mat','NCEP');
+load([path '/Data/NCEP.mat'],'NCEP');
 
 % Format latitude and longitude
 NCEP.latitude = repmat(NCEP.lat',size(NCEP.mslp,1),1);
@@ -22,5 +22,11 @@ end
 % Convert Pascals to Atmospheres
 mslp = mslp./101325;
 
+% Remove values outside of ocean mask
+for t = 1:length(month)
+    mslp_tmp = mslp(:,:,t);
+    mslp_tmp(~ocean_mask) = NaN;
+    mslp(:,:,t) = mslp_tmp;
+end
 
 end
