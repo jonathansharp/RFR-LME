@@ -18,4 +18,4 @@ SOCAT.(char(region(n))).fCO2_src = fCO2rec_src;
 SOCAT.(char(region(n))).flag = QC_Flag;
 
 % Clean up
-clearvars -except SOCAT region n
+clearvars -except SOCAT SOCAT_grid region n
