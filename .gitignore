@@ -1,8 +1,5 @@
 
-Data/*
+Data/global/*
 SOCATv2022/*
 Data_Import/*
-.DS_Store
-gridded_pco2.mat
-gridded_predictors.mat
 .DS_Store
