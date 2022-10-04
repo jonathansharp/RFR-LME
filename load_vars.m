@@ -1,16 +1,13 @@
 % Load Variables
 % 
-% This script grids loads satellite variables for five US large Marine
-% Ecosystems (Alaska, California Current, Insular Pacific / Hawaii, Gulf of
-% Mexico / Caribbean, and US East Coast) and regrids them in preparation
-% for clustering and machine learning algorithm fits.
+% This script loads satellite and reanalysis variables for five US large
+% Marine Ecosystems (Alaska, California Current, Insular Pacific / Hawaii,
+% Gulf of Mexico / Caribbean, and US East Coast) and regrids them in
+% preparation for clustering and machine learning algorithm fits.
 % 
 % Written by J.D. Sharp: 8/19/22
 % Last updated by J.D. Sharp: 8/30/22
 % 
-
-% load gridded pCO2 if necessary
-if ~exist('SOCAT_grid','var'); load('gridded_pco2','SOCAT_grid'); end
 
 % define regions of interest
 region = {'CCS' 'AK' 'EastCoast' 'GoM_Car' 'Hawaii'};
@@ -20,10 +17,13 @@ path = pwd;
 
 for n = 1:length(region)
 
+    %% load gridded pCO2
+    load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
+
     %% display status
     disp(['Loading predictor variables (' region{n} ')']);
 
-    %% Duplicate SOCAT grid
+    %% Duplicate SOCAT grid for predictors grid
     Preds_grid.(region{n}).lon = SOCAT_grid.(region{n}).lon;
     Preds_grid.(region{n}).lat = SOCAT_grid.(region{n}).lat;
     Preds_grid.(region{n}).lim = SOCAT_grid.(region{n}).lim;
@@ -86,6 +86,7 @@ for n = 1:length(region)
                         Preds_grid.(region{n}).lon,...
                         Preds_grid.(region{n}).month,...
                         Preds_grid.(region{n}).ocean_mask,path);
+    Preds_grid.(region{n}).CHL(Preds_grid.(region{n}).CHL< 0) = 0.0001;
 
     % test plot
     plot_temporal_mean(Preds_grid.(region{n}).lim,...
@@ -160,7 +161,8 @@ for n = 1:length(region)
         Preds_grid.(region{n}).lon,Preds_grid.(region{n}).pCO2_atm,...
         369.5,390.5,21,'pCO2_atm','Atmospheric pCO_{2} (\muatm)',region{n});
 
-end
+    % Save gridded predictor data
+    save(['Data/' region{n} '/gridded_predictors'],'Preds_grid','-v7.3');
+    clearvars -except region path
 
-% Save gridded predictor data for all LMEs
-save('gridded_predictors','Preds_grid','-v7.3');
+end

@@ -6,7 +6,7 @@
 % extractions from SOCATv2022 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/22
-% Last updated by J.D. Sharp: 8/23/22
+% Last updated by J.D. Sharp: 9/15/22
 
 % define regions of interest
 region = {'CCS' 'AK' 'EastCoast' 'GoM_Car' 'Hawaii'};
@@ -82,7 +82,8 @@ for n = 1:length(region)
     clear time
 
     % save figure
-    exportgraphics(gcf,['Figures/' region{n} '_hist.png']);
+    if ~isfolder(['Figures/' region{n}]); mkdir(['Figures/' region{n}]); end
+    exportgraphics(gcf,['Figures/' region{n} '/hist.png']);
     close
     
     %% display status
@@ -288,7 +289,8 @@ for n = 1:length(region)
     cbarrow('up');
 
     % save figure
-    exportgraphics(gcf,['Figures/' region{n} '_obs.png']);
+    if ~isfolder(['Figures/' region{n}]); mkdir(['Figures/' region{n}]); end
+    exportgraphics(gcf,['Figures/' region{n} '/obs.png']);
     close
 
     % clean up
@@ -306,7 +308,7 @@ for n = 1:length(region)
         squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
     SOCAT_grid.(region{n}).fco2_dom_mean(SOCAT_grid.(region{n}).fco2_dom_mean == 0) = NaN;
     % Fit trend to area weighted domain mean
-    [yf,yr,x] = leastsq(SOCAT_grid.(region{n}).month,...
+    [yf,yr,x] = leastsq2(SOCAT_grid.(region{n}).month,...
         SOCAT_grid.(region{n}).fco2_dom_mean,0,0,0);
     % Remove difference from mean for each month
     for m = 1:length(SOCAT_grid.(region{n}).month)
@@ -341,15 +343,16 @@ for n = 1:length(region)
     cbarrow;
 
     % save figure
-    exportgraphics(gcf,['Figures/' region{n} '_pCO2.png']);
+    if ~isfolder(['Figures/' region{n}]); mkdir(['Figures/' region{n}]); end
+    exportgraphics(gcf,['Figures/' region{n} '/fCO2.png']);
     close
 
     % clean up
     clear land c mycolormap
 
+    % Save gridded pco2 data
+    if ~isfolder(['Data/' region{n}]); mkdir(['Data/' region{n}]); end
+    save(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid','-v7.3');
+    clearvars -except region
+
 end
-
-% Save gridded pco2 data for all LMEs
-save('gridded_pco2','SOCAT_grid','-v7.3');
-
-clear n m x yf yr area_weights

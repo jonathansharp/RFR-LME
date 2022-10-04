@@ -43,5 +43,6 @@ c.Label.String = 'Groups';
 c.TickLength = 0;
 
 % save figure
-exportgraphics(gcf,['Figures/' reg '_SOM.png']);
-close
+if ~isfolder(['Figures/' reg]); mkdir(['Figures/' reg]); end
+exportgraphics(gcf,['Figures/' reg '/SOM.png']);
+close all

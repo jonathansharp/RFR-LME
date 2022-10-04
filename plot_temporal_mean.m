@@ -1,4 +1,9 @@
 % Plot temporal mean of spatial surface variable
+% 
+% Written by J.D. Sharp: 8/24/22
+% Last updated by J.D. Sharp: 9/15/22
+% 
+
 function plot_temporal_mean(lim,dim,lat,lon,z,zmin,zmax,lev,varname,lab,reg)
 
 figure('visible','off'); worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
@@ -13,5 +18,6 @@ c.Label.String = lab;
 cbarrow;
 
 % save figure
-exportgraphics(gcf,['Figures/' reg '_' varname '.png']);
+if ~isfolder(['Figures/' reg]); mkdir(['Figures/' reg]); end
+exportgraphics(gcf,['Figures/' reg '/' varname '.png']);
 close

@@ -1,17 +1,22 @@
-function [nn,err,rmse,r2,Y_fit,delta] = ...
-    fit_nn(X_mod,Y_mod,idx_vars,idx_group)
+% Fit Neural Network Algorithm
+% 
+% Written by J.D. Sharp: 8/30/22
+% Last updated by J.D. Sharp: 9/15/22
+% 
+
+function [nn,err,rmse,r2,Y_fit,delta] = fit_nn(X_mod,Y_mod,idx_vars,idx_group,size1,size2)
 
 % set training function
 trainFcn = 'trainlm';  % Levenberg-Marquardt backpropagation
 
-% set hidden layer sizes
-size1 = [20 15 10];
-size2 = [10 15 20];
-
 % pre-allocate error stats
-err = nan(max(idx_group),length(size1));
-rmse = nan(max(idx_group),length(size1));
-r2 = nan(max(idx_group),length(size1));
+err = nan(max(idx_group),length(size1)+1);
+rmse = nan(max(idx_group),length(size1)+1);
+r2 = nan(max(idx_group),length(size1)+1);
+
+% pre-allocate test pco2s and deltas
+Y_fit.all = nan(size(Y_mod));
+delta.all = nan(size(Y_mod));
 
 % for each cluster
 for c = 1:max(idx_group)
@@ -24,8 +29,8 @@ for c = 1:max(idx_group)
     Y_temp = Y_mod(idx_group==c);
 
     % pre-allocate test vectors
-    Y_fit.(clab) = nan(sz,length(size1));
-    delta.(clab) = nan(sz,length(size1));
+    Y_fit.(clab) = nan(length(Y_temp),length(size1)+1);
+    delta.(clab) = nan(length(Y_temp),length(size1)+1);
 
     % for each architecture
     for a = 1:length(size1)
@@ -45,6 +50,7 @@ for c = 1:max(idx_group)
         net.(clab).(alab).trainParam.max_fail = 6; % default: 6
         net.(clab).(alab).trainParam.mu_max = 1e10; % default: 1e10
         net.(clab).(alab).trainParam.min_grad = 1e-7; % default: 1e-7
+        net.(clab).(alab).trainParam.showWindow = 0;
     
         % set up cross-validation
         numFolds = 5;
@@ -89,13 +95,17 @@ for c = 1:max(idx_group)
     end
 
     % average each architecture
-    Y_fit.(clab)(:,a+1) = mean(Y_fit.(clab),2);
-    delta.(clab)(:,a+1) = mean(delta.(clab),2);
+    Y_fit.(clab)(:,a+1) = mean(Y_fit.(clab)(:,1:a),2);
+    delta.(clab)(:,a+1) = mean(delta.(clab)(:,1:a),2);
 
     % save network error statistics
-    err(c,a+1) = mean(delta.(clab)(:,a+1));
-    rmse(c,a+1) = sqrt(mean(delta.(clab)(:,a+1).^2));
+    err(c,a+1) = mean(delta.(clab)(:,a+1),1);
+    rmse(c,a+1) = sqrt(mean(delta.(clab)(:,a+1).^2,1));
     r2(c,a+1) = corr(Y_fit.(clab)(:,a+1),Y_temp).^2;
+
+    % save fitted values and errors across clusters
+    Y_fit.all(idx_group==c) = Y_fit.(clab)(:,a+1);
+    delta.all(idx_group==c) = delta.(clab)(:,a+1);
 
 end
 

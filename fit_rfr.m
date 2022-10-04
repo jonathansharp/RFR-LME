@@ -1,15 +1,20 @@
-function [rfr,err,rmse,r2,Y_fit,delta] = ...
-    fit_rfr(X_mod,Y_mod,idx_vars,idx_group,headers)
+% Fit Random Forest Regression
+% 
+% Written by J.D. Sharp: 9/2/22
+% Last updated by J.D. Sharp: 9/15/22
+% 
 
-% set parameters for random forest
-nTrees = 20;
-minLeafSize = 5;
-numpredictors = 6;
+function [rfr,err,rmse,r2,Y_fit,delta] = fit_rfr(X_mod,Y_mod,idx_vars,...
+    idx_group,headers,nTrees,minLeafSize,numpredictors)
 
 % pre-allocate error stats
 err = nan(max(idx_group),1);
 rmse = nan(max(idx_group),1);
 r2 = nan(max(idx_group),1);
+
+% pre-allocate test pco2s and deltas
+Y_fit.all = nan(size(Y_mod));
+delta.all = nan(size(Y_mod));
 
 % for each cluster
 for c = 1:max(idx_group)
@@ -27,8 +32,8 @@ for c = 1:max(idx_group)
         ints = randperm(length(Y_temp))';
 
         % pre-allocate
-        Y_fit.(clab) = nan(sz,1);
-        delta.(clab) = nan(sz,1);
+        Y_fit.(clab) = nan(size(Y_temp));
+        delta.(clab) = nan(size(Y_temp));
 
         % for each fold
         for f = 1:numFolds
@@ -63,26 +68,36 @@ for c = 1:max(idx_group)
         rmse(c) = sqrt(mean(delta.(clab).^2));
         r2(c) = corr(Y_fit.(clab),Y_temp).^2;
 
+        % save fitted values and errors across clusters
+        Y_fit.all(idx_group==c) = Y_fit.(clab);
+        delta.all(idx_group==c) = delta.(clab);
+
         % construct random forest with all data
         rfr.(clab) = ...
             TreeBagger(nTrees,X_temp,Y_temp,'Method','regression',...
                 'OOBPrediction','on','OOBPredictorImportance','on');
 
-        % Plot Out-of-Bag MSE based on tree number
-        figure;
-        plot(sqrt(oobError(rfr.(clab))),'k','LineWidth',2);
-        xlabel('Number of Grown Trees');
-        ylabel('Out-of-Bag Root Mean Squared Error');
-        
-        % Plot importance of each predictor
-        figure;
-        set(gcf,'units','normalized','outerposition',[0 0 0.5 0.5]);
-        set(gca,'fontsize',22);
-        bar(rfr.(clab).OOBPermutedPredictorDeltaError,'k');
-        set(gca,'fontsize',16);
-        xlabel('Predictors');
-        ylabel('Out-of-Bag Feature Importance');
-        xticklabels(headers(idx_vars));
+%         % Plot Out-of-Bag MSE based on tree number
+%         figure;
+%         plot(sqrt(oobError(rfr.(clab))),'k','LineWidth',2);
+%         xlabel('Number of Grown Trees');
+%         ylabel('Out-of-Bag Root Mean Squared Error');
+%         % save figure
+%         exportgraphics(gcf,['Figures/rfr_validate/' region{n} '_' clab '_OOB_RMSE.png']);
+%         close
+%         
+%         % Plot importance of each predictor
+%         figure;
+%         set(gcf,'units','normalized','outerposition',[0 0 0.5 0.5]);
+%         set(gca,'fontsize',22);
+%         bar(rfr.(clab).OOBPermutedPredictorDeltaError,'k');
+%         set(gca,'fontsize',16);
+%         xlabel('Predictors');
+%         ylabel('Out-of-Bag Feature Importance');
+%         xticklabels(headers(idx_vars));
+%         % export figure
+%         exportgraphics(gcf,['Figures/rfr_validate/' region{n} '_' clab '_Pred_Imp.png']);
+%         close
 
 end
 
