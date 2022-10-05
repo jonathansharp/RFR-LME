@@ -1,6 +1,5 @@
-
-Data/global/*
-Data/LMEs/*
+.DS_Store
+Data/*
 SOCATv2022/*
 Data_Import/*
-.DS_Store
+
