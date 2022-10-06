@@ -1,7 +1,7 @@
 % Obtain bathymetry from ETOPO2
 function Bathy = import_Bathy_ETOPO2(lat,lon,ocean_mask,path)
 
-load([path '/Data/ETOPO2.mat'],'ETOPO2');
+load([path '/Data/global/ETOPO2.mat'],'ETOPO2');
 
 % Convert longitude
 ETOPO2.lon = convert_lon(ETOPO2.lon);
