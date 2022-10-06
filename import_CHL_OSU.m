@@ -1,7 +1,7 @@
-% Import CHL
+% Import CHL (OSU)
 function Chlor_a = import_CHL_OSU(lat,lon,month,ocean_mask,path)
 
-load([path '/Data/CHL.mat'],'CHL');
+load([path '/Data/global/CHL_OSU.mat'],'CHL');
 
 % Convert longitude
 CHL.lon = convert_lon(CHL.lon);
