@@ -1,5 +1,9 @@
 .DS_Store
 Data/*
+Data_old/*
 SOCATv2022/*
 Data_Import/*
-
+Figures/*
+Figures_old/*
+ESPER-main/*
+CO2-System-Extd-main/*

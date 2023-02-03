@@ -69,7 +69,3 @@ for t = 1:length(month)
 end
 
 end
-
-
-
-
