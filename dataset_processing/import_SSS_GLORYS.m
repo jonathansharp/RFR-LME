@@ -1,7 +1,7 @@
 % Obtain mixed layer depth from GLORYS reanalysis
 function Salinity = import_SSS_GLORYS(lat,lon,month,ocean_mask,path)
 
-load([path '/Data/global/SSS_GLORYS.mat'],'SSS');
+load([path '/data_to_use/SSS_GLORYS.mat'],'SSS');
 
 % Convert longitude
 SSS.lon = convert_lon(SSS.lon);

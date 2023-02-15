@@ -1,7 +1,7 @@
 % Import CHL (NASA)
 function Chlor_a = import_CHL_NASA(lat,lon,month,ocean_mask,path)
 
-load([path '/Data/global/CHL_NASA.mat'],'CHL');
+load([path '/data_to_use/CHL_NASA.mat'],'CHL');
 
 % Convert longitude
 CHL.lon = convert_lon(CHL.lon);

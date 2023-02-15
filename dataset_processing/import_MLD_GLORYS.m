@@ -1,7 +1,7 @@
 % Obtain mixed layer depth from GLORYS reanalysis
 function Mixed_Layer = import_MLD_GLORYS(lat,lon,month,ocean_mask,path)
 
-load([path '/Data/global/MLD_GLORYS.mat'],'MLD');
+load([path '/data_to_use/MLD_GLORYS.mat'],'MLD');
 
 % Convert longitude
 MLD.lon = convert_lon(MLD.lon);

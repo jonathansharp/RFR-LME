@@ -2,7 +2,7 @@
 function pCO2_atm = import_pCO2_MBL(lat,lon,month,SSS,SST,mslp,ocean_mask,path)
 
 % Open and scan file
-file = fopen([path '/Data/global/MBL_1998_2020.txt']);
+file = fopen([path '/data_to_use/MBL_1998_2020.txt']);
 NOAA_MBL = textscan(file,'%f','Delimiter',',','CommentStyle','#');
 fclose(file);
 

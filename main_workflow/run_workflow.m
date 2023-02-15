@@ -6,23 +6,23 @@ cd /raid/sharp/matlab/US-LMES
 
 % this script loads SOCAT fCO2 and ancillary data surrounding North
 % American extracted from the SOCATv2022 database
-% load_socat % ***DONE FOR NOW***
+load_socat
 
 % this script grids fCO2 observations from the SOCAT database into grid
 % cells of resolution: 0.25 deg lat x 0.25 deg lon x 1 month
-% grid_socat % ***DONE FOR NOW***
+grid_socat
 
 % this script extracts each of eleven LMEs from the gridded data
 % surrounding North America
-% extract_lme % ***DONE FOR NOW***
+extract_lme
 
 % this script loads gridded satellite, model, and reanalysis variables and
 % re-grids them to match the size of the fCO2 grids
-% load_vars % ***DONE FOR NOW***
+load_vars
 
 % this script defines predictors variables for algorithm training as X and
 % the target variable for algorithm training (i.e. fCO2) as Y
-define_x_y % ***DONE FOR NOW***
+define_x_y
 
 % Procedure to test and optimize GMM cluster parameters
 % GMM_test

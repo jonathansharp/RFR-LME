@@ -1,7 +1,7 @@
 % Import CMEMS SSH
 function SSH = import_SSH_CMEMS(lat,lon,ocean_mask,path)
 
-load([path '/Data/global/CMEMS_SSH.mat'],'CMEMS_SSH');
+load([path '/data_to_use/CMEMS_SSH.mat'],'CMEMS_SSH');
 
 % Format latitude and longitude
 CMEMS_SSH.latitude = repmat(CMEMS_SSH.lat',size(CMEMS_SSH.sla_mon,1),1,size(CMEMS_SSH.sla_mon,3));

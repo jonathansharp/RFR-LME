@@ -1,7 +1,7 @@
 % Import ECCO2 SSH
 function SSH = import_SSH_ECCO(lat,lon,ocean_mask,path)
 
-load([path '/Data/global/ECCO_SSH.mat'],'ECCO_SSH');
+load([path '/data_to_use/ECCO_SSH.mat'],'ECCO_SSH');
 
 % Format latitude and longitude
 ECCO_SSH.latitude = repmat(ECCO_SSH.lat',size(ECCO_SSH.ssh_mon,1),1,size(ECCO_SSH.ssh_mon,3));

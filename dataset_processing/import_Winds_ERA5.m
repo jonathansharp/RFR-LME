@@ -1,7 +1,7 @@
 % Import ERA5 Winds
 function Wind_Speed = import_Winds_ERA5(lat,lon,month,ocean_mask,path)
 
-load([path '/Data/global/ERA5.mat'],'ERA5');
+load([path '/data_to_use/ERA5.mat'],'ERA5');
 
 % Format latitude and longitude
 ERA5.latitude = repmat(ERA5.lat',size(ERA5.speed,1),1,size(ERA5.speed,3));

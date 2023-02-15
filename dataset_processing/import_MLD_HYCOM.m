@@ -1,7 +1,7 @@
 % Obtain mixed layer depth from HYCOM model
 function Mixed_Layer = import_MLD_HYCOM(lat,lon,month,ocean_mask,path)
 
-load([path '/Data/global/MLD_HYCOM.mat'],'MLD');
+load([path '/data_to_use/MLD_HYCOM.mat'],'MLD');
 
 % Convert longitude
 MLD.lon = convert_lon(MLD.lon);

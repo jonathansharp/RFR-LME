@@ -1,7 +1,7 @@
 % Import Ice Concentration
 function IceC = import_Ice_OISST(lat,lon,ocean_mask,path)
 
-load([path '/Data/global/OISST_ice.mat'],'OISST_ice');
+load([path '/data_to_use/OISST_ice.mat'],'OISST_ice');
 
 % Format latitude and longitude
 OISST_ice.latitude = repmat(OISST_ice.lat',size(OISST_ice.icec_mon,1),1,size(OISST_ice.icec_mon,3));

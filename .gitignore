@@ -8,3 +8,7 @@ Figures_old/*
 ESPER-main/*
 CO2-System-Extd-main/*
 defunct/*
+data_to_use/MBL_1998_2020.txt
+data_to_use/*.shp
+data_to_use/*.nc
+data_to_use/*.mat

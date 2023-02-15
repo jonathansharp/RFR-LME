@@ -1,7 +1,7 @@
 % Import OISSTv2
 function SST = import_SST_OISST(lat,lon,ocean_mask,path)
 
-load([path '/Data/global/OISSTv2.mat'],'OISST');
+load([path '/data_to_use/OISSTv2.mat'],'OISST');
 
 % Format latitude and longitude
 OISST.latitude = repmat(OISST.lat',size(OISST.sst_mon,1),1,size(OISST.sst_mon,3));
