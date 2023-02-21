@@ -7,6 +7,7 @@
 % 
 % Written by J.D. Sharp: 7/26/22
 % Last updated by J.D. Sharp: 11/15/22
+% 
 
 %% load SOCAT structure
 if ~exist('SOCAT','var')
@@ -151,7 +152,7 @@ SOCAT_grid.area_km2 = ...
     111.320.*cosd(repmat(SOCAT_grid.lat',SOCAT_grid.dim.x,1))); % longitude distance
 
 %% Determine sea fraction of each grid cell
-load('Data/global/ETOPO2.mat','ETOPO2');
+load('data_to_use/ETOPO2.mat','ETOPO2');
 ETOPO2.lon = convert_lon(ETOPO2.lon);
 %     % limit to LME in question
 %     lonidx = ETOPO2.lon >= SOCAT_grid.lim.lonmin - 360 & ...

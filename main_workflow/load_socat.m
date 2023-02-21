@@ -6,6 +6,7 @@
 % 
 % Written by J.D. Sharp: 7/26/22
 % Last updated by J.D. Sharp: 1/9/23
+% 
 
 %% display status
 disp('Downloading SOCAT Data');

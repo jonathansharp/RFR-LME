@@ -89,8 +89,8 @@ for n = 1:length(region)
                             Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
                             Preds_grid.(region{n}).month_of_year,...
                             idx_clust_temp,...
-                            num_groups(n,en),strat,options,Sigma{n},...
-                            SharedCovariance{n},RegularizationValue,region{n});
+                            num_groups(n,en),strat,options,Sigma,...
+                            SharedCovariance,RegularizationValue,region{n});
                     done = 1; % successful cluster
                 catch
                     rng(randi(100)) % reset random seed and try again if there's an error
@@ -127,18 +127,23 @@ for n = 1:length(region)
         clear vars idx_vars idx_clust clust_temp idx_clust_temp
 
         %% Plot groups on map
-        figure('visible','off');
+        figure('visible','on');
         worldmap([min(Preds_grid.(region{n}).lat) max(Preds_grid.(region{n}).lat)],...
             [min(Preds_grid.(region{n}).lon) max(Preds_grid.(region{n}).lon)]);
         pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
             mode(Clusts_grid.(region{n}).groups,3)');
+        pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
+            mode(Clusts_grid.(region{n}).probabilities.c3,3)');
         colormap(jet(levs));
+        % colormap([rgb('red');rgb('green');rgb('blue')]);
+        % colormap(customcolormap([0 1],[rgb('blue'); 1 1 1]))
         % title('Most frequent cluster');
         plot_land('map');
         c=colorbar;
         caxis([0.5 levs+0.5]);
         c.Label.String = 'Cluster';
         c.TickLength = 0;
+        % c.Ticks = [1 2 3];
         
         % save figure
         if ~isfolder('Figures'); mkdir('Figures'); end

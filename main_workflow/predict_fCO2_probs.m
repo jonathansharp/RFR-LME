@@ -8,10 +8,7 @@
 % Last updated by J.D. Sharp: 2/2/22
 % 
 
-% this script defines the bounds of the eighteen LMEs
-define_regions
-
-for n = 2:length(region)
+for n = 1:length(region)
 
     %% display status
     disp(['Predicting fCO2 (' region{n} ')']);
@@ -48,7 +45,7 @@ for n = 2:length(region)
     clear Clusts_grid Mods temp_rfr temp_nn c
 
     % average RFR result across clusters
-    fco2_rfr = sum(fco2_rfr_tmp.*fco2_gmm_probs,2);
+    fco2_rfr = sum(fco2_rfr_tmp.*fco2_gmm_probs,2,'omitnan');
 
     % clean up
     clear fco2_rfr_tmp fco2_gmm_probs fco2_nn_temp fco2_nn
@@ -75,6 +72,11 @@ for n = 2:length(region)
         OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
         OAI_grid.(region{n}).lon,OAI_grid.(region{n}).fCO2,...
         parula(20),'fCO2','Surface {\itf}CO_{2} (\muatm)',region{n});
+    plot_regional_gif(OAI_grid.(region{n}).lim,...
+        OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+        OAI_grid.(region{n}).fCO2,parula(20),'fCO2',...
+        'Surface {\itf}CO_{2} (\muatm)',OAI_grid.(region{n}).year,...
+        OAI_grid.(region{n}).month_of_year,region{n});
 
     %% save estimated fCO2 grid
     save(['Data/' region{n} '/ML_fCO2'],'OAI_grid','-v7.3');

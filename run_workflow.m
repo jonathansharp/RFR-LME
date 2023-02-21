@@ -4,25 +4,28 @@
 % navigate to correct directory
 cd /raid/sharp/matlab/US-LMES
 
+% this script defines the bounds of the eighteen LMEs
+define_regions
+
 % this script loads SOCAT fCO2 and ancillary data surrounding North
 % American extracted from the SOCATv2022 database
-load_socat
+% load_socat
 
 % this script grids fCO2 observations from the SOCAT database into grid
 % cells of resolution: 0.25 deg lat x 0.25 deg lon x 1 month
-grid_socat
+% grid_socat
 
 % this script extracts each of eleven LMEs from the gridded data
 % surrounding North America
-extract_lme
+% extract_lme
 
 % this script loads gridded satellite, model, and reanalysis variables and
 % re-grids them to match the size of the fCO2 grids
-load_vars
+% load_vars
 
 % this script defines predictors variables for algorithm training as X and
 % the target variable for algorithm training (i.e. fCO2) as Y
-define_x_y
+% define_x_y
 
 % Procedure to test and optimize GMM cluster parameters
 % GMM_test
@@ -46,7 +49,7 @@ log_errs
 
 % this script applies the machine learning algorithms within each cluster
 % to produce fCO2 estimates on the original grids
-predict_fco2_probs
+predict_fCO2_probs
 
 % this script applies the ESPER algorithm to produce TA estimates within
 % each LME, then uses fCO2 and TA to calculate OA indicators within each
@@ -58,7 +61,6 @@ OA_summary_stats
 
 % create netCDF files
 matlab_to_netcdf
-
 
 % close matlab
 exit

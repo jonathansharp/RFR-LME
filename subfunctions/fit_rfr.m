@@ -4,14 +4,15 @@
 % Last updated by J.D. Sharp: 9/15/22
 % 
 
-function [rfr,err,rmse,mae,r2,Y_fit,delta,pred_imp] = fit_rfr(X_mod,Y_mod,idx_vars,...
-    idx_group,headers,nTrees,minLeafSize,numpredictors,region)
+function [rfr,avg_err,med_err,rmse,mae,r2,Y_fit,delta,pred_imp] = fit_rfr(X_mod,Y_mod,idx_vars,...
+    idx_group,idx_probs,headers,nTrees,minLeafSize,numpredictors,num_groups,region)
 
 % pre-allocate error stats
-err = nan(max(idx_group),1);
-rmse = nan(max(idx_group),1);
-mae = nan(max(idx_group),1);
-r2 = nan(max(idx_group),1);
+avg_err = nan(num_groups,1);
+med_err = nan(num_groups,1);
+rmse = nan(num_groups,1);
+mae = nan(num_groups,1);
+r2 = nan(num_groups,1);
 
 % pre-allocate test pco2s and deltas
 Y_fit.all = nan(size(Y_mod));
@@ -19,7 +20,7 @@ delta.all = nan(size(Y_mod));
 pred_imp.all = nan(size(Y_mod));
 
 % for each cluster
-for c = 1:max(idx_group)
+for c = 1:num_groups
 
     %% prepare
 
@@ -27,7 +28,7 @@ for c = 1:max(idx_group)
     clab = ['c' num2str(c)];
 
     % cluster index
-    idx_clust = idx_group==c;
+    idx_clust = logical(idx_probs(:,c));
 
     if sum(idx_clust) > 40 % need at least 40 observations to fit model (arbitrary)
         
@@ -93,7 +94,8 @@ for c = 1:max(idx_group)
         end
     
         %% save network error statistics for each fold
-        err(c) = mean(delta.(clab));
+        avg_err(c) = mean(delta.(clab));
+        med_err(c) = median(delta.(clab));
         rmse(c) = sqrt(mean(delta.(clab).^2));
         mae(c) = median(abs(delta.(clab)));
         r2(c) = corr(Y_fit.(clab),Y_temp).^2;
@@ -138,7 +140,8 @@ for c = 1:max(idx_group)
         Y_fit.(clab) = nan;
         delta.(clab) = nan;
         pred_imp.(clab) = nan;
-        err(c) = nan;
+        avg_err(c) = nan;
+        med_err(c) = nan;
         rmse(c) = nan;
         mae(c) = nan;
         r2(c) = nan;
@@ -149,7 +152,8 @@ for c = 1:max(idx_group)
 end
 
 % save network error statistics across all clusters
-err(c+1) = mean(delta.all);
+avg_err(c+1) = mean(delta.all);
+med_err(c+1) = median(delta.all);
 rmse(c+1) = sqrt(mean(delta.all.^2));
 mae(c+1) = median(abs(delta.all));
 r2(c+1) = corr(Y_fit.all,Y_mod).^2;

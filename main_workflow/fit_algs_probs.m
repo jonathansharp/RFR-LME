@@ -4,7 +4,7 @@
 % prediction of sea surface fCO2 in various US LMEs.
 % 
 % Written by J.D. Sharp: 8/26/22
-% Last updated by J.D. Sharp: 2/2/23
+% Last updated by J.D. Sharp: 2/16/23
 % 
 
 for n = 1:length(region)
@@ -43,8 +43,15 @@ for n = 1:length(region)
         Vars_array.(region{n}).vars));
 
     %% define group indices
+    % pre-allocate
+    Vars_array.(region{n}).prob_group_mod = ...
+        nan(length(Vars_array.(region{n}).Y_mod),num_groups(n));
     Vars_array.(region{n}).idx_group_mod = ...
         Clusts_grid.(region{n}).groups(Preds_grid.(region{n}).idx_mod);
+    for c = 1:num_groups(n)
+        Vars_array.(region{n}).prob_group_mod(:,c) = ...
+            Clusts_grid.(region{n}).probabilities.(['c' num2str(c)])(Preds_grid.(region{n}).idx_mod) > 0.1;
+    end
 
 %     %% fit NNs
 %     rng(7); % for reproducibility
@@ -75,15 +82,16 @@ for n = 1:length(region)
 %     for lf = 1:length(minLeafSize)
     disp(['Fitting RFRs (' region{n} ')']);
     % fit model
-    [Mods.(region{n}).rfr,Val.(region{n}).err_rfr,...
+    [Mods.(region{n}).rfr,Val.(region{n}).avg_err_rfr,Val.(region{n}).med_err_rfr,...
      Val.(region{n}).rmse_rfr,Val.(region{n}).mae_rfr,Val.(region{n}).r2_rfr,...
      Val.(region{n}).Y_fit_rfr,Val.(region{n}).delta_rfr] = ...
         fit_rfr(Vars_array.(region{n}).X_mod,Vars_array.(region{n}).Y_mod,...
         Vars_array.(region{n}).idx_vars,Vars_array.(region{n}).idx_group_mod,...
-        Vars_array.(region{n}).headers,nTrees,minLeafSize,...
-        numpredictors,region{n});
+        Vars_array.(region{n}).prob_group_mod,Vars_array.(region{n}).headers,nTrees,minLeafSize,...
+        numpredictors,num_groups(n),region{n});
     % print error stats
-    disp(['Avg. Err. = ' num2str(round(Val.(region{n}).err_rfr(end),2))]);
+    disp(['Avg. Err. = ' num2str(round(Val.(region{n}).avg_err_rfr(end),2))]);
+    disp(['Med. Err. = ' num2str(round(Val.(region{n}).med_err_rfr(end),2))]);
     disp(['RMSE = ' num2str(round(Val.(region{n}).rmse_rfr(end),2))]);
     disp(['R2 = ' num2str(round(Val.(region{n}).r2_rfr(end),2))]);
 %     test_rmse(lf) = Mods.(region{n}).rmse_rfr(2);

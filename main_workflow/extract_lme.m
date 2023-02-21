@@ -7,10 +7,12 @@
 % 
 % Written by J.D. Sharp: 7/26/22
 % Last updated by J.D. Sharp: 11/30/22
+% 
 
-% this script defines the bounds of the eighteen LMEs
+%% this script defines the bounds of the eighteen LMEs
 define_regions
 
+%% extract each LME from large grid
 for n = 1:length(region)
 
     %% load SOCAT grid

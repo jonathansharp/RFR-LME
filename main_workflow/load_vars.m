@@ -9,12 +9,10 @@
 % Last updated by J.D. Sharp: 11/30/22
 % 
 
-% define path
+%% define path
 filepath = pwd;
 
-% this script defines the bounds of the eighteen LMEs
-define_regions
-
+%% load predictor variables for each LME
 for n = 1:length(region)
 
     %% load gridded pCO2

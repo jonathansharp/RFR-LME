@@ -11,7 +11,7 @@ region = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'HI' ...
 %% core LMEs
 
 % import LME bounds
-lme_shape = shaperead('Data/global/LME66/LMEs66.shp');
+lme_shape = shaperead('data_to_use/LMEs66.shp');
 
 % define regions according to numbers
 lme_idx.CCS = 10;
@@ -29,9 +29,9 @@ lme_idx.HI = 24;
 %% Pacific Island LMEs
 
 % import LME grid for US Pacific Islands
-lme_grid_is = ncread('Data/global/LME_Scott/mhw_lme_v4.nc','layer');
-lme_lon_is = ncread('Data/global/LME_Scott/mhw_lme_v4.nc','longitude');
-lme_lat_is = ncread('Data/global/LME_Scott/mhw_lme_v4.nc','latitude');
+lme_grid_is = ncread('data_to_use/mhw_lme_v4.nc','layer');
+lme_lon_is = ncread('data_to_use/mhw_lme_v4.nc','longitude');
+lme_lat_is = ncread('data_to_use/mhw_lme_v4.nc','latitude');
 
 % define US Pacific Island regions according to numbers
 lme_idx_is.AS = 5;

@@ -1,4 +1,5 @@
 .DS_Store
+*.asv
 Data/*
 Data_old/*
 SOCATv2022/*
@@ -12,3 +13,6 @@ data_to_use/MBL_1998_2020.txt
 data_to_use/*.shp
 data_to_use/*.nc
 data_to_use/*.mat
+CODAP_NA/*
+GLODAPv2.2022/*
+stn_locs/*

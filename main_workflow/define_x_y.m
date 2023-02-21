@@ -10,7 +10,7 @@
 % Last updated by J.D. Sharp: 1/27/22
 % 
 
-% this script defines the bounds of the eighteen LMEs
+%% this script defines the bounds of the eighteen LMEs
 define_regions
 
 for n = 1:length(region)
