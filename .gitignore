@@ -10,7 +10,13 @@ ESPER-main/*
 CO2-System-Extd-main/*
 defunct/*
 data_to_use/MBL_1998_2020.txt
+data_to_use/*.cpg
+data_to_use/*.dbf
+data_to_use/*.prj
+data_to_use/*.sbn
+data_to_use/*.sbx
 data_to_use/*.shp
+data_to_use/*.shx
 data_to_use/*.nc
 data_to_use/*.mat
 CODAP_NA/*
