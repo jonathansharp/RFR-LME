@@ -132,8 +132,8 @@ for n = 1:length(region)
             [min(Preds_grid.(region{n}).lon) max(Preds_grid.(region{n}).lon)]);
         pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
             mode(Clusts_grid.(region{n}).groups,3)');
-        pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
-            mode(Clusts_grid.(region{n}).probabilities.c3,3)');
+%         pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
+%             mode(Clusts_grid.(region{n}).probabilities.c3,3)');
         colormap(jet(levs));
         % colormap([rgb('red');rgb('green');rgb('blue')]);
         % colormap(customcolormap([0 1],[rgb('blue'); 1 1 1]))

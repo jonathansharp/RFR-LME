@@ -158,9 +158,12 @@ for n = 1:length(region)
     save(['Data/' region{n} '/variable_arrays'],'Vars_array','-v7.3');
 
     %% clean up
-    clear Mods Vars_array
+    clear Mods Val Vars_array
 
 end
+
+%% plot values across full domain if not testing
+if test_idx == 0
 
 %% plot gridded delta values across region
 cmap_type = 'cmocean';
@@ -181,3 +184,5 @@ plot_delta_mean_full(-1.25,21.25,cmap_type,cmap_name,cmap_segs,...
 
 %% plot delta values for each LME
 % fCO2_rfr_errors
+
+end
