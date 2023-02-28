@@ -34,7 +34,7 @@ for v = 1:length(Vars_pred)
 end
 
 %% Pre-allocate full grid of OA Indicators
-Vars_OA = {'fCO2' 'TA' 'uTA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
+Vars_OA = {'fCO2' 'DIC' 'TA' 'uTA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
 for v = 1:length(Vars_OA)
    US_LME_RFR.(Vars_OA{v}) = ...
        nan(US_LME_RFR.dim.x,US_LME_RFR.dim.y,US_LME_RFR.dim.z);
@@ -79,7 +79,7 @@ for n = 1:length(region)
 end
 
 %% save predictors as NetCDF
-filename = 'Data/US_LME_RFR_Preds.nc';
+filename = ['Data/US_LME_RFR_Preds_' date '.nc'];
 time = datenum([repmat(1998,US_LME_RFR.dim.z,1) US_LME_RFR.month, ...
     zeros(US_LME_RFR.dim.z,1)]);
 nccreate(filename,'Lon','Dimensions',{'Lon',US_LME_RFR.dim.x});
@@ -101,7 +101,7 @@ for v = 1:length(Vars_pred)
 end
 
 %% save OA indicators as NetCDF
-filename = 'Data/US_LME_RFR_Inds.nc';
+filename = ['Data/US_LME_RFR_Inds_' date '.nc'];
 time = datenum([repmat(1998,US_LME_RFR.dim.z,1) US_LME_RFR.month, ...
     zeros(US_LME_RFR.dim.z,1)]);
 nccreate(filename,'Lon','Dimensions',{'Lon',US_LME_RFR.dim.x});
@@ -119,10 +119,11 @@ for v = 1:length(Vars_OA)
 end
 
 %% plot for sanity
-% figure;
-% worldmap([US_LME_RFR.lim.latmin US_LME_RFR.lim.latmax],...
-%     [US_LME_RFR.lim.lonmin US_LME_RFR.lim.lonmax]);
-% pcolorm(US_LME_RFR.lat,US_LME_RFR.lon,mean(US_LME_RFR.fCO2,3)');
+figure;
+worldmap([US_LME_RFR.lim.latmin US_LME_RFR.lim.latmax],...
+    [US_LME_RFR.lim.lonmin US_LME_RFR.lim.lonmax]);
+pcolorm(US_LME_RFR.lat,US_LME_RFR.lon,mean(US_LME_RFR.fCO2,3,'omitnan')');
+close
 
 %% Clean up
 clear US_LME_RFR Vars_OA Vars_pred v n time filename

@@ -7,14 +7,17 @@ X_norm = normalize(X(:,idx_vars));
 % Fit GMM from predictor variables
 gmm = fitgmdist(X_norm,num_groups,...
     'CovarianceType',Sigma,...
-    'SharedCovariance',SharedCovariance,'Replicates',20,...
+    'SharedCovariance',SharedCovariance,'Replicates',50,...
     'Options',options,'RegularizationValue',RegularizationValue);
 [clusters,~,p] = cluster(gmm,X_norm);
 bic = gmm.BIC;
 % calculate silhouette score
 sil = silhouette(X_norm,clusters);
 % plot silhouette score
-silhouette(X_norm,clusters);
+silhouette(X_norm,clusters); hold on
+yL = ylim;
+plot([mean(sil) mean(sil)],[yL(1) yL(2)],'k--','linewidth',2);
+title(['Sigma = ' Sigma]);
 exportgraphics(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'])
 close
 

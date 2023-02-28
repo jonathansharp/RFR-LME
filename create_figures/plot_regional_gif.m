@@ -7,7 +7,7 @@
 function plot_regional_gif(lim,lat,lon,z,clrmp,varname,lab,year,month_of_year,reg)
 
 % initialize figure
-h=figure('visible','on');
+h=figure('visible','off');
 set(h,'color','white');
 box on; hold on;
 worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);

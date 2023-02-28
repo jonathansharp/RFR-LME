@@ -2,8 +2,9 @@
 % 'Hawaii' 'AmSamoa' 'Jarvis' 'LineIs' 'HowBak' 'Johnst' 'Wake' 'Guam'
 
 options = statset('MaxIter',1000,'Display','off');
-Sigma = 'full';
-SharedCovariance = false;
-num_groups = [6;10;2;2;2;4;2;6;3;3;2;1;1;4;1;1;1;1];
+Sigma = 'full'; % predictor variabes are correlated (a priori)
+SharedCovariance = false; % each cluster has unique covariance shape
+num_groups = [5;7;3;4;4;3;3;3;3;5;2;... % large regional clusters determined by examining RMSE, BIC, and silhouette scores
+    1;1;1;1;1;1;1]; % island regions all one cluster
 RegularizationValue = 0;
 test_idx = 0;

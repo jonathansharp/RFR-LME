@@ -5,7 +5,7 @@
 % US large Marine Ecosystems.
 % 
 % Written by J.D. Sharp: 9/15/22
-% Last updated by J.D. Sharp: 2/2/22
+% Last updated by J.D. Sharp: 2/23/22
 % 
 
 for n = 1:length(region)
@@ -66,6 +66,8 @@ for n = 1:length(region)
                         Preds_grid.(region{n}).dim.y,...
                         Preds_grid.(region{n}).dim.z);
     OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).idx_clust) = fco2_rfr;
+    % remove fCO2 where ice covers more than 50% of grid cell
+    OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).IceC > 0.5) = NaN;
 
     %% plot estimated fCO2
     plot_temporal_mean(OAI_grid.(region{n}).lim,...

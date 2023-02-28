@@ -5,7 +5,7 @@
 % algorithms via a self-organizing map method.
 % 
 % Written by J.D. Sharp: 8/26/22
-% Last updated by J.D. Sharp: 2/1/23
+% Last updated by J.D. Sharp: 2/27/23
 % 
 
 % cluster options:
@@ -47,6 +47,17 @@ for n = 1:length(region)
             clust_temp = Vars_array.(region{n}).X_clust_var;
             idx_clust_temp = Preds_grid.(region{n}).idx_clust_var;
         end
+        % determine covariance among cluster variables
+        [R,P] = corrcoef(clust_temp(:,idx_vars));
+        R = [R(1,2),R(1,3),R(2,3)];
+        P = [P(1,2),P(1,3),P(2,3)];
+        R_idx = P < 0.05;
+        if sum(R_idx) >= 2
+            Sigma = 'full';
+        else
+            Sigma = 'diagonal';
+        end
+        % plotmatrix(clust_temp(:,idx_vars));
         % obtain gridded group numbers
         rng(3); % for reproducibility
         if clust_opt == 1 % SOM

@@ -17,7 +17,7 @@ for n = 1:length(region)
 
     %% Set GMM options
     set_gmm_options % set baseline options
-    num_groups_vec = [1:20]; % test different group amounts
+    num_groups_vec = 1:20; % test different group amounts
     nGrp = length(num_groups_vec);
     test_idx = 1; % set index to test
 
@@ -53,17 +53,16 @@ for n = 1:length(region)
     end
     
     %% find number of groups for minimum SIL
-
-     Ri = find(RMSE==min(RMSE(:)));
-     Bi = find(BIC==min(BIC(:)));
-     Si = find(SIL==max(SIL(:)));
+    Ri = find(RMSE==min(RMSE(:)));
+    Bi = find(BIC==min(BIC(:)));
+    Si = find(SIL==max(SIL(:)));
 
 
     % plot RMSE
     figure; hold on;
     bar(num_groups_vec,RMSE);
     ylim([min(RMSE(:))-1 max(RMSE(:))+1]);
-    title('RMSE for various {\itk} Choices');
+    title(['RMSE for various {\itk} Choices (' Sigma ')']);
     xlabel('Number of Groups');
     ylabel('RMSE');
     text(3,max(BIC(:)),['Best: ' num2str(num_groups_vec(Ri))]);
@@ -73,7 +72,7 @@ for n = 1:length(region)
     % plot BIC
     figure; hold on;
     bar(num_groups_vec,BIC);
-    title('BIC for various {\itk} Choices');
+    title(['BIC for various {\itk} Choices (' Sigma ')']);
     % legend({'diagonal, shared' 'diagonal, unshared' 'full, shared' 'full, unshared'});
     xlabel('Number of Groups ({\itk})');
     ylabel('BIC');
@@ -84,7 +83,7 @@ for n = 1:length(region)
     % plot mean SIL
     figure; hold on;
     bar(num_groups_vec,SIL);
-    title('SIL for various {\itk} Choices');
+    title(['SIL for various {\itk} Choices (' Sigma ')']);
     % legend({'diagonal, shared' 'diagonal, unshared' 'full, shared' 'full, unshared'});
     xlabel('Number of Groups ({\itk})');
     ylabel('SIL');

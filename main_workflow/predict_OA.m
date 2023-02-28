@@ -18,6 +18,7 @@ for n = 1:length(region)
     %% load gridded fCO2, predictors, and models
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
+    load(['Data/' region{n} '/us_lme_model_evals'],'Val');
 
     %% predict TA (and nutrients) using ESPER
     % process ESPER predictors
@@ -32,16 +33,20 @@ for n = 1:length(region)
     tmp = Preds_grid.(region{n}).SST(Preds_grid.(region{n}).idxspc);
     % predict TA using ESPER-Mixed
     [data,u_data] = ESPER_Mixed([1 4 6],[lon lat depth],[sal tmp],[1 2],'Equations',8);
-    % pre-allocate TA and uTA
+    % pre-allocate TA and nutrients
     OAI_grid.(region{n}).TA = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).uTA = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).P = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).uP = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).Si = nan(size(Preds_grid.(region{n}).idxspc));
-    % add TA and uTA to OA grid
+    OAI_grid.(region{n}).uSi = nan(size(Preds_grid.(region{n}).idxspc));
+    % add TA and nutrients to OA grid
     OAI_grid.(region{n}).TA(Preds_grid.(region{n}).idxspc) = data.TA;
     OAI_grid.(region{n}).uTA(Preds_grid.(region{n}).idxspc) = u_data.TA;
-    OAI_grid.(region{n}).P(Preds_grid.(region{n}).idxspc) = data.phosphate;
+    OAI_grid.(region{n}).uP(Preds_grid.(region{n}).idxspc) = data.phosphate;
+    OAI_grid.(region{n}).P(Preds_grid.(region{n}).idxspc) = u_data.phosphate;
     OAI_grid.(region{n}).Si(Preds_grid.(region{n}).idxspc) = data.silicate;
+    OAI_grid.(region{n}).uSi(Preds_grid.(region{n}).idxspc) = u_data.silicate;
 
     %% plot estimated TA
     plot_temporal_mean(OAI_grid.(region{n}).lim,...
@@ -62,8 +67,18 @@ for n = 1:length(region)
 
     %% calculate other OA Indicators
     fCO2 = OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).idxspc);
+    fCO2_err = repmat(Val.(region{n}).rmse_rfr(end),size(fCO2));
     carb_system = CO2SYS(data.TA,fCO2,1,5,sal,tmp,NaN,1,NaN,...
         data.silicate,data.phosphate,0,0,1,10,1,2,2);
+    u_carb_system = errors(data.TA,fCO2,1,5,sal,tmp,NaN,1,NaN,...
+        data.silicate,data.phosphate,0,0,u_data.TA,fCO2_err,0,0,...
+        u_data.silicate,u_data.phosphate,0,0,'','',0,1,10,1,2,2);
+    % log fCO2 uncertainties
+    OAI_grid.(region{n}).ufCO2 = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).ufCO2(Preds_grid.(region{n}).idxspc) = fCO2_err;
+    % convert -999 to NaN
+    carb_system(carb_system==-999) = NaN;
+    u_carb_system(u_carb_system==-999) = NaN;
     % pre-allocate OA indicators
     OAI_grid.(region{n}).DIC = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).pH = nan(size(Preds_grid.(region{n}).idxspc));
@@ -80,12 +95,29 @@ for n = 1:length(region)
     OAI_grid.(region{n}).H(Preds_grid.(region{n}).idxspc) = 10.^-carb_system(:,3);
     OAI_grid.(region{n}).CO3(Preds_grid.(region{n}).idxspc) = carb_system(:,7);
     OAI_grid.(region{n}).RF(Preds_grid.(region{n}).idxspc) = carb_system(:,16);
+    % pre-allocate OA indicator uncertainties
+    OAI_grid.(region{n}).uDIC = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).upH = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).uOmA = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).uOmC = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).uH = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).uCO3 = nan(size(Preds_grid.(region{n}).idxspc));
+    OAI_grid.(region{n}).uRF = nan(size(Preds_grid.(region{n}).idxspc));
+    % add OA indicator uncertainties to OA grid
+    OAI_grid.(region{n}).uDIC(Preds_grid.(region{n}).idxspc) = u_carb_system(:,2);
+    OAI_grid.(region{n}).upH(Preds_grid.(region{n}).idxspc) = ... % pH ucertainty by adjusting pH by u[H+]
+        carb_system(:,3) + log10(10.^-carb_system(:,3)+(u_carb_system(:,3)./10^9));
+    OAI_grid.(region{n}).uOmA(Preds_grid.(region{n}).idxspc) = u_carb_system(:,11);
+    OAI_grid.(region{n}).uOmC(Preds_grid.(region{n}).idxspc) = u_carb_system(:,10);
+    OAI_grid.(region{n}).uH(Preds_grid.(region{n}).idxspc) = 10.^-u_carb_system(:,3);
+    OAI_grid.(region{n}).uCO3(Preds_grid.(region{n}).idxspc) = u_carb_system(:,7);
+    OAI_grid.(region{n}).uRF(Preds_grid.(region{n}).idxspc) = u_carb_system(:,9);
     
     %% plot estimated OA indicators
     plot_temporal_mean(OAI_grid.(region{n}).lim,...
         OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
         OAI_grid.(region{n}).lon,OAI_grid.(region{n}).DIC,...
-        flipud(jet(20)),'DIC','Dissolved Inorganic Carbon',region{n});
+        flipud(jet(20)),'DIC','Dissolved Inorganic Carbon (\mumol kg^{-1})',region{n});
     plot_temporal_mean(OAI_grid.(region{n}).lim,...
         OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
         OAI_grid.(region{n}).lon,OAI_grid.(region{n}).pH,...
@@ -110,23 +142,33 @@ for n = 1:length(region)
         OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
         OAI_grid.(region{n}).lon,OAI_grid.(region{n}).RF,...
         flipud(jet(28)),'RF','Surface RF',region{n});
-    plot_regional_gif(OAI_grid.(region{n}).lim,...
-        OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
-        OAI_grid.(region{n}).TA,cmocean('haline',24),'TA',...
-        'Surface {\itA}_{T} (\mumol kg^{-1})',OAI_grid.(region{n}).year,...
-        OAI_grid.(region{n}).month_of_year,region{n});
+%     plot_regional_gif(OAI_grid.(region{n}).lim,...
+%         OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+%         OAI_grid.(region{n}).TA,cmocean('haline',24),'TA',...
+%         'Surface {\itA}_{T} (\mumol kg^{-1})',OAI_grid.(region{n}).year,...
+%         OAI_grid.(region{n}).month_of_year,region{n});
+
+    %% plot estimated OA indicator uncertainties
+    plot_temporal_mean(OAI_grid.(region{n}).lim,...
+        OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
+        OAI_grid.(region{n}).lon,OAI_grid.(region{n}).uTA,...
+        flipud(jet(28)),'uTA','Surface TA Uncertainty (\mumol kg^{-1})',region{n});
+    plot_temporal_mean(OAI_grid.(region{n}).lim,...
+        OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
+        OAI_grid.(region{n}).lon,OAI_grid.(region{n}).upH,...
+        flipud(jet(28)),'upH','Surface pH Uncertainty',region{n});
 
     %% save estimated OA grid
     save(['Data/' region{n} '/ML_fCO2'],'OAI_grid','-v7.3');
 
     %% clean up
-    clear carb_system depth fCO2 lat lon OAI_grid Preds_grid sal TA tmp uTA
+    clear carb_system u_carb_system depth fCO2 lat lon OAI_grid Preds_grid sal TA tmp uTA
 
 end
 
 %% plot time series
-OA_time_series
 OA_summary_stats
+OA_time_series
 
 %% plot OA indicators across full region
 plot_temporal_mean_full(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
@@ -148,13 +190,13 @@ plot_full_gif(5,10,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx
 plot_full_gif(50,250,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
 plot_full_gif(8,16,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
 
-%% plot OA indicators across full region (seasonally)
-plot_temporal_mean_full_seas(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(7.9,8.2,0.02,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
-plot_temporal_mean_full_seas(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
- 
+% %% plot OA indicators across full region (seasonally)
+% plot_temporal_mean_full_seas(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(7.9,8.2,0.02,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
+% plot_temporal_mean_full_seas(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
+%  
