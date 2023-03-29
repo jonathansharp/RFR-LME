@@ -11,15 +11,15 @@ define_regions
 
 % this script loads SOCAT fCO2 and ancillary data surrounding North
 % America extracted from the SOCATv2022 database
-load_socat
+% load_socat
 
 % this script grids fCO2 observations from the SOCAT database into grid
 % cells of resolution: 0.25 deg lat x 0.25 deg lon x 1 month
-grid_socat
+% grid_socat
 
 % this script extracts each of eighteen LMEs from the gridded data
 % surrounding North America
-extract_lme
+% extract_lme
 
 % this script loads gridded satellite, model, and reanalysis variables and
 % re-grids them to match the size of the fCO2 grids
@@ -55,9 +55,6 @@ predict_fCO2_probs
 % each LME, then uses fCO2 and TA to calculate OA indicators within each
 % LME
 predict_OA
-
-% save summary statistics for each LME
-OA_summary_stats
 
 % create netCDF files
 matlab_to_netcdf

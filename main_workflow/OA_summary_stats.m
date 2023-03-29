@@ -1,7 +1,7 @@
 % Save OA indicator summary statistics
 % 
 % Written by J.D. Sharp: 2/1/23
-% Last updated by J.D. Sharp: 2/23/23
+% Last updated by J.D. Sharp: 3/6/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
@@ -38,6 +38,8 @@ for n = 1:length(region)
         OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         for t = 1:OAI_grid.(region{n}).dim.z
+            % remove ice-filled cells
+            area_weights(isnan(OAI_grid.(region{n}).(var_type{var_num})(:,:,t))) = NaN;
             OAI_grid.(region{n}).var_dom_mean(t) = ...
                 squeeze(sum(sum(OAI_grid.(region{n}).(var_type{var_num})(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
