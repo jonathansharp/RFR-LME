@@ -6,12 +6,12 @@
 % extractions from SOCATv2022 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/22
-% Last updated by J.D. Sharp: 11/15/22
+% Last updated by J.D. Sharp: 4/3/22
 % 
 
 %% load SOCAT structure
 if ~exist('SOCAT','var')
-    load('Data/socat_structure','SOCAT');
+    load('Data/socat_structure_all_years','SOCAT');
 end
 
 %% display status
@@ -23,7 +23,7 @@ SOCAT_grid.lim.latmax = round(max(SOCAT.latitude),0);
 SOCAT_grid.lim.lonmin = round(min(SOCAT.longitude),0);
 SOCAT_grid.lim.lonmax = round(max(SOCAT.longitude),0);
 SOCAT_grid.lim.monthmin = 1;
-SOCAT_grid.lim.monthmax = 288;
+SOCAT_grid.lim.monthmax = 504;
 
 %% Create 0.25 x 0.25 degree monthly grid
 SOCAT_grid.lon = [SOCAT_grid.lim.lonmin+0.125:0.25:SOCAT_grid.lim.lonmax]';
@@ -34,15 +34,15 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2021,12)';
-SOCAT_grid.month_of_year = repmat(1:12,1,24)';
+SOCAT_grid.year = repelem(1980:2021,12)';
+SOCAT_grid.month_of_year = repmat(1:12,1,42)';
 
 %% Determine bin number of each data point
 [~,~,Xnum] = histcounts(SOCAT.longitude,...
     SOCAT_grid.lim.lonmin:0.25:SOCAT_grid.lim.lonmax);
 [~,~,Ynum] = histcounts(SOCAT.latitude,...
     SOCAT_grid.lim.latmin:0.25:SOCAT_grid.lim.latmax);
-[~,~,Znum] = histcounts(SOCAT.month_since_1998,...
+[~,~,Znum] = histcounts(SOCAT.month_since_1980,...
     SOCAT_grid.lim.monthmin-1:SOCAT_grid.lim.monthmax);
 
 %% Accumulate 3D grid by applying function to SOCAT values with bin numbers that match grid cells
@@ -56,20 +56,14 @@ SOCAT_grid.count_ncruise = accumarray(subs, SOCAT.cruise, sz, @(x) numel(unique(
 SOCAT_grid.fco2_count_nobs = accumarray(subs, SOCAT.fCO2, sz, @numel, NaN);
 SOCAT_grid.fco2_ave_unwtd = accumarray(subs, SOCAT.fCO2, sz, @nanmean, NaN);
 SOCAT_grid.fco2_std_unwtd = accumarray(subs, SOCAT.fCO2, sz, @nanstd, NaN);
-SOCAT_grid.fco2_max_unwtd = accumarray(subs, SOCAT.fCO2, sz, @max, NaN);
-SOCAT_grid.fco2_min_unwtd = accumarray(subs, SOCAT.fCO2, sz, @min, NaN);
 % temperature
 SOCAT_grid.sst_count_nobs = accumarray(subs, SOCAT.temperature, sz, @numel, NaN);
 SOCAT_grid.sst_ave_unwtd = accumarray(subs, SOCAT.temperature, sz, @nanmean, NaN);
 SOCAT_grid.sst_std_unwtd = accumarray(subs, SOCAT.temperature, sz, @nanstd, NaN);
-SOCAT_grid.sst_max_unwtd = accumarray(subs, SOCAT.temperature, sz, @max, NaN);
-SOCAT_grid.sst_min_unwtd = accumarray(subs, SOCAT.temperature, sz, @min, NaN);
 % salinity
 SOCAT_grid.sss_count_nobs = accumarray(subs, SOCAT.salinity, sz, @numel, NaN);
 SOCAT_grid.sss_ave_unwtd = accumarray(subs, SOCAT.salinity, sz, @nanmean, NaN);
 SOCAT_grid.sss_std_unwtd = accumarray(subs, SOCAT.salinity, sz, @nanstd, NaN);
-SOCAT_grid.sss_max_unwtd = accumarray(subs, SOCAT.salinity, sz, @max, NaN);
-SOCAT_grid.sss_min_unwtd = accumarray(subs, SOCAT.salinity, sz, @min, NaN);
 
 clear subs sz Xnum Ynum Znum
 
@@ -141,15 +135,7 @@ clear a b c idx cruises cruiselist fco2 temperature salinity
 clear fco22 std22 temperature2 salinity2 k cruiseidx SOCAT
 
 %% Count number of months with at least one observation in each grid cell
-% Total
 SOCAT_grid.num_months = sum(~isnan(SOCAT_grid.fco2_ave_unwtd),3);
-% Climatological
-SOCAT_grid.fco2_ave_unwtd_clim = nan(SOCAT_grid.dim.x,SOCAT_grid.dim.y,12);
-for m = 1:12
-    SOCAT_grid.fco2_ave_unwtd_clim(:,:,m) = ...
-        mean(SOCAT_grid.fco2_ave_unwtd(:,:,m:12:end),3,'omitnan');
-end
-SOCAT_grid.num_months_clim = sum(~isnan(SOCAT_grid.fco2_ave_unwtd_clim),3);
 
 %% Determine area of each grid cell
 SOCAT_grid.area_km2 = ...
@@ -281,8 +267,7 @@ clear land c mycolormap
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_gridded','SOCAT_grid','-v7.3');
+save('Data/socat_gridded_1980','SOCAT_grid','-v7.3');
 
 %% clean up
 clear SOCAT_grid
-

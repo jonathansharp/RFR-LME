@@ -18,6 +18,8 @@ set(gca,'fontsize',16);
 c=colorbar('location','southoutside');
 c.TickLength = 0;
 c.Label.String = lab;
+colormap(clrmp);
+caxis([zmin,zmax]);
 cbarrow;
 % define filename
 filename = ['Figures/full/' varname '_monthly.gif'];
@@ -27,13 +29,10 @@ for m = 1:288
     % initialize axis
     worldmap([-18 82],[140 302]);
     setm(gca,'MapProjection','robinson','MLabelParallel','south');
-    set(gca,'fontsize',16);
-    % figure properties
-    colormap(clrmp);
-    caxis([zmin,zmax]);
+    set(gca,'fontsize',16);    
     % plot regions
     for n = 1:length(region)
-        if any(strcmp(varname,{'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
+        if any(strcmp(varname,{'DIC' 'fCO2' 'ufCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
             type = 'OAI_grid';
             vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
         else

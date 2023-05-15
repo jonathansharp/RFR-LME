@@ -54,7 +54,7 @@ for var_num = 1:9
                         OAI_grid.(region{n}).month_of_year ...
                         repmat(15,OAI_grid.(region{n}).dim.z,1)]);
     
-        % plot fCO2 time series
+        % plot time series
         nexttile
         plot(time,OAI_grid.(region{n}).var_dom_mean,'linewidth',2);
         datetick('x');

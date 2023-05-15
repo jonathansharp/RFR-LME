@@ -7,11 +7,11 @@
 % algorithm training.
 % 
 % Written by J.D. Sharp: 9/20/22
-% Last updated by J.D. Sharp: 1/27/22
+% Last updated by J.D. Sharp: 5/15/22
 % 
 
 %% this script defines the bounds of the eighteen LMEs
-define_regions
+define_regions_eiwg
 
 for n = 1:length(region)
 

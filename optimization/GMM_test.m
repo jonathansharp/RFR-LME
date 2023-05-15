@@ -3,16 +3,16 @@
 % This function tests the number of clusters to include in the GMM
 % 
 % Written by J.D. Sharp: 9/20/22
-% Last updated by J.D. Sharp: 2/21/23
+% Last updated by J.D. Sharp: 4/7/23
 % 
 
 % define regions for loop
-define_regions
+define_regions_eiwg
 
 for n = 1:length(region)
 
     %% define and select region
-    define_regions; % define regions
+    define_regions_eiwg; % define regions
     region = region(n); % select region for test step
 
     %% Set GMM options
@@ -23,7 +23,7 @@ for n = 1:length(region)
 
     %% Set RFR options
     set_rfr_options % set baseline options
-    nTrees = 100; % reduce number of trees
+    nTrees = 100; % reduce number of trees for efficiency
     
     %% pre-allocate
     RMSE = nan(nGrp,1);
@@ -56,7 +56,6 @@ for n = 1:length(region)
     Ri = find(RMSE==min(RMSE(:)));
     Bi = find(BIC==min(BIC(:)));
     Si = find(SIL==max(SIL(:)));
-
 
     % plot RMSE
     figure; hold on;
@@ -91,11 +90,40 @@ for n = 1:length(region)
     exportgraphics(gcf,['Figures/' region{1} '_SIL_test_groups.png']);
     close
 
+    % plot combined
+    clrs = colororder;
+    set_gmm_options;
+    figure; hold on;
+    set(gcf,'Position',[720 478 700 420])
+    set(gca,'Position',[0.2300 0.1100 0.6750 0.8150]);
+    xlim([1.5 20.5]);
+    yyaxis left
+    plot(num_groups_vec(2:end),RMSE(2:end),'color',clrs(1,:),'linewidth',3);
+    plot([num_groups(n) num_groups(n)],[min(RMSE(:))-1 max(RMSE(:))+1],'k--');
+    ylim([min(RMSE(:))-0.5 max(RMSE(:))+0.5]);
+    xlabel('No. Clusters');
+    ylabel('Root Mean Squared Error (\mumol kg^{-1})');
+    yyaxis right
+    plot(num_groups_vec(2:end),BIC(2:end),'color',clrs(2,:),'linewidth',3);
+    ylabel('Bayesian Information Criterion');
+    axes('position',[0.2300 0.1100 0.6750 0.8150]); hold on
+    set(gca,'YDir','reverse','Color','none','XColor','none','YColor','none');
+    xlim([1.5 20.5]);
+    plot(num_groups_vec(2:end),SIL(2:end),'color',clrs(4,:),'linewidth',3);
+    axes('Position',[0.1100 0.1100 0.6750 0.8150]); hold on
+    set(gca,'Color','none','YDir','reverse','XColor','none','YColor',clrs(4,:));
+    plot(num_groups_vec(2:end),SIL(2:end),'color',clrs(4,:),'linestyle','none');
+    ylabel('Global Mean Silhouette Score');
+    exportgraphics(gcf,['Figures/' region{1} '_Combined_test_groups.png']);
+    close
+
     % save error stats
     save(['Data/' region{1} '/RMSE'],'RMSE');
     save(['Data/' region{1} '/BIC'],'BIC');
+    save(['Data/' region{1} '/SIL'],'SIL');
 
     % clean up
     clear RMSE BIC region
 
 end
+

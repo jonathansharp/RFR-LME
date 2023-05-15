@@ -8,7 +8,7 @@ function plot_temporal_mean(lim,dim,lat,lon,z,clrmp,varname,lab,reg)
 
 zmean = mean(z,3,'omitnan');
 figure('visible','off'); worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
-if ~contains(varname,'_var')
+if ~contains(varname,'_var') & ~startsWith(varname,'u')
     zmax = mean(zmean(:),'omitnan')+3.*std(zmean(:),[],'omitnan');
     zmin = mean(zmean(:),'omitnan')-3.*std(zmean(:),[],'omitnan');
 else

@@ -7,15 +7,17 @@
 cd /raid/sharp/matlab/US-LMES
 
 % this script defines the bounds of the eighteen LMEs
-define_regions
+define_regions_eiwg
 
 % this script loads SOCAT fCO2 and ancillary data surrounding North
 % America extracted from the SOCATv2022 database
 % load_socat
+% load_socat_1980
 
 % this script grids fCO2 observations from the SOCAT database into grid
 % cells of resolution: 0.25 deg lat x 0.25 deg lon x 1 month
 % grid_socat
+% grid_socat_1980
 
 % this script extracts each of eighteen LMEs from the gridded data
 % surrounding North America

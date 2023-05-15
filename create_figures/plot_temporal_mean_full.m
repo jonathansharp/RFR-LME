@@ -21,7 +21,7 @@ c.Label.String = lab;
 cbarrow;
 % plot regions
 for n = 1:length(region)
-    if any(strcmp(varname,{'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
+    if any(strcmp(varname,{'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'ufCO2'}))
         type = 'OAI_grid';
         vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
         if strcmp(varname,'H')

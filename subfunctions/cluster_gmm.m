@@ -17,7 +17,7 @@ sil = silhouette(X_norm,clusters);
 silhouette(X_norm,clusters); hold on
 yL = ylim;
 plot([mean(sil) mean(sil)],[yL(1) yL(2)],'k--','linewidth',2);
-title(['Sigma = ' Sigma]);
+title([reg ', Clusters = ' num2str(num_groups)]);
 exportgraphics(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'])
 close
 

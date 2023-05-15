@@ -4,16 +4,15 @@
 % Last updated by J.D. Sharp: 1/18/23
 % 
 
-function plot_regional_gif(lim,lat,lon,z,clrmp,varname,lab,year,month_of_year,reg)
+function plot_regional_gif(lim,lat,lon,z,clrmp,varname,lab,year,month_of_year,reg,shape)
 
 % initialize figure
 h=figure('visible','off');
 set(h,'color','white');
 box on; hold on;
-worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
 % determine mean and limits
 zmean = mean(z,3,'omitnan');
-if ~contains(varname,'_var')
+if ~contains(varname,'_var') && ~startsWith(varname,'u')
     zmax = mean(zmean(:),'omitnan')+3.*std(zmean(:),[],'omitnan');
     zmin = mean(zmean(:),'omitnan')-3.*std(zmean(:),[],'omitnan');
 else
@@ -24,22 +23,22 @@ end
 c=colorbar('location','eastoutside');
 c.TickLength = 0;
 c.Label.String = lab;
-cbarrow;
 colormap(clrmp);
 caxis([zmin,zmax]);
+cbarrow;
 % define filename
 filename = ['Figures/' reg '_' varname '_monthly.gif'];
 f=1;
 % loop through months
 for m = 1:288
     % initialize axis
-%     worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
-%     setm(gca,'MapProjection','robinson');
-%     set(gca,'fontsize',16);
+    worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
     % plot
     p=pcolorm(lat,lon,z(:,:,m)');
     % plot land
     plot_land('map');
+    % plot border
+    plotm(shape.Y,shape.X,'k','linewidth',1);
     % add text
     title([num2str(month_of_year(m)) '/' num2str(year(m))],'fontsize',16);
     % save frame
@@ -52,6 +51,7 @@ for m = 1:288
     else
         imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.2);
     end
+    cla;
     f=f+1;
 end
 

@@ -11,9 +11,9 @@ region = {'CCS' 'GA' 'EBS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'HI' ...
 %% Pacific Island LMEs
 
 % import LME grid for US Pacific Islands
-lme_grid_is = ncread('Data/global/LME_Mask.nc','layer');
-lme_lon_is = ncread('Data/global/LME_Mask.nc','longitude');
-lme_lat_is = ncread('Data/global/LME_Mask.nc','latitude');
+lme_grid_is = ncread('data_to_use/LME_Mask.nc','layer');
+lme_lon_is = ncread('data_to_use/LME_Mask.nc','longitude');
+lme_lat_is = ncread('data_to_use/LME_Mask.nc','latitude');
 
 % define US Pacific Island regions according to numbers
 lme_idx_is.GA = 1;
