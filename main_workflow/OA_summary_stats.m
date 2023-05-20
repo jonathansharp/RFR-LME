@@ -1,14 +1,13 @@
 % Save OA indicator summary statistics
 % 
 % Written by J.D. Sharp: 2/1/23
-% Last updated by J.D. Sharp: 3/6/23
+% Last updated by J.D. Sharp: 5/18/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
-define_regions
+define_regions_eiwg
 % region labels
-reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' ...
-           'HI' 'AS' 'JI' 'PK' 'HB' 'JA' 'WI' 'GC'};
+reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
 y_span = [1700,2400;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
 var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
@@ -115,7 +114,7 @@ for n = 1:length(region)
 
         %% plot time series
         % initialize figure
-        figure('Visible','off'); hold on;
+        figure('Visible','on'); hold on;
         set(gcf,'position',[10 10 900 400]);
         % plot
         plot(time,OAI_grid.(region{n}).var_dom_mean,'k-','linewidth',1);
@@ -134,27 +133,27 @@ for n = 1:length(region)
         plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
         % add text to plot
         title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean),rounder(var_num))) ...
-            ' ' units{var_num} ' | ' num2str(round(x(2)*12,rounder(var_num))) ...
+            ' ' units{var_num} ' | Tr. = ' num2str(round(x(2)*12,rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
             'FontSize',10,'HorizontalAlignment','center');
         xL = xlim; yL = ylim;
         % Add recent trend indicator
-        if pos_signif_5
-            text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
-        elseif neg_signif_5
-            text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
-        else
-            text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
-        end
+%         if pos_signif_5
+%             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
+%         elseif neg_signif_5
+%             text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
+%         else
+%             text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
+%         end
         % Add recent mean indicator
-        if pos_mean
-            text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
-        elseif neg_mean
-            text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
-        else
-            text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
-        end
+%         if pos_mean
+%             text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         elseif neg_mean
+%             text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         else
+%             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         end
         % save figure
         exportgraphics(gcf,['Figures/' region{n} '_time_series_' var_type{var_num} '.png']);
         close

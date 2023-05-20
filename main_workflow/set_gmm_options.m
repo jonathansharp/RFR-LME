@@ -1,10 +1,18 @@
-% 'CCS' 'GoAK' 'Aleut' 'EBer' 'Beauf' 'BerChuk' 'NEast' 'SEast' 'GoM' 'Car'
-% 'Hawaii' 'AmSamoa' 'Jarvis' 'LineIs' 'HowBak' 'Johnst' 'Wake' 'Guam'
+% 1. CCS
+% 2. GA
+% 3. AI
+% 4. EBS
+% 5. BS
+% 6. NBCS
+% 7. NE
+% 8. SE
+% 9. GM
+% 10. CS
+% 11. PI
 
 options = statset('MaxIter',1000,'Display','off');
 Sigma = 'full'; % predictor variabes are correlated (a priori)
 SharedCovariance = false; % each cluster has unique covariance shape
-num_groups = [5;7;3;4;4;3;3;3;3;5;2;... % large regional clusters determined by examining RMSE, BIC, and silhouette scores
-    1;1;1;1;1;1;1]; % island regions all one cluster
+num_groups = [5;3;4;4;2;2;2;5;3;2;5]; %  regional clusters by examining RMSE, BIC, and silhouette scores
 RegularizationValue = 0;
 test_idx = 0;

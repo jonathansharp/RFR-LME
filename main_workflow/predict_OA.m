@@ -8,9 +8,9 @@
 % 
 
 % this script defines the bounds of the eighteen LMEs
-define_regions
+define_regions_eiwg
 
-for n = 1:length(region)
+for n = 1%:length(region)
 
     %% display status
     disp(['Calculating CO2 System (' region{n} ')']);
@@ -144,29 +144,30 @@ for n = 1:length(region)
         repmat(OAI_grid.(region{n}).ufCO2,1,1,OAI_grid.(region{n}).dim.z);
 
     %% scale uncertainty over time
-    % determine annual scaling factors (3-yr to 5-yr periods)
-    ann_obs = nan(length(unique(Preds_grid.(region{n}).year)),1);
-    ann_tot = nan(length(unique(Preds_grid.(region{n}).year)),1);
-    for y = 1:length(unique(Preds_grid.(region{n}).year))
-        if y == 1
-            ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,1:36)))));
-            ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,1:36))));
-        elseif y == 2
-            ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,1:48)))));
-            ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,1:48))));
-        elseif y == length(unique(Preds_grid.(region{n}).year)) - 1
-            ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,(y-3)*12+1:(y-3)*12+48)))));
-            ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,(y-3)*12+1:(y-3)*12+48))));
-        elseif y == length(unique(Preds_grid.(region{n}).year))
-            ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,(y-3)*12+1:(y-3)*12+36)))));
-            ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,(y-3)*12+1:(y-3)*12+36))));
-        else
-            ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,(y-3)*12+1:(y-3)*12+60)))));
-            ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,(y-3)*12+1:(y-3)*12+60))));
-        end
-            
-    end
-    ann_per = 100.*(ann_obs./ann_tot);
+%     % determine annual scaling factors (3-yr to 5-yr periods)
+%     ann_obs = nan(length(unique(Preds_grid.(region{n}).year)),1);
+%     ann_tot = nan(length(unique(Preds_grid.(region{n}).year)),1);
+%     for y = 1:length(unique(Preds_grid.(region{n}).year))
+%         if y == 1
+%             ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,1:36)))));
+%             ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,1:36))));
+%         elseif y == 2
+%             ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,1:48)))));
+%             ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,1:48))));
+%         elseif y == length(unique(Preds_grid.(region{n}).year)) - 1
+%             ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,(y-3)*12+1:(y-3)*12+48)))));
+%             ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,(y-3)*12+1:(y-3)*12+48))));
+%         elseif y == length(unique(Preds_grid.(region{n}).year))
+%             ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,(y-3)*12+1:(y-3)*12+36)))));
+%             ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,(y-3)*12+1:(y-3)*12+36))));
+%         else
+%             ann_obs(y) = sum(sum(sum(~isnan(SOCAT_grid.(region{n}).fco2_ave_wtd(:,:,(y-3)*12+1:(y-3)*12+60)))));
+%             ann_tot(y) = sum(sum(sum(SOCAT_grid.(region{n}).idxspc(:,:,(y-3)*12+1:(y-3)*12+60))));
+%         end
+%             
+%     end
+%     ann_per = 100.*(ann_obs./ann_tot);
+    ann_per = repmat(100,length(unique(Preds_grid.(region{n}).year)),1);
     % determine seasonal scaling factors (3-month periods)
     mnth_obs = nan(length(unique(Preds_grid.(region{n}).month_of_year)),1);
     mnth_tot = nan(length(unique(Preds_grid.(region{n}).month_of_year)),1);
@@ -305,6 +306,16 @@ for n = 1:length(region)
         OAI_grid.(region{n}).TA,cmocean('haline',24),'TA',...
         'Surface {\itA}_{T} (\mumol kg^{-1})',OAI_grid.(region{n}).year,...
         OAI_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    plot_regional_gif(OAI_grid.(region{n}).lim,...
+        OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+        OAI_grid.(region{n}).pH,flipud(jet(20)),'pH',...
+        'Surface pH_{T}',OAI_grid.(region{n}).year,...
+        OAI_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    plot_regional_gif(OAI_grid.(region{n}).lim,...
+        OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+        OAI_grid.(region{n}).OmA,flipud(jet(16)),'OmA',...
+        'Surface \Omega_{A}',OAI_grid.(region{n}).year,...
+        OAI_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
     % plot pH uncertainties
     plot_temporal_mean(OAI_grid.(region{n}).lim,...
             OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
@@ -340,33 +351,33 @@ OA_summary_stats
 OA_time_series
 
 %% plot OA indicators across full region
-% plot_temporal_mean_full(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(7.9,8.2,0.02,jet(15),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
-% plot_temporal_mean_full(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
+plot_temporal_mean_full(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+plot_temporal_mean_full(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
+plot_temporal_mean_full(7.9,8.2,0.02,jet(15),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
+plot_temporal_mean_full(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
+plot_temporal_mean_full(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
+plot_temporal_mean_full(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
+plot_temporal_mean_full(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
+plot_temporal_mean_full(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,40,2,cmocean('amp',21),'ufCO2','Sea Surface {\itf}CO_{2} Uncertainty',region,lme_shape,lme_idx)
 
 %% plot gifs of OA indicators across full region
-% plot_full_gif(1900,2500,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
-% plot_full_gif(1700,2300,jet(15),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
-% plot_full_gif(7.9,8.2,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
-% plot_full_gif(0,5,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
-% plot_full_gif(1,6,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
-% plot_full_gif(5,10,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
-% plot_full_gif(50,250,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
-% plot_full_gif(8,16,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
+plot_full_gif(1900,2500,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+plot_full_gif(1700,2300,jet(15),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
+plot_full_gif(7.9,8.2,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
+plot_full_gif(0,5,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
+plot_full_gif(1,6,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
+plot_full_gif(5,10,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
+plot_full_gif(50,250,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
+plot_full_gif(8,16,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
 plot_full_gif(0,40,cmocean('amp',21),'ufCO2','Sea Surface {\itf}CO_{2} Uncertainty',region,lme_shape,lme_idx)
 
 %% plot OA indicators across full region (seasonally)
-% plot_temporal_mean_full_seas(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(7.9,8.2,0.02,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
-% plot_temporal_mean_full_seas(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(7.9,8.2,0.02,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
+plot_temporal_mean_full_seas(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)

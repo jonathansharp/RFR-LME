@@ -10,7 +10,7 @@ var_num = 1;
 n = 9;
 
 % this script defines the bounds of the eighteen LMEs
-define_regions
+define_regions_eiwg
 
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' ...

@@ -13,7 +13,7 @@
 define_regions_eiwg
 
 %% extract each LME from large grid
-for n = 1:length(region)
+for n = 1%:length(region)
 
     %% load SOCAT grid
     load('Data/socat_gridded','SOCAT_grid');
@@ -123,11 +123,11 @@ for n = 1:length(region)
 %     exportgraphics(gcf,['Figures/' region{n} '/hist.png']);
 %     close
 
-%     plot_regional_gif(SOCAT_grid.(region{n}).lim,...
-%         SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
-%         SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,parula(20),'fCO2_obs',...
-%         'Surface {\itf}CO_{2} (\muatm)',SOCAT_grid.(region{n}).year,...
-%         SOCAT_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    plot_regional_gif(SOCAT_grid.(region{n}).lim,...
+        SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
+        SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,parula(20),'fCO2_obs',...
+        'Surface {\itf}CO_{2} (\muatm)',SOCAT_grid.(region{n}).year,...
+        SOCAT_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
 
     %% Plot the percentage of grid cells with data
     figure('visible','off');
@@ -268,7 +268,7 @@ mycolormap(1,:) = 1;
 colormap(mycolormap);
 caxis([-0.5 12.5]);
 c.TickLength = 0;
-c.Label.String = 'Total Months Represented';
+c.Label.String = 'Months of Year Represented';
 % plot background
 pcolorm(SOCAT_grid.lat,SOCAT_grid.lon,SOCAT_grid.num_months_clim');
 alpha 0.3
@@ -325,7 +325,7 @@ z = mean(SOCAT_grid.fco2_ave_wtd_detrend,3,'omitnan')';
 %                SOCAT_grid.fco2_ave_wtd_detrend(:,:,2:12:end)),...
 %                3,'omitnan')';
 pcolorm(SOCAT_grid.lat,SOCAT_grid.lon,z);
-alpha 0.1
+alpha 0.3
 % clear SOCAT grid
 clear SOCAT_grid
 % plot regions

@@ -4,11 +4,11 @@
 % NetCDF files.
 % 
 % Written by J.D. Sharp: 1/30/23
-% Last updated by J.D. Sharp: 1/30/23
+% Last updated by J.D. Sharp: 5/17/23
 % 
 
-%% this script defines the bounds of the eighteen LMEs
-define_regions
+%% this script defines the bounds of the eleven LMEs
+define_regions_eiwg
 
 %% full data grid structure
 load('Data/socat_gridded','SOCAT_grid');
@@ -37,6 +37,13 @@ end
 Vars_OA = {'fCO2' 'DIC' 'TA' 'uTA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
 for v = 1:length(Vars_OA)
    US_LME_RFR.(Vars_OA{v}) = ...
+       nan(US_LME_RFR.dim.x,US_LME_RFR.dim.y,US_LME_RFR.dim.z);
+end
+
+%% Pre-allocate full grid of OA Indicator uncertaintiess
+uVars_OA = {'ufCO2' 'uDIC' 'uTA' 'upH' 'uOmA' 'uOmC' 'uH' 'uCO3' 'uRF'};
+for v = 1:length(uVars_OA)
+   US_LME_RFR.(uVars_OA{v}) = ...
        nan(US_LME_RFR.dim.x,US_LME_RFR.dim.y,US_LME_RFR.dim.z);
 end
 
@@ -73,6 +80,19 @@ for n = 1:length(region)
         US_LME_RFR.(Vars_OA{v})(idx) = tmp_var(idx);
     end
 
+    %% Add OA indicator uncertainties to full grid
+    idx_lon = US_LME_RFR.lon >= min(OAI_grid.(region{n}).lon) & ...
+        US_LME_RFR.lon <= max(OAI_grid.(region{n}).lon);
+    idx_lat = US_LME_RFR.lat >= min(OAI_grid.(region{n}).lat) & ...
+        US_LME_RFR.lat <= max(OAI_grid.(region{n}).lat);
+    for v = 1:length(uVars_OA)
+        tmp_var = US_LME_RFR.(uVars_OA{v});
+        tmp_var(idx_lon,idx_lat,:) = ...
+            OAI_grid.(region{n}).(uVars_OA{v});
+        idx = ~isnan(tmp_var);
+        US_LME_RFR.(uVars_OA{v})(idx) = tmp_var(idx);
+    end
+
     %% clean up
     clear idx_lon idx_lat idx v Preds_grid OAI_grid tmp_var
 
@@ -102,8 +122,8 @@ end
 
 %% save OA indicators as NetCDF
 filename = ['Data/US_LME_RFR_Inds_' date '.nc'];
-time = datenum([repmat(1998,US_LME_RFR.dim.z,1) US_LME_RFR.month, ...
-    zeros(US_LME_RFR.dim.z,1)]);
+time = datenum([repmat(1998,US_LME_RFR.dim.z,1) floor(US_LME_RFR.month), ...
+    repmat(15,US_LME_RFR.dim.z,1)]);
 nccreate(filename,'Lon','Dimensions',{'Lon',US_LME_RFR.dim.x});
 ncwrite(filename,'Lon',US_LME_RFR.lon);
 ncwriteatt(filename,'Lon','_CoordinateAxisType','Lon');
@@ -116,6 +136,24 @@ ncwriteatt(filename,'Time','_CoordinateAxisType','Time');
 for v = 1:length(Vars_OA)
     nccreate(filename,Vars_OA{v},'Dimensions',{'Lon',US_LME_RFR.dim.x,'Lat',US_LME_RFR.dim.y,'Time',US_LME_RFR.dim.z});
     ncwrite(filename,Vars_OA{v},US_LME_RFR.(Vars_OA{v}));
+end
+
+%% save OA indicator uncertainties as NetCDF
+filename = ['Data/US_LME_RFR_Inds_Uncer_' date '.nc'];
+time = datenum([repmat(1998,US_LME_RFR.dim.z,1) US_LME_RFR.month, ...
+    zeros(US_LME_RFR.dim.z,1)]);
+nccreate(filename,'Lon','Dimensions',{'Lon',US_LME_RFR.dim.x});
+ncwrite(filename,'Lon',US_LME_RFR.lon);
+ncwriteatt(filename,'Lon','_CoordinateAxisType','Lon');
+nccreate(filename,'Lat','Dimensions',{'Lat',US_LME_RFR.dim.y});
+ncwrite(filename,'Lat',US_LME_RFR.lat);
+ncwriteatt(filename,'Lat','_CoordinateAxisType','Lat');
+nccreate(filename,'Time','Dimensions',{'Time',US_LME_RFR.dim.z});
+ncwrite(filename,'Time',time);
+ncwriteatt(filename,'Time','_CoordinateAxisType','Time');
+for v = 1:length(uVars_OA)
+    nccreate(filename,uVars_OA{v},'Dimensions',{'Lon',US_LME_RFR.dim.x,'Lat',US_LME_RFR.dim.y,'Time',US_LME_RFR.dim.z});
+    ncwrite(filename,uVars_OA{v},US_LME_RFR.(uVars_OA{v}));
 end
 
 %% plot for sanity

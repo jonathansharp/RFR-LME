@@ -4,7 +4,8 @@
 % Last updated by J.D. Sharp: 1/31/23
 % 
 
-function plot_delta_mean_full(zmin,zmax,cmap_type,cmap_name,cmap_segs,zero_piv,num_groups,varname,lab,region,lme_shape,lme_idx)
+function plot_delta_mean_full(zmin,zmax,cmap_type,cmap_name,cmap_segs,...
+    zero_piv,num_groups,varname,lab,region,lme_shape,lme_idx,test_idx)
 
 % initialize figure
 figure('visible','off'); hold on;
@@ -30,8 +31,14 @@ cbarrow;
 % plot regions
 type = 'Val';
 for n = 1:length(region)
-for en = 1:size(num_groups,2)    
-    vars_grid_temp = load(['Data/' region{n} '/us_lme_model_evals_' num2str(en)],type);
+for en = 1:size(num_groups,2)
+    if test_idx == 0
+        vars_grid_temp = ...
+            load(['Data/' region{n} '/us_lme_model_evals'],type);
+    elseif test_idx == 1
+        vars_grid_temp = ...
+            load(['Data/' region{n} '/us_lme_model_evals_test'],type);
+    end
     vars_grid.([type num2str(en)]).(region{n}) = ...
         vars_grid_temp.(type).(region{n});
     clear vars_grid_temp

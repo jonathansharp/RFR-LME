@@ -41,7 +41,7 @@ clear idx G2* expocode expocodeno
 
 %% remove CODAP data outside LMEs
 % determine LME index
-define_regions
+define_regions_eiwg
 idx_tmp = nan(length(CODAP.lat),length(region));
 for n = 1:length(region)
     if n <= 11
@@ -102,7 +102,7 @@ LME_RFR.CO3 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'CO3');
 LME_RFR.RF = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'RF');
 
 %% plot data locations
-define_regions
+define_regions_eiwg
 % initialize figure
 figure('visible','on'); box on; hold on;
 worldmap([-18 82],[140 302]);
@@ -256,7 +256,7 @@ exportgraphics(gcf,'Figures/CODAP_eval_fCO2.png');
 % GLODAP
 figure; hold on;
 title('fCO2');
-scatter(GLODAP.fco2(idx),GLODAP.fco2_grid(idx),'k.');
+scatter(GLODAP.fco2,GLODAP.fco2_grid,'k.');
 plot([0 1500],[0 1500],'k-');
 xlabel('GLODAP');
 ylabel('LME Grid');

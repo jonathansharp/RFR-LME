@@ -144,22 +144,23 @@ for n = 1:length(region)
         pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
             mode(Clusts_grid.(region{n}).groups,3)');
 %         pcolorm(Preds_grid.(region{n}).lat,Preds_grid.(region{n}).lon,...
-%             mode(Clusts_grid.(region{n}).probabilities.c3,3)');
-        colormap(jet(levs));
-        % colormap([rgb('red');rgb('green');rgb('blue')]);
-        % colormap(customcolormap([0 1],[rgb('blue'); 1 1 1]))
+%             mode(Clusts_grid.(region{n}).probabilities.c5,3)');
+        colormap(flipud(jet(levs)));
+        % colormap([rgb('red');rgb('cyan');rgb('green');rgb('magenta');rgb('blue')]);
+        % colormap(customcolormap([0 1],[rgb('blue'); 1 1 1]));
         % title('Most frequent cluster');
         plot_land('map');
         c=colorbar;
         caxis([0.5 levs+0.5]);
         c.Label.String = 'Cluster';
+        % c.Label.String = 'C5 Probability';
         c.TickLength = 0;
-        % c.Ticks = [1 2 3];
+        c.Ticks = 1:levs;
         
         % save figure
         if ~isfolder('Figures'); mkdir('Figures'); end
         exportgraphics(gcf,['Figures/' region{n} '_Clusts_' type '_' ...
-            strat '.png']);
+            strat '_' num2str(levs) '.png']);
         close all
     
         %% Save gridded cluster data for all LMEs

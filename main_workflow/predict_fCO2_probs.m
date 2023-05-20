@@ -67,7 +67,7 @@ for n = 1:length(region)
                         Preds_grid.(region{n}).dim.z);
     OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).idx_clust) = fco2_rfr;
     % remove fCO2 where ice covers more than 50% of grid cell
-    OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).IceC > 0.5) = NaN;
+    % OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).IceC > 0.5) = NaN;
 
     %% plot estimated fCO2
     plot_temporal_mean(OAI_grid.(region{n}).lim,...

@@ -172,7 +172,7 @@ cmap_name = 'balance';
 zero_piv = 1;
 cmap_segs = 9;
 plot_delta_mean_full(-22.5,22.5,cmap_type,cmap_name,cmap_segs,zero_piv,...
-    num_groups,'delta_rfr_grid','\Delta{\itf}CO_{2}',region,lme_shape,lme_idx);
+    num_groups,'delta_rfr_grid','\Delta{\itf}CO_{2}',region,lme_shape,lme_idx,test_idx);
 
 %% plot gridded absolute delta values across region
 cmap_type = 'cmocean';
@@ -181,7 +181,7 @@ zero_piv = 0;
 cmap_segs = 9;
 plot_delta_mean_full(-1.25,21.25,cmap_type,cmap_name,cmap_segs,...
     zero_piv,num_groups,'delta_rfr_grid_abs','\Delta{\itf}CO_{2}',...
-    region,lme_shape,lme_idx);
+    region,lme_shape,lme_idx,test_idx);
 
 %% plot delta values for each LME
 % fCO2_rfr_errors

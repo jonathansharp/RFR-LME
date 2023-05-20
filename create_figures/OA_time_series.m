@@ -5,10 +5,9 @@
 % 
 
 % this script defines the bounds of the eighteen LMEs
-define_regions
+define_regions_eiwg
 % region labels
-reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' ...
-           'HI' 'AS' 'JI' 'PK' 'HB' 'JA' 'WI' 'GC'};
+reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
 y_span = [1700,2400;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
 var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
@@ -22,7 +21,7 @@ for var_num = 1:9
 
     % initialize figure
     figure('Visible','off'); hold on;
-    tcl = tiledlayout(6,3);
+    tcl = tiledlayout(4,3);
     set(gcf,'position',[10 10 1800 1600]);
     title(tcl,['Weighted Mean ' var_lab{var_num} ' Time Series in U.S. LMEs (\muatm)'],...
         'FontSize',24);
