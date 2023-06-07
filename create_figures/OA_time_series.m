@@ -1,7 +1,7 @@
 % Plot OA indicator time series in each LME
 % 
 % Written by J.D. Sharp: 1/17/23
-% Last updated by J.D. Sharp: 2/1/23
+% Last updated by J.D. Sharp: 6/7/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
@@ -11,26 +11,24 @@ reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
 y_span = [1800,2300;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
 var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
-var_lab = {'{\itC}_{T}' '{\itf}CO_{2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
+var_lab = {'{\itC}_{T}' '{\itf}_{CO2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
     '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
 units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
 rounder = [1 1 1 3 2 2 1 1 2];
 
 % loop through variables
-for var_num = 1:9
+for var_num = 1%:9
 
     % initialize figure
     figure('Visible','on'); hold on;
-    tcl = tiledlayout(4,3);
-    set(gcf,'position',[10 10 1800 1600]);
-    nexttile
-    set(gca,'Visible','off')
+    tcl = tiledlayout(6,2);
+    set(gcf,'units','inches','position',[0 0 8.5 11]);
 
     % add text title
-    text(0.5,0.7,['Weighted Mean ' var_lab{var_num} ' Time'],...
-        'FontSize',24,'HorizontalAlignment','center');
-    text(0.5,0.3,'Series in U.S. LMEs (\muatm)',...
-        'FontSize',24,'HorizontalAlignment','center');
+%     text(0.5,0.6,['Weighted Mean ' var_lab{var_num} ' Time'],...
+%         'FontSize',12,'HorizontalAlignment','center');
+%     text(0.5,0.4,'Series in U.S. LMEs (\muatm)',...
+%         'FontSize',12,'HorizontalAlignment','center');
 %     title(tcl,['Weighted Mean ' var_lab{var_num} ' Time Series in U.S. LMEs (\muatm)'],...
 %         'FontSize',24);
     
@@ -61,6 +59,7 @@ for var_num = 1:9
         % scale H to nanomoles
         if strcmp(var_type{var_num},'H')
             OAI_grid.(region{n}).var_dom_mean = (10^9).*OAI_grid.(region{n}).var_dom_mean;
+            OAI_grid.(region{n}).u_var_dom_mean = (10^9).*OAI_grid.(region{n}).u_var_dom_mean;
         end
     
         % re-calculate time
@@ -69,12 +68,13 @@ for var_num = 1:9
                         repmat(15,OAI_grid.(region{n}).dim.z,1)]);
     
         % plot time series
-        nexttile
-        fill([time;flipud(time)],...
+        nexttile; hold on
+        set(gca,'fontsize',6);
+        u=fill([time;flipud(time)],...
             [OAI_grid.(region{n}).var_dom_mean + OAI_grid.(region{n}).u_var_dom_mean;...
             flipud(OAI_grid.(region{n}).var_dom_mean - OAI_grid.(region{n}).u_var_dom_mean)],...
-            rgb('grey'),'LineStyle','none'); hold on
-        plot(time,OAI_grid.(region{n}).var_dom_mean,'k','linewidth',2);
+            rgb('grey'),'LineStyle','none');
+        p=plot(time,OAI_grid.(region{n}).var_dom_mean,'k','linewidth',1);
         datetick('x');
         xlim([datenum([1998 1 1]) datenum([2022 1 1])]);
         ylim(y_span(var_num,:));
@@ -99,13 +99,20 @@ for var_num = 1:9
             ' | ' num2str(round(x(2)*12,rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
-            'FontSize',10,'HorizontalAlignment','center');
+            'FontSize',6,'HorizontalAlignment','center');
+
+        % add legend
+        if n == 11
+            lg=legend([p u],{'Monthly Mean' 'Uncertainty'},'fontsize',20);
+            lg.Position(1) = lg.Position(1)+0.45;
+            lg.Position(2) = lg.Position(2)-0.05;
+        end
     
         % clean up
         clear SOCAT_grid OAI_grid area_weights t time
     
     end
-    
+
     % save figure
     exportgraphics(gcf,['Figures/all_time_series_' var_type{var_num} '.png']);
     close

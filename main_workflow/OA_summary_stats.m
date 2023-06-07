@@ -9,15 +9,12 @@ define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
-y_span = [1700,2400;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
 var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
-var_lab = {'{\itC}_{T}' '{\itf}CO_{2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
-    '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
 units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
 rounder = [1 1 1 3 2 2 1 1 2];
 
 % preallocate table
-stats = nan(length(region),length(var_type)*3);
+stats = nan(length(region),length(var_type)*4);
 monthly = nan(288,length(region)*length(var_type));
 u_monthly = nan(288,length(region)*length(var_type));
 ann = nan(288/12,length(region)*length(var_type));
@@ -78,6 +75,9 @@ for n = 1:length(region)
             leastsq2(OAI_grid.(region{n}).month,...
             OAI_grid.(region{n}).var_dom_mean,0,2,[6 12]);
     
+        % calculate interannual variability
+        iav = std(yr);
+
         % determine average modelled climatology
         clim = nan(12,1);
         for m = 1:12
@@ -101,9 +101,10 @@ for n = 1:length(region)
         neg_mean = mean5 < meantot-conf90;
     
         % fill table with summary statistics
-        stats(n,(var_num-1)*3+1) = mean(OAI_grid.(region{n}).var_dom_mean);
-        stats(n,(var_num-1)*3+2) = x(2)*12;
-        stats(n,(var_num-1)*3+3) = amp;
+        stats(n,(var_num-1)*4+1) = mean(OAI_grid.(region{n}).var_dom_mean);
+        stats(n,(var_num-1)*4+2) = x(2)*12;
+        stats(n,(var_num-1)*4+3) = amp;
+        stats(n,(var_num-1)*4+4) = iav;
 
         % fill table with monthly values
         monthly(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean;
@@ -169,9 +170,10 @@ end
 % pre-allocate variable names
 VarNameSt = cell(length(var_type)*3,1);
 for var_num = 1:9
-    VarNameSt{(var_num-1)*3+1} = [var_type{var_num} ',Avg.'];
-    VarNameSt{(var_num-1)*3+2} = [var_type{var_num} ',Tr.'];
-    VarNameSt{(var_num-1)*3+3} = [var_type{var_num} ',Amp.'];
+    VarNameSt{(var_num-1)*4+1} = [var_type{var_num} ',Avg.'];
+    VarNameSt{(var_num-1)*4+2} = [var_type{var_num} ',Tr.'];
+    VarNameSt{(var_num-1)*4+3} = [var_type{var_num} ',Amp.'];
+    VarNameSt{(var_num-1)*4+4} = [var_type{var_num} ',IAV'];
 end
 VarNameMnAn = cell(length(region)*length(var_type),1);
 for n = 1:length(region)
