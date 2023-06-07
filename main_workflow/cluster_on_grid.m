@@ -164,10 +164,10 @@ for n = 1:length(region)
         close all
     
         %% Save gridded cluster data for all LMEs
-        if test_idx == 0
+        if gmm_test_idx == 0
             % save(['Data/' region{n} '/gridded_clusters_' num2str(en)],'Clusts_grid','-v7.3');
             save(['Data/' region{n} '/gridded_clusters'],'Clusts_grid','-v7.3');
-        elseif test_idx == 1
+        elseif gmm_test_idx == 1
             save(['Data/' region{n} '/gridded_clusters_test'],'Clusts_grid','-v7.3');
         end
     

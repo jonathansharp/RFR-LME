@@ -9,7 +9,7 @@ define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
-y_span = [1700,2400;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
+y_span = [1800,2300;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
 var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
 var_lab = {'{\itC}_{T}' '{\itf}CO_{2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
     '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
@@ -20,11 +20,19 @@ rounder = [1 1 1 3 2 2 1 1 2];
 for var_num = 1:9
 
     % initialize figure
-    figure('Visible','off'); hold on;
+    figure('Visible','on'); hold on;
     tcl = tiledlayout(4,3);
     set(gcf,'position',[10 10 1800 1600]);
-    title(tcl,['Weighted Mean ' var_lab{var_num} ' Time Series in U.S. LMEs (\muatm)'],...
-        'FontSize',24);
+    nexttile
+    set(gca,'Visible','off')
+
+    % add text title
+    text(0.5,0.7,['Weighted Mean ' var_lab{var_num} ' Time'],...
+        'FontSize',24,'HorizontalAlignment','center');
+    text(0.5,0.3,'Series in U.S. LMEs (\muatm)',...
+        'FontSize',24,'HorizontalAlignment','center');
+%     title(tcl,['Weighted Mean ' var_lab{var_num} ' Time Series in U.S. LMEs (\muatm)'],...
+%         'FontSize',24);
     
     % loop through each region
     for n = 1:length(region)
@@ -35,10 +43,17 @@ for var_num = 1:9
     
         % calculate area-weighted time series
         OAI_grid.(region{n}).var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
+        OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         for t = 1:OAI_grid.(region{n}).dim.z
+            % remove ice-filled cells
+            area_weights(isnan(OAI_grid.(region{n}).(var_type{var_num})(:,:,t))) = NaN;
             OAI_grid.(region{n}).var_dom_mean(t) = ...
                 squeeze(sum(sum(OAI_grid.(region{n}).(var_type{var_num})(:,:,t).*...
+                    area_weights,1,'omitnan'),2,'omitnan'))./...
+                    squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
+            OAI_grid.(region{n}).u_var_dom_mean(t) = ...
+                squeeze(sum(sum(OAI_grid.(region{n}).(['u' var_type{var_num}])(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
                     squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
         end
@@ -55,7 +70,11 @@ for var_num = 1:9
     
         % plot time series
         nexttile
-        plot(time,OAI_grid.(region{n}).var_dom_mean,'linewidth',2);
+        fill([time;flipud(time)],...
+            [OAI_grid.(region{n}).var_dom_mean + OAI_grid.(region{n}).u_var_dom_mean;...
+            flipud(OAI_grid.(region{n}).var_dom_mean - OAI_grid.(region{n}).u_var_dom_mean)],...
+            rgb('grey'),'LineStyle','none'); hold on
+        plot(time,OAI_grid.(region{n}).var_dom_mean,'k','linewidth',2);
         datetick('x');
         xlim([datenum([1998 1 1]) datenum([2022 1 1])]);
         ylim(y_span(var_num,:));

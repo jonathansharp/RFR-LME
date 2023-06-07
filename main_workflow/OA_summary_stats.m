@@ -52,6 +52,7 @@ for n = 1:length(region)
         % scale H to nanomoles
         if strcmp(var_type{var_num},'H')
             OAI_grid.(region{n}).var_dom_mean = (10^9).*OAI_grid.(region{n}).var_dom_mean;
+            OAI_grid.(region{n}).u_var_dom_mean = (10^9).*OAI_grid.(region{n}).u_var_dom_mean;
         end
 
         % re-calculate time
@@ -157,7 +158,7 @@ for n = 1:length(region)
         % save figure
         exportgraphics(gcf,['Figures/' region{n} '_time_series_' var_type{var_num} '.png']);
         close
-
+    
         % clean up
         clear SOCAT_grid OAI_grid area_weights t time
 

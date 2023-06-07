@@ -13,7 +13,7 @@
 define_regions_eiwg
 
 %% extract each LME from large grid
-for n = 1%:length(region)
+for n = 1:length(region)
 
     %% load SOCAT grid
     load('Data/socat_gridded','SOCAT_grid');
@@ -319,11 +319,11 @@ c.TickLength = 0;
 c.Label.String = 'Surface {\itf}CO_{2} (\muatm)';
 cbarrow;
 % plot background
-z = mean(SOCAT_grid.fco2_ave_wtd_detrend,3,'omitnan')';
-% z = mean(cat(3,SOCAT_grid.fco2_ave_wtd_detrend(:,:,12:12:end),...
-%                SOCAT_grid.fco2_ave_wtd_detrend(:,:,1:12:end),...
-%                SOCAT_grid.fco2_ave_wtd_detrend(:,:,2:12:end)),...
-%                3,'omitnan')';
+% z = mean(SOCAT_grid.fco2_ave_wtd_detrend,3,'omitnan')';
+z = mean(cat(3,SOCAT_grid.fco2_ave_wtd_detrend(:,:,9:12:end),...
+               SOCAT_grid.fco2_ave_wtd_detrend(:,:,10:12:end),...
+               SOCAT_grid.fco2_ave_wtd_detrend(:,:,11:12:end)),...
+               3,'omitnan')';
 pcolorm(SOCAT_grid.lat,SOCAT_grid.lon,z);
 alpha 0.3
 % clear SOCAT grid
@@ -331,11 +331,11 @@ clear SOCAT_grid
 % plot regions
 for n = 1:length(region)
     load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
-    z = mean(SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,3,'omitnan')';
-%     z = mean(cat(3,SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,12:12:end),...
-%                SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,1:12:end),...
-%                SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,2:12:end)),...
-%                3,'omitnan')';
+%     z = mean(SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,3,'omitnan')';
+    z = mean(cat(3,SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,9:12:end),...
+               SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,10:12:end),...
+               SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,11:12:end)),...
+               3,'omitnan')';
     pcolorm(SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,z);
     clear SOCAT_grid
 end
@@ -354,7 +354,7 @@ plot_land('map');
 mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,'Figures/full/fCO2_obs.png');
+exportgraphics(gcf,'Figures/full/fCO2_obs_SON.png');
 close
 % clean up
 clear n z h r c tmp_lon

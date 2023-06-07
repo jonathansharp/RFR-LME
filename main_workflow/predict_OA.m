@@ -10,7 +10,7 @@
 % this script defines the bounds of the eighteen LMEs
 define_regions_eiwg
 
-for n = 1%:length(region)
+for n = 1:length(region)
 
     %% display status
     disp(['Calculating CO2 System (' region{n} ')']);

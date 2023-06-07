@@ -3,3 +3,4 @@
 nTrees = 1000;
 minLeafSize = 3;
 numpredictors = 7;
+rfr_test_idx = 0;

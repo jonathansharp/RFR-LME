@@ -15,4 +15,4 @@ Sigma = 'full'; % predictor variabes are correlated (a priori)
 SharedCovariance = false; % each cluster has unique covariance shape
 num_groups = [5;3;4;4;2;2;2;5;3;2;5]; %  regional clusters by examining RMSE, BIC, and silhouette scores
 RegularizationValue = 0;
-test_idx = 0;
+gmm_test_idx = 0;

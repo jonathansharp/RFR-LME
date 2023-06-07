@@ -19,7 +19,7 @@ for n = 1:length(region)
     set_gmm_options % set baseline options
     num_groups_vec = 1:20; % test different group amounts
     nGrp = length(num_groups_vec);
-    test_idx = 1; % set index to test
+    gmm_test_idx = 1; % set GMM index to test
 
     %% Set RFR options
     set_rfr_options % set baseline options

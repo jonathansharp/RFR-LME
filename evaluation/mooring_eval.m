@@ -4,7 +4,7 @@
 ImportMoorings
 
 %% load US LME data
-date = '17-May-2023';
+date = '20-May-2023';
 LME_RFR = netcdfreader(['Data/US_LME_RFR_Inds_' date '.nc']);
 LME_RFR_u = netcdfreader(['Data/US_LME_RFR_Inds_Uncer_' date '.nc']);
 
@@ -101,24 +101,27 @@ for n = 1:length(moornames)
     % plot fCO2 time series
     clrs = cbrewer('qual','Set1',4);
     f=figure; hold on;
-    f.Position(3) = 3*f.Position(3);
+    f.Position(3) = 2*f.Position(3);
     p1=plot(MOORING.(moornames{n}).LME_RFR_datetime,MOORING.(moornames{n}).LME_RFR_fCO2,...
         'color',clrs(1,:),'linewidth',2);
     fill([MOORING.(moornames{n}).LME_RFR_datetime;flipud(MOORING.(moornames{n}).LME_RFR_datetime)],...
         [MOORING.(moornames{n}).LME_RFR_fCO2+MOORING.(moornames{n}).LME_RFR_ufCO2;...
         flipud(MOORING.(moornames{n}).LME_RFR_fCO2-MOORING.(moornames{n}).LME_RFR_ufCO2)],...
         clrs(1,:),'facealpha',0.25,'linestyle','none')
-    p2=plot(MOORING.(moornames{n}).CMEMS_LSCE_datetime,MOORING.(moornames{n}).CMEMS_LSCE_pCO2,...
-        'color',clrs(2,:),'linewidth',2);
-    p3=plot(MOORING.(moornames{n}).SODA_ETHZ_datetime,MOORING.(moornames{n}).SODA_ETHZ_pCO2,...
-        'color',clrs(3,:),'linewidth',2);
-    p4=plot(MOORING.(moornames{n}).MPI_SOMFFN_datetime,MOORING.(moornames{n}).MPI_SOMFFN_pCO2,...
-        'color',clrs(4,:),'linewidth',2);
+%     p2=plot(MOORING.(moornames{n}).CMEMS_LSCE_datetime,MOORING.(moornames{n}).CMEMS_LSCE_pCO2,...
+%         'color',clrs(2,:),'linewidth',2);
+%     p3=plot(MOORING.(moornames{n}).SODA_ETHZ_datetime,MOORING.(moornames{n}).SODA_ETHZ_pCO2,...
+%         'color',clrs(3,:),'linewidth',2);
+%     p4=plot(MOORING.(moornames{n}).MPI_SOMFFN_datetime,MOORING.(moornames{n}).MPI_SOMFFN_pCO2,...
+%         'color',clrs(4,:),'linewidth',2);
     s1=scatter(MOORING.(moornames{n}).datetime_monthly,MOORING.(moornames{n}).fCO2SW_monthly(:,1),'ko','filled');
-    xlim([min(MOORING.(moornames{n}).LME_RFR_datetime) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
+%     xlim([min(MOORING.(moornames{n}).LME_RFR_datetime) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
+    xlim([MOORING.(moornames{n}).LME_RFR_datetime(96) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
     datetick('x','yyyy','keeplimits');
-    legend([p1 p2 p3 p4 s1],{'LME-RFR' 'CMEMS-LSCE' 'OceanSODA-ETHZ' 'MPI-SOMFFN' 'Mooring'},...
-        'Location','north','NumColumns',5);
+%     legend([p1 p2 p3 p4 s1],{'LME-RFR' 'CMEMS-LSCE' 'OceanSODA-ETHZ' 'MPI-SOMFFN' 'Mooring'},...
+%         'Location','north','NumColumns',5);
+    legend([p1 s1],{'LME-RFR' 'Mooring'},...
+        'Location','north','NumColumns',2);
     exportgraphics(f,['Figures/mooring_comp_' moornames{n} '.png']);
     close
     % plot absolute difference between mooring and RFR
@@ -137,7 +140,7 @@ c=colorbar('location','southoutside');
 colormap(parula(18));
 caxis([295 475]);
 c.TickLength = 0;
-c.Label.String = 'Sea Surface {\itf}CO_{2}';
+c.Label.String = 'Sea Surface {\itf}CO_{2} (\muatm)';
 cbarrow;
 % plot land
 bordersm('alaska','facecolor',rgb('gray'))
@@ -220,7 +223,7 @@ caxis([1 2.5]);
 c.TickLength = 0;
 c.Ticks = [1 1.477 2 2.477];
 c.TickLabels = [10 30 100 300];
-c.Label.String = 'Sea Surface {\itf}CO_{2} Amplitude';
+c.Label.String = 'Sea Surface {\itf}CO_{2} Amplitude (\muatm)';
 % plot land
 bordersm('alaska','facecolor',rgb('gray'))
 bordersm('continental us','facecolor',rgb('gray'))
@@ -304,10 +307,10 @@ set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
 c=colorbar('location','southoutside');
-colormap(cmocean('tempo',12));
-caxis([0 4]);
+clim([-1 4]);
+colormap(cmocean('balance',20,'pivot',0));
 c.TickLength = 0;
-c.Label.String = 'Sea Surface {\itf}CO_{2} Trend';
+c.Label.String = 'Sea Surface {\itf}CO_{2} Trend (\muatm yr^{-1})';
 % plot land
 bordersm('alaska','facecolor',rgb('gray'))
 bordersm('continental us','facecolor',rgb('gray'))
@@ -329,7 +332,7 @@ for n = 1:4
     end
     % plot
     contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
-        OAI_grid.(region{n}).fCO2_trend',1:0.25:4,'LineStyle','none');
+        OAI_grid.(region{n}).fCO2_trend',-1:0.25:4,'LineStyle','none');
     clear vars_grid z
 end
 % plot borders around regions
@@ -351,7 +354,7 @@ for n = 1:length(moornames)
 end
 % save figure
 if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,'Figures/Mooring_eval_amp_map.png');
+exportgraphics(gcf,'Figures/Mooring_eval_trend_map.png');
 % print amplitudes
 for n = 1:length(moornames)
     % Mooring trend
@@ -362,7 +365,7 @@ for n = 1:length(moornames)
     % RFR-LME trend
     lon_idx = find(abs(LME_RFR.Lon - moor_lon) == min(abs(LME_RFR.Lon - moor_lon)));
     lat_idx = find(abs(LME_RFR.Lat - moor_lat) == min(abs(LME_RFR.Lat - moor_lat)));
-    mod = polyfit(LME_RFR.Time-LME_RFR.Time(1),squeeze(LME_RFR.fCO2(lon_idx,lat_idx,:)),2);
+    mod = polyfit(LME_RFR.Time-LME_RFR.Time(1),squeeze(LME_RFR.fCO2(lon_idx,lat_idx,:)),1);
     disp(['RFR-LME Trend (' moornames{n} ') = ' ...
         num2str(round(mean(mod(1)*365,3,'omitnan'),1)) ' uatm/yr']);
 end

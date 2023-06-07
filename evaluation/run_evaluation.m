@@ -253,6 +253,7 @@ ylim([0 1200]);
 text(200,1000,['CODAP ' char(45) ' RFR-LME = ' num2str(round(mean(CODAP.fco2_del,'omitnan'),1)),...
     ' ' char(177) ' ' num2str(round(std(CODAP.fco2_del,[],'omitnan'),1))]);
 exportgraphics(gcf,'Figures/CODAP_eval_fCO2.png');
+close
 % GLODAP
 figure; hold on;
 title('fCO2');
@@ -265,6 +266,22 @@ ylim([0 1200]);
 text(200,1000,['GLODAP ' char(45) ' RFR-LME = ' num2str(round(mean(GLODAP.fco2_del,'omitnan'),1)),...
     ' ' char(177) ' ' num2str(round(std(GLODAP.fco2_del,[],'omitnan'),1))]);
 exportgraphics(gcf,'Figures/GLODAP_eval_fCO2.png');
+close
+% Both
+figure; hold on;
+scatter(GLODAP.fco2,GLODAP.fco2_grid,'g.');
+scatter(CODAP.fco2,CODAP.fco2_grid,'r.');
+plot([0 1500],[0 1500],'k-');
+xlabel('GLODAP/CODAP {\itf}CO_{2}');
+ylabel('LME Grid {\itf}CO_{2}');
+xlim([0 1200]);
+ylim([0 1200]);
+text(200,1100,['GLODAP ' char(45) ' RFR-LME = ' num2str(round(mean(GLODAP.fco2_del,'omitnan'),1)),...
+    ' ' char(177) ' ' num2str(round(std(GLODAP.fco2_del,[],'omitnan'),1))]);
+text(200,900,['CODAP ' char(45) ' RFR-LME = ' num2str(round(mean(CODAP.fco2_del,'omitnan'),1)),...
+    ' ' char(177) ' ' num2str(round(std(CODAP.fco2_del,[],'omitnan'),1))]);
+exportgraphics(gcf,'Figures/GLODAP_CODAP_eval_fCO2.png');
+close
 
 %% pH
 % CODAP
@@ -279,6 +296,7 @@ ylim([7.4 8.5]);
 text(7.5,8.4,['CODAP ' char(45) ' RFR-LME = ' num2str(round(mean(CODAP.pH_del,'omitnan'),3)),...
     ' ' char(177) ' ' num2str(round(std(CODAP.pH_del,[],'omitnan'),3))]);
 exportgraphics(gcf,'Figures/CODAP_eval_pH.png');
+close
 % GLODAP
 figure; hold on;
 title('pH');
@@ -291,6 +309,7 @@ ylim([7.4 8.6]);
 text(7.5,8.4,['GLODAP ' char(45) ' RFR-LME = ' num2str(round(mean(GLODAP.pH_del,'omitnan'),3)),...
     ' ' char(177) ' ' num2str(round(std(GLODAP.pH_del,[],'omitnan'),3))]);
 exportgraphics(gcf,'Figures/GLODAP_eval_pH.png');
+close
 
 %% OmA
 % CODAP
@@ -303,6 +322,7 @@ ylabel('LME Grid');
 text(0.5,4.5,['CODAP ' char(45) ' LME = ' num2str(round(mean(CODAP.OmA_del,'omitnan'),3)),...
     ' ' char(177) ' ' num2str(round(std(CODAP.OmA_del,[],'omitnan'),3))]);
 exportgraphics(gcf,'Figures/CODAP_eval_OmA.png');
+close
 % GLODAP
 figure; hold on;
 title('\Omega_{A}');
@@ -313,3 +333,19 @@ ylabel('LME Grid');
 text(0.5,4.5,['GLODAP ' char(45) ' LME = ' num2str(round(mean(GLODAP.OmA_del,'omitnan'),3)),...
     ' ' char(177) ' ' num2str(round(std(GLODAP.OmA_del,[],'omitnan'),3))]);
 exportgraphics(gcf,'Figures/GLODAP_eval_OmA.png');
+close
+% Both scatter
+f=figure; hold on;
+% f.Position(3) = 1.5*f.Position(3);
+scatter(GLODAP.OmA,GLODAP.OmA_grid,'g.');
+scatter(CODAP.OmA,CODAP.OmA_grid,'r.');
+plot([0 5],[0 5],'k-');
+ylim([0 5]); xlim([0 5]);
+xlabel('GLODAP/CODAP \Omega_{A}');
+ylabel('LME Grid \Omega_{A}');
+text(0.5,4.7,['GLODAP ' char(45) ' LME = ' num2str(round(mean(GLODAP.OmA_del,'omitnan'),3)),...
+    ' ' char(177) ' ' num2str(round(std(GLODAP.OmA_del,[],'omitnan'),3))]);
+text(0.5,4.4,['CODAP ' char(45) ' LME = ' num2str(round(mean(CODAP.OmA_del,'omitnan'),3)),...
+    ' ' char(177) ' ' num2str(round(std(CODAP.OmA_del,[],'omitnan'),3))]);
+exportgraphics(gcf,'Figures/GLODAP_CODAP_eval_OmA.png');
+% Both histogram

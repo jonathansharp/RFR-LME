@@ -4,7 +4,7 @@
 % prediction of sea surface fCO2 in various US LMEs.
 % 
 % Written by J.D. Sharp: 8/26/22
-% Last updated by J.D. Sharp: 2/16/23
+% Last updated by J.D. Sharp: 5/6/23
 % 
 
 for n = 1:length(region)
@@ -12,9 +12,9 @@ for n = 1:length(region)
     %% load gridded pCO2, predictors, and clusters
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     load(['Data/' region{n} '/variable_arrays'],'Vars_array');
-    if test_idx == 0
+    if gmm_test_idx == 0
         load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');
-    elseif test_idx == 1
+    elseif gmm_test_idx == 1
         load(['Data/' region{n} '/gridded_clusters_test'],'Clusts_grid');
     end
 
@@ -149,10 +149,10 @@ for n = 1:length(region)
     close
 
     %% Save models and predictor/target arrays with variable indices
-    if test_idx == 0
+    if rfr_test_idx == 0
         save(['Data/' region{n} '/us_lme_models'],'Mods','-v7.3');
         save(['Data/' region{n} '/us_lme_model_evals'],'Val','-v7.3');
-    elseif test_idx == 1
+    elseif rfr_test_idx == 1
         save(['Data/' region{n} '/us_lme_models_test'],'Mods','-v7.3');
         save(['Data/' region{n} '/us_lme_model_evals_test'],'Val','-v7.3');
     end
@@ -164,7 +164,7 @@ for n = 1:length(region)
 end
 
 %% plot values across full domain if not testing
-if test_idx == 0
+if rfr_test_idx == 0
 
 %% plot gridded delta values across region
 cmap_type = 'cmocean';
@@ -172,7 +172,7 @@ cmap_name = 'balance';
 zero_piv = 1;
 cmap_segs = 9;
 plot_delta_mean_full(-22.5,22.5,cmap_type,cmap_name,cmap_segs,zero_piv,...
-    num_groups,'delta_rfr_grid','\Delta{\itf}CO_{2}',region,lme_shape,lme_idx,test_idx);
+    num_groups,'delta_rfr_grid','\Delta{\itf}CO_{2}',region,lme_shape,lme_idx,rfr_test_idx);
 
 %% plot gridded absolute delta values across region
 cmap_type = 'cmocean';
@@ -181,7 +181,7 @@ zero_piv = 0;
 cmap_segs = 9;
 plot_delta_mean_full(-1.25,21.25,cmap_type,cmap_name,cmap_segs,...
     zero_piv,num_groups,'delta_rfr_grid_abs','\Delta{\itf}CO_{2}',...
-    region,lme_shape,lme_idx,test_idx);
+    region,lme_shape,lme_idx,rfr_test_idx);
 
 %% plot delta values for each LME
 % fCO2_rfr_errors

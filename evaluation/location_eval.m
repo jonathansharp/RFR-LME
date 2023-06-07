@@ -1,7 +1,7 @@
 % Evaluate US LME OA indicators at specific locations
 
 %% load US LME data
-date = '17-May-2023';
+date = '20-May-2023';
 LME_RFR = netcdfreader(['Data/US_LME_RFR_Inds_' date '.nc']);
 LME_RFR_u = netcdfreader(['Data/US_LME_RFR_Inds_Uncer_' date '.nc']);
 
@@ -53,6 +53,20 @@ SCal.ufCO2 = squeeze(LME_RFR_u.ufCO2(SCal.lon_idx,SCal.lat_idx,:));
 SCal.pH = squeeze(LME_RFR.pH(SCal.lon_idx,SCal.lat_idx,:));
 SCal.upH = squeeze(LME_RFR_u.upH(SCal.lon_idx,SCal.lat_idx,:));
 
+%% calculate climatology
+NGoA.fCO2_clim = nan(12,1);
+SGoA.fCO2_clim = nan(12,1);
+NCal.fCO2_clim = nan(12,1);
+MCal.fCO2_clim = nan(12,1);
+SCal.fCO2_clim = nan(12,1);
+for m = 1:12
+    NGoA.fCO2_clim(m) = mean(NGoA.fCO2(m:12:end));
+    SGoA.fCO2_clim(m) = mean(SGoA.fCO2(m:12:end));
+    NCal.fCO2_clim(m) = mean(NCal.fCO2(m:12:end));
+    MCal.fCO2_clim(m) = mean(MCal.fCO2(m:12:end));
+    SCal.fCO2_clim(m) = mean(SCal.fCO2(m:12:end));
+end
+
 %% plot fCO2 Time Series
 clrs = cbrewer('qual','Set1',5);
 f=figure; hold on;
@@ -75,6 +89,27 @@ fill([Time;flipud(Time)],[SCal.fCO2+SCal.ufCO2;flipud(SCal.fCO2-SCal.ufCO2)],...
 datetick('x','yyyy','keeplimits');
 exportgraphics(f,'Figures/location_comp.png');
 close
+
+%% plot fCO2 Climatology
+clrs = cbrewer('qual','Set1',5);
+f=figure; hold on;
+plot(1:12,NGoA.fCO2_clim-mean(NGoA.fCO2_clim),'color',clrs(1,:),'linewidth',2);
+plot(1:12,SGoA.fCO2_clim-mean(SGoA.fCO2_clim),'color',clrs(2,:),'linewidth',2);
+plot(1:12,NCal.fCO2_clim-mean(NCal.fCO2_clim),'color',clrs(3,:),'linewidth',2);
+plot(1:12,MCal.fCO2_clim-mean(MCal.fCO2_clim),'color',clrs(4,:),'linewidth',2);
+plot(1:12,SCal.fCO2_clim-mean(SCal.fCO2_clim),'color',clrs(5,:),'linewidth',2);
+plot(0:13,repmat(0,14,1),'k--')
+xlim([0 13]);
+xticks(1:12);
+xticklabels({'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'});
+ylabel('{\itf}CO_{2} Anomaly (\muatm)')
+exportgraphics(f,'Figures/location_clim_comp.png');
+close
+max(NGoA.fCO2_clim)-min(NGoA.fCO2_clim)
+max(SGoA.fCO2_clim)-min(SGoA.fCO2_clim)
+max(NCal.fCO2_clim)-min(NCal.fCO2_clim)
+max(MCal.fCO2_clim)-min(MCal.fCO2_clim)
+max(SCal.fCO2_clim)-min(SCal.fCO2_clim)
 
 %% plot pH Time Series
 clrs = cbrewer('qual','Set1',5);
@@ -130,6 +165,126 @@ for n = 1:4
 end
 % plot borders around regions
 for n = 1:4
+    if n <= 11
+        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+    else
+        tmp_lon = lme_shape(lme_idx.(region{n})).X';
+    end
+    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+end
+% add locations to plot
+scatterm(NGoA.lat,NGoA.lon,100,clrs(1,:),'^','filled');
+scatterm(SGoA.lat,SGoA.lon,100,clrs(2,:),'^','filled');
+scatterm(NCal.lat,NCal.lon,100,clrs(3,:),'^','filled');
+scatterm(MCal.lat,MCal.lon,100,clrs(4,:),'^','filled');
+scatterm(SCal.lat,SCal.lon,100,clrs(5,:),'^','filled');
+% save figure
+if ~isfolder('Figures'); mkdir('Figures'); end
+exportgraphics(gcf,'Figures/Location_map.png');
+
+%% plot amplitudes on map
+define_regions_eiwg
+% initialize figure
+figure('visible','on'); box on; hold on;
+worldmap([28 62],[194 244]);
+setm(gca,'MapProjection','robinson','MLabelParallel','south');
+set(gcf,'position',[100 100 900 600]);
+set(gca,'fontsize',16);
+% figure properties
+c=colorbar('location','southoutside');
+colormap(cmocean('thermal',15));
+caxis([1 2.5]);
+c.TickLength = 0;
+c.Ticks = [1 1.477 2 2.477];
+c.TickLabels = [10 30 100 300];
+c.Label.String = 'Sea Surface {\itf}CO_{2} Amplitude (\muatm)';
+cbarrow;
+% plot land
+bordersm('alaska','facecolor',rgb('gray'))
+bordersm('continental us','facecolor',rgb('gray'))
+bordersm('canada','facecolor',rgb('light grey'))
+mlabel off
+% plot regions
+for n = 1:4
+    load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
+    % calculate climatology
+    OAI_grid.(region{n}).fCO2_clim = ...
+        nan(OAI_grid.(region{n}).dim.x,OAI_grid.(region{n}).dim.y,12);
+    for m = 1:12
+        OAI_grid.(region{n}).fCO2_clim(:,:,m) = ...
+            mean(OAI_grid.(region{n}).fCO2(:,:,m:12:end),3,'omitnan');
+    end
+    % calculate amplitude
+    OAI_grid.(region{n}).fCO2_amp = ...
+        max(OAI_grid.(region{n}).fCO2_clim,[],3) - ...
+        min(OAI_grid.(region{n}).fCO2_clim,[],3);
+    contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+        log10(OAI_grid.(region{n}).fCO2_amp)',1:0.1:2.5,'LineStyle','none');
+    alpha 0.5
+    clear vars_grid z
+end
+% plot borders around regions
+for n = 1:4
+    if n <= 11
+        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+    else
+        tmp_lon = lme_shape(lme_idx.(region{n})).X';
+    end
+    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+end
+% add locations to plot
+scatterm(NGoA.lat,NGoA.lon,100,clrs(1,:),'^','filled');
+scatterm(SGoA.lat,SGoA.lon,100,clrs(2,:),'^','filled');
+scatterm(NCal.lat,NCal.lon,100,clrs(3,:),'^','filled');
+scatterm(MCal.lat,MCal.lon,100,clrs(4,:),'^','filled');
+scatterm(SCal.lat,SCal.lon,100,clrs(5,:),'^','filled');
+% save figure
+if ~isfolder('Figures'); mkdir('Figures'); end
+exportgraphics(gcf,'Figures/Location_map.png');
+
+%% plot amplitudes on map (Hawaii)
+define_regions_eiwg
+% initialize figure
+figure('visible','on'); box on; hold on;
+worldmap([15 25],[190 210]);
+setm(gca,'MapProjection','robinson','MLabelParallel','south');
+set(gcf,'position',[100 100 900 600]);
+set(gca,'fontsize',16);
+% figure properties
+c=colorbar('location','southoutside');
+colormap(cmocean('thermal',15));
+caxis([1 2.5]);
+c.TickLength = 0;
+c.Ticks = [1 1.477 2 2.477];
+c.TickLabels = [10 30 100 300];
+c.Label.String = 'Sea Surface {\itf}CO_{2} Amplitude (\muatm)';
+cbarrow;
+% plot land
+bordersm('hawaii','facecolor',rgb('gray'))
+mlabel off
+% plot regions
+for n = 11
+    load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
+    % calculate climatology
+    OAI_grid.(region{n}).fCO2_clim = ...
+        nan(OAI_grid.(region{n}).dim.x,OAI_grid.(region{n}).dim.y,12);
+    for m = 1:12
+        OAI_grid.(region{n}).fCO2_clim(:,:,m) = ...
+            mean(OAI_grid.(region{n}).fCO2(:,:,m:12:end),3,'omitnan');
+    end
+    % calculate amplitude
+    OAI_grid.(region{n}).fCO2_amp = ...
+        max(OAI_grid.(region{n}).fCO2_clim,[],3) - ...
+        min(OAI_grid.(region{n}).fCO2_clim,[],3);
+    contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+        log10(OAI_grid.(region{n}).fCO2_amp)',1:0.1:2.5,'LineStyle','none');
+    alpha 0.5
+    clear vars_grid z
+end
+% plot borders around regions
+for n = 11
     if n <= 11
         tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
     else
