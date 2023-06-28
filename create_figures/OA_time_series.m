@@ -17,7 +17,7 @@ units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mu
 rounder = [1 1 1 3 2 2 1 1 2];
 
 % loop through variables
-for var_num = 1%:9
+for var_num = 1:9
 
     % initialize figure
     figure('Visible','on'); hold on;

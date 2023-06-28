@@ -4,7 +4,7 @@
 ImportMoorings
 
 %% load US LME data
-date = '20-May-2023';
+date = '08-Jun-2023';
 LME_RFR = netcdfreader(['Data/US_LME_RFR_Inds_' date '.nc']);
 LME_RFR_u = netcdfreader(['Data/US_LME_RFR_Inds_Uncer_' date '.nc']);
 
@@ -108,20 +108,20 @@ for n = 1:length(moornames)
         [MOORING.(moornames{n}).LME_RFR_fCO2+MOORING.(moornames{n}).LME_RFR_ufCO2;...
         flipud(MOORING.(moornames{n}).LME_RFR_fCO2-MOORING.(moornames{n}).LME_RFR_ufCO2)],...
         clrs(1,:),'facealpha',0.25,'linestyle','none')
-%     p2=plot(MOORING.(moornames{n}).CMEMS_LSCE_datetime,MOORING.(moornames{n}).CMEMS_LSCE_pCO2,...
-%         'color',clrs(2,:),'linewidth',2);
-%     p3=plot(MOORING.(moornames{n}).SODA_ETHZ_datetime,MOORING.(moornames{n}).SODA_ETHZ_pCO2,...
-%         'color',clrs(3,:),'linewidth',2);
-%     p4=plot(MOORING.(moornames{n}).MPI_SOMFFN_datetime,MOORING.(moornames{n}).MPI_SOMFFN_pCO2,...
-%         'color',clrs(4,:),'linewidth',2);
+    p2=plot(MOORING.(moornames{n}).CMEMS_LSCE_datetime,MOORING.(moornames{n}).CMEMS_LSCE_pCO2,...
+        'color',clrs(2,:),'linewidth',2);
+    p3=plot(MOORING.(moornames{n}).SODA_ETHZ_datetime,MOORING.(moornames{n}).SODA_ETHZ_pCO2,...
+        'color',clrs(3,:),'linewidth',2);
+    p4=plot(MOORING.(moornames{n}).MPI_SOMFFN_datetime,MOORING.(moornames{n}).MPI_SOMFFN_pCO2,...
+        'color',clrs(4,:),'linewidth',2);
     s1=scatter(MOORING.(moornames{n}).datetime_monthly,MOORING.(moornames{n}).fCO2SW_monthly(:,1),'ko','filled');
-%     xlim([min(MOORING.(moornames{n}).LME_RFR_datetime) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
-    xlim([MOORING.(moornames{n}).LME_RFR_datetime(96) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
+    xlim([min(MOORING.(moornames{n}).LME_RFR_datetime) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
+%     xlim([MOORING.(moornames{n}).LME_RFR_datetime(96) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
     datetick('x','yyyy','keeplimits');
-%     legend([p1 p2 p3 p4 s1],{'LME-RFR' 'CMEMS-LSCE' 'OceanSODA-ETHZ' 'MPI-SOMFFN' 'Mooring'},...
-%         'Location','north','NumColumns',5);
-    legend([p1 s1],{'LME-RFR' 'Mooring'},...
-        'Location','north','NumColumns',2);
+    legend([p1 p2 p3 p4 s1],{'LME-RFR' 'CMEMS-LSCE' 'OceanSODA-ETHZ' 'MPI-SOMFFN' 'Mooring'},...
+        'Location','north','NumColumns',5);
+%     legend([p1 s1],{'LME-RFR' 'Mooring'},...
+%         'Location','north','NumColumns',2);
     exportgraphics(f,['Figures/mooring_comp_' moornames{n} '.png']);
     close
     % plot absolute difference between mooring and RFR
@@ -148,23 +148,26 @@ bordersm('continental us','facecolor',rgb('gray'))
 bordersm('canada','facecolor',rgb('light grey'))
 mlabel off
 % plot regions
-for n = 1:4
-    load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
-    z = mean(OAI_grid.(region{n}).fCO2,3,'omitnan')';
-    contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
-        z,295:10:475,'LineStyle','none');
-    clear vars_grid z
-end
-% plot borders around regions
-for n = 1:4
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+% for n = 1:4
+%     load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
+%     z = mean(OAI_grid.(region{n}).fCO2,3,'omitnan')';
+%     contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+%         z,295:10:475,'LineStyle','none');
+%     clear vars_grid z
+% end
+% % plot borders around regions
+% for n = 1:4
+%     if n <= 11
+%         tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+%     else
+%         tmp_lon = lme_shape(lme_idx.(region{n})).X';
+%     end
+%     tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+%     plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+% end
+% plot ETHZ
+contourfm(SODA_ETHZ.lat,SODA_ETHZ.lon,mean(SODA_ETHZ.pco2,3,'omitnan'),...
+    295:10:475,'LineStyle','none');
 % add Moorings to plot
 for n = 1:length(moornames)
     moor_lon = mean(MOORING.(moornames{n}).lon,'omitnan');

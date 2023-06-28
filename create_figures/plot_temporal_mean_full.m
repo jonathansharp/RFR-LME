@@ -21,7 +21,7 @@ c.Label.String = lab;
 cbarrow;
 % plot regions
 for n = 1:length(region)
-    if any(strcmp(varname,{'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'ufCO2'}))
+    if any(strcmp(varname,{'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'ufCO2' 'TA_DIC'}))
         type = 'OAI_grid';
         vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
         if strcmp(varname,'H')
@@ -32,7 +32,12 @@ for n = 1:length(region)
         type = 'Preds_grid';
         vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
     end
-    z = mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')';
+    if ~strcmp(varname,'TA_DIC')
+        z = mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')';
+    else
+        z = mean(vars_grid.(type).(region{n}).TA./ ...
+            vars_grid.(type).(region{n}).DIC,3,'omitnan')';
+    end
     contourfm(vars_grid.(type).(region{n}).lat,vars_grid.(type).(region{n}).lon,...
         z,zmin:zsp:zmax,'LineStyle','none');
     clear vars_grid z

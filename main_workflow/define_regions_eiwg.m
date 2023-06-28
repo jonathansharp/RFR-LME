@@ -27,14 +27,6 @@ lme_idx.CS = 1;
 lme_idx.SE = 11;
 lme_idx.NE = 6;
 
-% lme_idx.AS = 5;
-% lme_idx.JI = 6;
-% lme_idx.PK = 7;
-% lme_idx.HB = 8;
-% lme_idx.JA = 9;
-% lme_idx.WI = 10;
-% lme_idx.GC = 11;
-
 % %% plot regions for reference
 % figure('visible','on');
 % worldmap([-18 82],[140 302]);
