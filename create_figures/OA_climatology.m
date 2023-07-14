@@ -10,13 +10,13 @@ define_regions_eiwg
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
 % y_span = [-100,100;-200,200;-100,100;-0.2,0.2;-1,1;-1,1;6,16;-60,60;-2,2];
-var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
-var_lab = {'{\itC}_{T}' '{\itf}_{CO2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
+var_type = {'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
+var_lab = {'{\itC}_{T}' '{\itp}_{CO2}' '{\itf}_{CO2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
     '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
-units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
-rounder = [1 1 1 3 2 2 1 1 2];
-co2sys_idx = [2 5 1 3 18 17 15 7 16];
-deriv_idx = [2 5 1 3 11 10 3 7 9];
+units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
+rounder = [1 1 1 1 3 2 2 1 1 2];
+co2sys_idx = [2 4 5 1 3 18 17 15 7 16];
+deriv_idx = [2 4 5 1 3 11 10 3 7 9];
 
 % loop through variables
 for var_num = 1:9

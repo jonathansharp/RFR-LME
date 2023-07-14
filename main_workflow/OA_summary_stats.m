@@ -1,7 +1,7 @@
 % Save OA indicator summary statistics
 % 
 % Written by J.D. Sharp: 2/1/23
-% Last updated by J.D. Sharp: 5/18/23
+% Last updated by J.D. Sharp: 7/13/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
@@ -9,9 +9,9 @@ define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
-var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
-units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
-rounder = [1 1 1 3 2 2 1 1 2];
+var_type = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
+units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
+rounder = [1 1 1 1 3 2 2 1 1 2];
 
 % preallocate table
 stats = nan(length(region),length(var_type)*4);
@@ -23,7 +23,7 @@ u_ann = nan(288/12,length(region)*length(var_type));
 % loop through each region
 for n = 1:length(region)
 
-    for var_num = 1:9
+    for var_num = 1:length(var_type)
 
         % load estimated OA grid
         load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
@@ -34,8 +34,12 @@ for n = 1:length(region)
         OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         for t = 1:OAI_grid.(region{n}).dim.z
-            % remove ice-filled cells
-            area_weights(isnan(OAI_grid.(region{n}).(var_type{var_num})(:,:,t))) = NaN;
+            % establish non-ice-covered fraction
+            open_per = sum(OAI_grid.(region{n}).idxspc(:,:,t),'all')./...
+                sum(SOCAT_grid.(region{n}).idxspc(:,:,t),'all');
+            % remove ice-filled cells from area weights
+            area_weights(~OAI_grid.(region{n}).idxspc(:,:,t)) = NaN;
+            % calculate area-weighted means
             OAI_grid.(region{n}).var_dom_mean(t) = ...
                 squeeze(sum(sum(OAI_grid.(region{n}).(var_type{var_num})(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
@@ -44,9 +48,14 @@ for n = 1:length(region)
                 squeeze(sum(sum(OAI_grid.(region{n}).(['u' var_type{var_num}])(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
                     squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
+            % remove means when region is >50% ice
+            if open_per < 0.5
+                OAI_grid.(region{n}).var_dom_mean(t) = NaN;
+                OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
+            end
         end
     
-        % scale H to nanomoles
+        % scale H and uH fom moles to nanomoles
         if strcmp(var_type{var_num},'H')
             OAI_grid.(region{n}).var_dom_mean = (10^9).*OAI_grid.(region{n}).var_dom_mean;
             OAI_grid.(region{n}).u_var_dom_mean = (10^9).*OAI_grid.(region{n}).u_var_dom_mean;
@@ -65,27 +74,33 @@ for n = 1:length(region)
             time_ann(y) = ...
                 mean(time((y-1)*12+1:(y-1)*12+12));
             OAI_grid.(region{n}).var_dom_mean_ann(y) = ...
-                mean(OAI_grid.(region{n}).var_dom_mean((y-1)*12+1:(y-1)*12+12));
+                mean(OAI_grid.(region{n}).var_dom_mean((y-1)*12+1:(y-1)*12+12),'omitnan');
             OAI_grid.(region{n}).u_var_dom_mean_ann(y) = ...
-                mean(OAI_grid.(region{n}).u_var_dom_mean((y-1)*12+1:(y-1)*12+12));
+                mean(OAI_grid.(region{n}).u_var_dom_mean((y-1)*12+1:(y-1)*12+12),'omitnan');
         end
     
         % calculate trend
         [yf,yr,x] = ...
-            leastsq2(OAI_grid.(region{n}).month,...
-            OAI_grid.(region{n}).var_dom_mean,0,2,[6 12]);
+            leastsq2(1:length(OAI_grid.(region{n}).year)/12,...
+            OAI_grid.(region{n}).var_dom_mean_ann,0,0,0);
     
         % calculate interannual variability
         iav = std(yr);
 
         % determine average modelled climatology
         clim = nan(12,1);
+        clim_uncer = nan(12,1);
         for m = 1:12
-            clim(m) = mean(yf(m:12:end));
+            clim(m) = mean(OAI_grid.(region{n}).var_dom_mean(m:12:end),'omitnan');
+            clim_uncer(m) = mean(OAI_grid.(region{n}).u_var_dom_mean(m:12:end),'omitnan');
         end
     
         % calculate amplitude
-        amp = max(clim) - min(clim);
+        if sum(~isnan(clim)) > 8
+            amp = max(clim) - min(clim);
+        else
+            amp = NaN;
+        end
 
         % calculate trend over most recent 5 years
         [yf5,yr5,x5,err5] = ...
@@ -101,10 +116,10 @@ for n = 1:length(region)
         neg_mean = mean5 < meantot-conf90;
     
         % fill table with summary statistics
-        stats(n,(var_num-1)*4+1) = mean(OAI_grid.(region{n}).var_dom_mean);
-        stats(n,(var_num-1)*4+2) = x(2)*12;
-        stats(n,(var_num-1)*4+3) = amp;
-        stats(n,(var_num-1)*4+4) = iav;
+        stats(n,(var_num-1)*4+1) = mean(OAI_grid.(region{n}).var_dom_mean,'omitnan'); % mean
+        stats(n,(var_num-1)*4+2) = x(2); % trend
+        stats(n,(var_num-1)*4+3) = amp; % amplitude
+        stats(n,(var_num-1)*4+4) = iav; % interannual variability
 
         % fill table with monthly values
         monthly(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean;
@@ -121,9 +136,12 @@ for n = 1:length(region)
         % plot
         plot(time,OAI_grid.(region{n}).var_dom_mean,'k-','linewidth',1);
         plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'r-','linewidth',3);
-        fill([time;flipud(time)],[OAI_grid.(region{n}).var_dom_mean+OAI_grid.(region{n}).u_var_dom_mean;...
-            flipud(OAI_grid.(region{n}).var_dom_mean-OAI_grid.(region{n}).u_var_dom_mean)],'k',...
-            'FaceAlpha',0.2,'LineStyle','none');
+%         fill([time;flipud(time)],[OAI_grid.(region{n}).var_dom_mean+OAI_grid.(region{n}).u_var_dom_mean;...
+%             flipud(OAI_grid.(region{n}).var_dom_mean-OAI_grid.(region{n}).u_var_dom_mean)],'k',...
+%             'FaceAlpha',0.2,'LineStyle','none');
+        fill([time_ann;flipud(time_ann)],[OAI_grid.(region{n}).var_dom_mean_ann+OAI_grid.(region{n}).u_var_dom_mean_ann;...
+            flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'k',...
+            'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
 %         fill([time_ann;flipud(time_ann)],[OAI_grid.(region{n}).var_dom_mean_ann+OAI_grid.(region{n}).u_var_dom_mean_ann;...
 %             flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'r',...
 %             'FaceAlpha',0.2,'LineStyle','none');
@@ -159,9 +177,62 @@ for n = 1:length(region)
         % save figure
         exportgraphics(gcf,['Figures/' region{n} '_time_series_' var_type{var_num} '.png']);
         close
-    
-        % clean up
+
+        %% plot climatology
+        % initialize figure
+        figure('Visible','on'); hold on;
+        set(gcf,'position',[10 10 700 400]);
+        % plot
+        plot(1:12,clim,'k-','linewidth',3);
+        fill([1:12,fliplr(1:12)]',[clim+clim_uncer;...
+            flipud(clim-clim_uncer)],'k',...
+            'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
+        scatter(1:12,clim,200,'k.');
+        xlim([0.5 12.5]);
+        xticks(1:12);
+        xticklabels({'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'})
+        % add text to plot
+        title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean),rounder(var_num))) ...
+            ' ' units{var_num} ' | Amp. = ' ...
+            num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
+            'FontSize',10,'HorizontalAlignment','center');
+        % Add recent trend indicator
+%         if pos_signif_5
+%             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
+%         elseif neg_signif_5
+%             text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
+%         else
+%             text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
+%         end
+        % Add recent mean indicator
+%         if pos_mean
+%             text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         elseif neg_mean
+%             text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         else
+%             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         end
+        % save figure
+        exportgraphics(gcf,['Figures/' region{n} '_climatology_' var_type{var_num} '.png']);
+        close
+
+        %% save LME-specific indicator time series
+        if ~exist(['IndsAndStats/' region{n}],'dir')
+            mkdir(['IndsAndStats/' region{n}]);
+        end
+        mnth_tmp = [OAI_grid.(region{n}).year,OAI_grid.(region{n}).month_of_year,...
+            OAI_grid.(region{n}).var_dom_mean,OAI_grid.(region{n}).u_var_dom_mean];
+        writetable(array2table(mnth_tmp,'VariableNames',{'Year' 'Month' 'Value' 'Uncertainty'}),...
+            ['IndsAndStats/' region{n} '/monthly_' var_type{var_num} '.csv']);
+        ann_tmp = [unique(OAI_grid.(region{n}).year),...
+            OAI_grid.(region{n}).var_dom_mean_ann,OAI_grid.(region{n}).u_var_dom_mean_ann];
+        writetable(array2table(ann_tmp,'VariableNames',{'Year' 'Value' 'Uncertainty'}),...
+            ['IndsAndStats/' region{n} '/annual_' var_type{var_num} '.csv'],'WriteRowNames',true);
+
+        %% clean up
         clear SOCAT_grid OAI_grid area_weights t time
+
+        %% save LME-specific indicator time series
 
     end
 
@@ -169,7 +240,7 @@ end
 
 % pre-allocate variable names
 VarNameSt = cell(length(var_type)*3,1);
-for var_num = 1:9
+for var_num = 1:length(var_type)
     VarNameSt{(var_num-1)*4+1} = [var_type{var_num} ',Avg.'];
     VarNameSt{(var_num-1)*4+2} = [var_type{var_num} ',Tr.'];
     VarNameSt{(var_num-1)*4+3} = [var_type{var_num} ',Amp.'];
@@ -177,8 +248,8 @@ for var_num = 1:9
 end
 VarNameMnAn = cell(length(region)*length(var_type),1);
 for n = 1:length(region)
-    for var_num = 1:9
-        VarNameMnAn{(n-1)*9+var_num} = [region{n} ',' var_type{var_num}];
+    for var_num = 1:length(var_type)
+        VarNameMnAn{(n-1)*length(var_type)+var_num} = [region{n} ',' var_type{var_num}];
     end
 end
 
@@ -190,8 +261,8 @@ u_monthly = array2table(u_monthly,'RowNames',arrayfun(@num2str,1:288,'UniformOut
 u_ann = array2table(u_ann,'RowNames',arrayfun(@num2str,1997 + (1:288/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
 
 % save table
-writetable(stats,['Data/SummaryStatistics-' date '.xls'],'WriteRowNames',true);
-writetable(monthly,['Data/Monthly-Inds-' date '.xls'],'WriteRowNames',true);
-writetable(u_monthly,['Data/Monthly-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
-writetable(ann,['Data/Annual-Inds-' date '.xls'],'WriteRowNames',true);
-writetable(u_ann,['Data/Annual-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
+writetable(stats,['IndsAndStats/SummaryStatistics-' date '.xls'],'WriteRowNames',true);
+writetable(monthly,['IndsAndStats/Monthly-Inds-' date '.xls'],'WriteRowNames',true);
+writetable(u_monthly,['IndsAndStats/Monthly-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
+writetable(ann,['IndsAndStats/Annual-Inds-' date '.xls'],'WriteRowNames',true);
+writetable(u_ann,['IndsAndStats/Annual-Inds-Uncer-' date '.xls'],'WriteRowNames',true);

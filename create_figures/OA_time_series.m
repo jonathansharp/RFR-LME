@@ -87,7 +87,7 @@ for var_num = 1:9
         % determine average modelled climatology
         clim = nan(12,1);
         for m = 1:12
-            clim(m) = mean(yf(m:12:end));
+            clim(m) = mean(yf(m:12:end),'omitnan');
         end
     
         % calculate amplitude
