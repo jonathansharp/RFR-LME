@@ -11,7 +11,7 @@
 
 %% load SOCAT structure
 if ~exist('SOCAT','var')
-    load('Data/socat_structure','SOCAT');
+    load('Data/socat_structure_2023','SOCAT');
 end
 
 %% display status
@@ -25,6 +25,13 @@ SOCAT_grid.lim.lonmax = round(max(SOCAT.longitude),0);
 SOCAT_grid.lim.monthmin = 1;
 SOCAT_grid.lim.monthmax = 288;
 
+%% remove values later than 2021
+idx_21 = SOCAT.month_since_1998 > 288;
+vars = fieldnames(SOCAT);
+for v = 1:length(vars)
+    SOCAT.(vars{v})(idx_21) = [];
+end
+
 %% Create 0.25 x 0.25 degree monthly grid
 SOCAT_grid.lon = [SOCAT_grid.lim.lonmin+0.125:0.25:SOCAT_grid.lim.lonmax]';
 SOCAT_grid.dim.x = length(SOCAT_grid.lon);
@@ -34,7 +41,7 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2021,12)';
+SOCAT_grid.year = repelem(1998:2022,12)';
 SOCAT_grid.month_of_year = repmat(1:12,1,24)';
 
 %% Determine bin number of each data point

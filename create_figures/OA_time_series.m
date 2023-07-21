@@ -1,7 +1,7 @@
 % Plot OA indicator time series in each LME
 % 
 % Written by J.D. Sharp: 1/17/23
-% Last updated by J.D. Sharp: 6/7/23
+% Last updated by J.D. Sharp: 7/14/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
@@ -9,20 +9,20 @@ define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
-y_span = [1800,2300;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
-var_type = {'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
-var_lab = {'{\itC}_{T}' '{\itf}_{CO2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
+y_span = [1800,2300;250,550;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
+var_type = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
+var_lab = {'{\itC}_{T}' '{\itp}CO_{2}' '{\itf}_{CO2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
     '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
-units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
-rounder = [1 1 1 3 2 2 1 1 2];
+units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
+rounder = [1 1 1 1 3 2 2 1 1 2];
 
 % loop through variables
 for var_num = 1:9
 
     % initialize figure
     figure('Visible','on'); hold on;
-    tcl = tiledlayout(6,2);
-    set(gcf,'units','inches','position',[0 0 8.5 11]);
+    tcl = tiledlayout(4,3);
+    set(gcf,'units','inches','position',[0 0 13 8]);
 
     % add text title
 %     text(0.5,0.6,['Weighted Mean ' var_lab{var_num} ' Time'],...
@@ -44,8 +44,12 @@ for var_num = 1:9
         OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         for t = 1:OAI_grid.(region{n}).dim.z
-            % remove ice-filled cells
-            area_weights(isnan(OAI_grid.(region{n}).(var_type{var_num})(:,:,t))) = NaN;
+            % establish non-ice-covered fraction
+            open_per = sum(OAI_grid.(region{n}).idxspc(:,:,t),'all')./...
+                sum(SOCAT_grid.(region{n}).idxspc(:,:,t),'all');
+            % remove ice-filled cells from area weights
+            area_weights(~OAI_grid.(region{n}).idxspc(:,:,t)) = NaN;
+            % calculate area-weighted means
             OAI_grid.(region{n}).var_dom_mean(t) = ...
                 squeeze(sum(sum(OAI_grid.(region{n}).(var_type{var_num})(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
@@ -54,6 +58,11 @@ for var_num = 1:9
                 squeeze(sum(sum(OAI_grid.(region{n}).(['u' var_type{var_num}])(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
                     squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
+            % remove means when region is >50% ice
+%             if open_per < 0.5
+%                 OAI_grid.(region{n}).var_dom_mean(t) = NaN;
+%                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
+%             end
         end
     
         % scale H to nanomoles
@@ -104,7 +113,7 @@ for var_num = 1:9
         % add legend
         if n == 11
             lg=legend([p u],{'Monthly Mean' 'Uncertainty'},'fontsize',20);
-            lg.Position(1) = lg.Position(1)+0.45;
+            lg.Position(1) = lg.Position(1)+0.28;
             lg.Position(2) = lg.Position(2)-0.05;
         end
     

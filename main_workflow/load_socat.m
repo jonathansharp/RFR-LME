@@ -15,7 +15,7 @@ disp('Downloading SOCAT Data');
 % this is obtained by running 'Read_SOCATv3_v2022.m' in the SOCATv2022
 % subfolder with the latitude limits of -18 to 82 degrees north and the
 % longitude limits of 140 to 302 degrees east
-load('data_to_use/SOCATv2022_USA.mat');
+load('data_to_use/SOCATv2023_USA.mat');
 
 %% assemble data into a structure
 SOCAT.expocode = Expocode;
@@ -90,4 +90,4 @@ close
 
 %% Save SOCAT structure
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_structure','SOCAT','-v7.3');
+save('Data/socat_structure_2023','SOCAT','-v7.3');

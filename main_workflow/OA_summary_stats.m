@@ -1,7 +1,7 @@
 % Save OA indicator summary statistics
 % 
 % Written by J.D. Sharp: 2/1/23
-% Last updated by J.D. Sharp: 7/13/23
+% Last updated by J.D. Sharp: 7/14/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
@@ -21,7 +21,7 @@ ann = nan(288/12,length(region)*length(var_type));
 u_ann = nan(288/12,length(region)*length(var_type));
 
 % loop through each region
-for n = 1:length(region)
+for n = 4%1:length(region)
 
     for var_num = 1:length(var_type)
 
@@ -49,10 +49,10 @@ for n = 1:length(region)
                     area_weights,1,'omitnan'),2,'omitnan'))./...
                     squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
             % remove means when region is >50% ice
-            if open_per < 0.5
-                OAI_grid.(region{n}).var_dom_mean(t) = NaN;
-                OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
-            end
+%             if open_per < 0.5
+%                 OAI_grid.(region{n}).var_dom_mean(t) = NaN;
+%                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
+%             end
         end
     
         % scale H and uH fom moles to nanomoles
@@ -152,8 +152,8 @@ for n = 1:length(region)
         plot([time(1) time(end-12*5)],[meantot meantot],'k--','linewidth',2);
         plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
         % add text to plot
-        title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean),rounder(var_num))) ...
-            ' ' units{var_num} ' | Tr. = ' num2str(round(x(2)*12,rounder(var_num))) ...
+        title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean,'omitnan'),rounder(var_num))) ...
+            ' ' units{var_num} ' | Tr. = ' num2str(round(x(2),rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
             'FontSize',10,'HorizontalAlignment','center');
