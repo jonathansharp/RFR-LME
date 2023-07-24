@@ -288,7 +288,7 @@ clear land c mycolormap
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_gridded','SOCAT_grid','-v7.3');
+save('Data/socat_gridded_2023','SOCAT_grid','-v7.3');
 
 %% clean up
 clear SOCAT_grid

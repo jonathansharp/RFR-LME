@@ -21,7 +21,7 @@ ann = nan(288/12,length(region)*length(var_type));
 u_ann = nan(288/12,length(region)*length(var_type));
 
 % loop through each region
-for n = 4%1:length(region)
+for n = 1:length(region)
 
     for var_num = 1:length(var_type)
 
