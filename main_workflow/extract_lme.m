@@ -16,7 +16,7 @@ define_regions_eiwg
 for n = 1:length(region)
 
     %% load SOCAT grid
-    load('Data/socat_gridded','SOCAT_grid');
+    load('Data/socat_gridded_2023','SOCAT_grid');
 
     %% display status
     disp(['Extracting ' region{n} ' LME from SOCAT grid']);
@@ -123,11 +123,13 @@ for n = 1:length(region)
 %     exportgraphics(gcf,['Figures/' region{n} '/hist.png']);
 %     close
 
-    plot_regional_gif(SOCAT_grid.(region{n}).lim,...
-        SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
-        SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,parula(20),'fCO2_obs',...
-        'Surface {\itf}CO_{2} (\muatm)',SOCAT_grid.(region{n}).year,...
-        SOCAT_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    if gif_idx == 1
+        plot_regional_gif(SOCAT_grid.(region{n}).lim,...
+            SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
+            SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,parula(20),'fCO2_obs',...
+            'Surface {\itf}CO_{2} (\muatm)',SOCAT_grid.(region{n}).year,...
+            SOCAT_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    end
 
     %% Plot the percentage of grid cells with data
     figure('visible','off');

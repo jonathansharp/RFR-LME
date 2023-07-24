@@ -36,7 +36,7 @@ SOCAT.fCO2_flag = fCO2rec_flag;
 SOCAT.fCO2_src = fCO2rec_src;
 SOCAT.flag = QC_Flag;
 % clean up
-clearvars -except SOCAT SOCAT_grid region n lme_* 
+clearvars -except SOCAT SOCAT_grid region n map_idx gif_idx lme_* 
 
 %% remove observations before 1998
 idxyr = SOCAT.year >= 1998;

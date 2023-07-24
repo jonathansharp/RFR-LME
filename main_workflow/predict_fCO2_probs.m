@@ -123,11 +123,13 @@ for n = 1:length(region)
         OAI_grid.(region{n}).dim,OAI_grid.(region{n}).lat,...
         OAI_grid.(region{n}).lon,OAI_grid.(region{n}).fCO2,...
         parula(20),'fCO2','Surface {\itf}CO_{2} (\muatm)',region{n});
-    plot_regional_gif(OAI_grid.(region{n}).lim,...
-        OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
-        OAI_grid.(region{n}).fCO2,parula(20),'fCO2',...
-        'Surface {\itf}CO_{2} (\muatm)',OAI_grid.(region{n}).year,...
-        OAI_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    if gif_idx == 1
+        plot_regional_gif(OAI_grid.(region{n}).lim,...
+            OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+            OAI_grid.(region{n}).fCO2,parula(20),'fCO2',...
+            'Surface {\itf}CO_{2} (\muatm)',OAI_grid.(region{n}).year,...
+            OAI_grid.(region{n}).month_of_year,region{n},lme_shape(lme_idx.(region{n})));
+    end
 
     %% plot estimated pCO2
     plot_temporal_mean(OAI_grid.(region{n}).lim,...
@@ -143,11 +145,17 @@ for n = 1:length(region)
 
 end
 
-%% plot fCO2 across full region
-plot_temporal_mean_full(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
+if map_idx == 1
 
-%% plot fCO2 across full region (seasonally)
-plot_temporal_mean_full_seas(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
+    %% plot fCO2 across full region
+    plot_temporal_mean_full(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
+    
+    %% plot fCO2 across full region (seasonally)
+    plot_temporal_mean_full_seas(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
+    
+    %% plot gif of fCO2 across full region
+    if gif_idx == 1
+        plot_full_gif(295,475,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx);
+    end
 
-%% plot gif of fCO2 across full region
-plot_full_gif(295,475,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx);
+end

@@ -3,17 +3,23 @@
 % LMEs using ESPER algorithms, then calculate ocean acidification
 % indicators for each LME.
 
+% determine whether or not to make maps
+% some of the maps take a long time to create, so setting this to zero
+% speeds up the computing time significantly
+map_idx = 0;
+gif_idx = 0;
+
 % this script defines the bounds of the eighteen LMEs
 define_regions_eiwg
 
 % this script loads SOCAT fCO2 and ancillary data surrounding North
 % America extracted from the SOCATv2022 database
-% load_socat
+load_socat
 % load_socat_1980
 
 % this script grids fCO2 observations from the SOCAT database into grid
 % cells of resolution: 0.25 deg lat x 0.25 deg lon x 1 month
-% grid_socat
+grid_socat
 % grid_socat_1980
 
 % this script extracts each of eighteen LMEs from the gridded data
