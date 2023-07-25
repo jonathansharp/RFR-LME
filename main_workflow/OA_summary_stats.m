@@ -48,7 +48,7 @@ for n = 1:length(region)
                 squeeze(sum(sum(OAI_grid.(region{n}).(['u' var_type{var_num}])(:,:,t).*...
                     area_weights,1,'omitnan'),2,'omitnan'))./...
                     squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
-            % remove means when region is >50% ice
+            % remove means when region is >50% ice (retaining these for now)
 %             if open_per < 0.5
 %                 OAI_grid.(region{n}).var_dom_mean(t) = NaN;
 %                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;

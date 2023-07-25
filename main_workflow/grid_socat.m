@@ -41,7 +41,7 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2022,12)';
+SOCAT_grid.year = repelem(1998:2021,12)';
 SOCAT_grid.month_of_year = repmat(1:12,1,24)';
 
 %% Determine bin number of each data point
