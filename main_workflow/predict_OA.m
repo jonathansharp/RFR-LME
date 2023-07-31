@@ -4,7 +4,7 @@
 % large Marine Ecosystems.
 % 
 % Written by J.D. Sharp: 1/19/23
-% Last updated by J.D. Sharp: 6/7/23
+% Last updated by J.D. Sharp: 7/27/23
 % 
 
 % this script defines the bounds of the eighteen LMEs
@@ -93,9 +93,11 @@ for n = 1:length(region)
     nan_spc = 1;
     num_cells = 2;
     while nan_spc > 0 % filter until all grid cells are filled
-        OAI_grid.(region{n}).ufCO2 = smooth2a(OAI_grid.(region{n}).ufCO2,num_cells,num_cells);
-        OAI_grid.(region{n}).ufCO2(~OAI_grid.(region{n}).idxspc(:,:,1)) = NaN;
-        nan_chk = OAI_grid.(region{n}).idxspc(:,:,1) - ~isnan(OAI_grid.(region{n}).ufCO2);
+        OAI_grid.(region{n}).ufCO2 = ... % filter
+            smooth2a(OAI_grid.(region{n}).ufCO2,num_cells,num_cells);
+        OAI_grid.(region{n}).ufCO2(~Preds_grid.(region{n}).idxspc(:,:,1)) = NaN; % blank out non-ocean cells
+        % check to see if all ocean cells are filled
+        nan_chk = Preds_grid.(region{n}).idxspc(:,:,1) - ~isnan(OAI_grid.(region{n}).ufCO2);
         nan_spc = sum(nan_chk(:));
         num_cells = num_cells+1;
     end
@@ -104,7 +106,10 @@ for n = 1:length(region)
     OAI_grid.(region{n}).ufCO2 = ...
         repmat(OAI_grid.(region{n}).ufCO2,1,1,OAI_grid.(region{n}).dim.z);
 
-    % test plot of spatially scaled absolute delta values
+    % blank ice-filled cells
+    OAI_grid.(region{n}).ufCO2(~OAI_grid.(region{n}).idxspc) = NaN;
+
+%     % test plot of spatially scaled absolute delta values
 %     figure;
 %     h=pcolor(OAI_grid.(region{n}).lon,OAI_grid.(region{n}).lat,...
 %         OAI_grid.(region{n}).ufCO2(:,:,1)');
@@ -324,20 +329,21 @@ end
 if map_idx == 1
 
     %% plot OA indicators across full region
-    % plot_temporal_mean_full(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(7.9,8.2,0.02,jet(15),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(0,40,2,cmocean('amp',21),'ufCO2','Sea Surface {\itf}CO_{2} Uncertainty',region,lme_shape,lme_idx)
-    % plot_temporal_mean_full(1,1.2,0.01,flipud(jet(20)),'TA_DIC','TA/DIC',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(2050,2400,flipud(cmocean('deep')),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(1850,2200,cmocean('matter'),'DIC','Sea Surface {\itC}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(8.0,8.2,cmocean('solar'),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(0.5,4.5,flipud(cmocean('ice')),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(1.0,6.0,flipud(cmocean('ice')),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(5,10,flipud(cmocean('solar')),'H','Sea Surface [H^{+}] (nmol kg^{-1})',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(50,250,flipud(cmocean('ice')),'CO3','Sea Surface [CO_{3}^{2-}] (\mumol kg^{-1})',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(9,16,cmocean('speed'),'RF','Sea Surface RF',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(0,50,cmocean('amp'),'upCO2','Sea Surface {\itp}CO_{2} Uncertainty (\muatm)',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(0,50,cmocean('amp'),'ufCO2','Sea Surface {\itf}_{CO2} Uncertainty (\muatm)',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(1,1.2,flipud(cmocean('tempo')),'TA_DIC','Sea Surface TA/DIC',region,lme_shape,lme_idx)
     
     %% plot gifs of OA indicators across full region
     if gif_idx == 1
-        plot_full_gif(1900,2500,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+        plot_full_gif(1900,2500,cmocean('haline'),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
         plot_full_gif(1700,2300,jet(15),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
         plot_full_gif(7.9,8.2,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
         plot_full_gif(0,5,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
@@ -348,13 +354,13 @@ if map_idx == 1
         plot_full_gif(0,40,cmocean('amp',21),'ufCO2','Sea Surface {\itf}CO_{2} Uncertainty',region,lme_shape,lme_idx)
     end
     %% plot OA indicators across full region (seasonally)
-    plot_temporal_mean_full_seas(1900,2500,25,cmocean('haline',24),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(1700,2300,25,flipud(jet(15)),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(7.9,8.2,0.02,flipud(jet(15)),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(0,5,0.25,flipud(jet(20)),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(1,6,0.25,flipud(jet(20)),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(5,10,0.25,parula(20),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(50,250,10,parula(20),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(8,15,0.5,parula(14),'RF','Sea Surface RF',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(2050,2400,flipud(cmocean('deep')),'TA','Sea Surface {\itA}_{T} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(1850,2200,cmocean('matter'),'DIC','Dissolved Inorganic Carbon',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(8.0,8.2,cmocean('solar'),'pH','Sea Surface pH_{T}',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(0.5,4.5,flipud(cmocean('ice')),'OmA','Sea Surface \Omega_{A}',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(1.0,6.0,flipud(cmocean('ice')),'OmC','Sea Surface \Omega_{C}',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(5,10,flipud(cmocean('solar')),'H','Sea Surface [H^{+}]',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(50,250,flipud(cmocean('ice')),'CO3','Sea Surface [CO_{3}^{2-}]',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(9,16,cmocean('speed'),'RF','Sea Surface RF',region,lme_shape,lme_idx)
 
 end

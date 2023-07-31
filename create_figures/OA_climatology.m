@@ -21,6 +21,9 @@ deriv_idx = [2 4 5 1 3 11 10 3 7 9];
 % loop through variables
 for var_num = 1:9
 
+    % preallocate table
+    clim_table = nan(length(region),11);
+
     % initialize figure
     figure('Visible','on'); hold on;
     tcl = tiledlayout(6,2);
@@ -279,8 +282,28 @@ for var_num = 1:9
         amp_sss = max(var_sss) - min(var_sss);
         amp_resid = max(var_resid) - min(var_resid);
     
-        % add text to plot
+        % calculate amplitudes and correlations
+        if strcmp(var_type{var_num},'TA')
+            r2_dic = corr(var_dic,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_sst = corr(var_sst,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_sss = corr(var_sss,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_pco2 = corr(var_pco2,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_resid = corr(var_resid,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+        elseif strcmp(var_type{var_num},'DIC')
+            r2_ta = corr(var_ta,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_sst = corr(var_sst,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_sss = corr(var_sss,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_pco2 = corr(var_pco2,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_resid = corr(var_resid,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+        else
+            r2_ta = corr(var_ta,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_dic = corr(var_dic,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_sst = corr(var_sst,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_sss = corr(var_sss,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+            r2_resid = corr(var_resid,OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+        end
 
+        % add text to plot
         text(6.5,ax.YLim(2)-0.1*(ax.YLim(2)-ax.YLim(1)),...
             reg_lab{n},'FontSize',12,'HorizontalAlignment','center');
 
@@ -305,7 +328,33 @@ for var_num = 1:9
             lg.Position(1) = lg.Position(1)+0.4;
             lg.Position(2) = lg.Position(2)-0.04;
         end
-    
+
+        % add amplitudes and correlations to table
+        if strcmp(var_type{var_num},'TA')
+            clim_table(n,1) = r2_dic; clim_table(n,2) = amp_dic;
+            clim_table(n,3) = r2_pco2; clim_table(n,4) = amp_pco2;
+            clim_table(n,5) = r2_sst; clim_table(n,6) = amp_sst;
+            clim_table(n,7) = r2_sss; clim_table(n,8) = amp_sss;
+            clim_table(n,9) = r2_resid; clim_table(n,10) = amp_resid;
+        elseif strcmp(var_type{var_num},'DIC')
+            clim_table(n,1) = r2_ta; clim_table(n,2) = amp_ta;
+            clim_table(n,3) = r2_pco2; clim_table(n,4) = amp_pco2;
+            clim_table(n,5) = r2_sst; clim_table(n,6) = amp_sst;
+            clim_table(n,7) = r2_sss; clim_table(n,8) = amp_sss;
+            clim_table(n,9) = r2_resid; clim_table(n,10) = amp_resid;
+        else
+            clim_table(n,1) = r2_ta; clim_table(n,2) = amp_ta;
+            clim_table(n,3) = r2_dic; clim_table(n,4) = amp_dic;
+            clim_table(n,5) = r2_sst; clim_table(n,6) = amp_sst;
+            clim_table(n,7) = r2_sss; clim_table(n,8) = amp_sss;
+            clim_table(n,9) = r2_resid; clim_table(n,10) = amp_resid;
+        end
+
+        % add true amplitude
+        clim_table(n,11) = ...
+            max(OAI_grid.(region{n}).var_dom_clim-var_ann_mean) - ...
+            min(OAI_grid.(region{n}).var_dom_clim-var_ann_mean);
+
         % clean up
         clear SOCAT_grid OAI_grid area_weights t months
     
@@ -314,5 +363,21 @@ for var_num = 1:9
     % save figure
     exportgraphics(gcf,['Figures/all_climatology_' var_type{var_num} '.png']);
     close
+
+    % save table
+    if strcmp(var_type{var_num},'TA')
+        clim_table = array2table(clim_table,'RowNames',region,'VariableNames',...
+            {'R2(DIC)' 'Amp.(DIC)' 'R2(pCO2)' 'Amp.(pCO2)' 'R2(SST)' 'Amp.(SST)' ...
+            'R2(SSS)' 'Amp.(SSS)' 'R2(resid.)' 'Amp.(resid.)' ' Amp.'});
+    elseif strcmp(var_type{var_num},'DIC')
+        clim_table = array2table(clim_table,'RowNames',region,'VariableNames',...
+            {'R2(TA)' 'Amp.(TA)' 'R2(pCO2)' 'Amp.(pCO2)' 'R2(SST)' 'Amp.(SST)' ...
+            'R2(SSS)' 'Amp.(SSS)' 'R2(resid.)' 'Amp.(resid.)' ' Amp.'});
+    else
+        clim_table = array2table(clim_table,'RowNames',region,'VariableNames',...
+            {'R2(TA)' 'Amp.(TA)' 'R2(DIC)' 'Amp.(DIC)' 'R2(SST)' 'Amp.(SST)' ...
+            'R2(SSS)' 'Amp.(SSS)' 'R2(resid.)' 'Amp.(resid.)' ' Amp.'});
+    end
+    writetable(clim_table,['IndsAndStats/ClimatologyStats-' var_type{var_num} '-' date '.xls'],'WriteRowNames',true);
 
 end

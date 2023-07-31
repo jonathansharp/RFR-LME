@@ -9,7 +9,7 @@ define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
-y_span = [1800,2300;250,550;250,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
+y_span = [1800,2300;200,550;200,550;1800,2500;7.9,8.2;1,5;1.5,7.5;6,16;50,300;8,18];
 var_type = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
 var_lab = {'{\itC}_{T}' '{\itp}CO_{2}' '{\itf}_{CO2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
     '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
@@ -17,7 +17,7 @@ units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{
 rounder = [1 1 1 1 3 2 2 1 1 2];
 
 % loop through variables
-for var_num = 1:9
+for var_num = 1:length(var_type)
 
     % initialize figure
     figure('Visible','on'); hold on;
@@ -75,15 +75,28 @@ for var_num = 1:9
         time = datenum([OAI_grid.(region{n}).year ...
                         OAI_grid.(region{n}).month_of_year ...
                         repmat(15,OAI_grid.(region{n}).dim.z,1)]);
+
+        % calculate annual means
+        OAI_grid.(region{n}).var_dom_mean_ann = nan(length(time)/12,1);
+        OAI_grid.(region{n}).u_var_dom_mean_ann = nan(length(time)/12,1);
+        time_ann = nan(length(time)/12,1);
+        for y = 1:length(time)/12
+            OAI_grid.(region{n}).var_dom_mean_ann(y) = ...
+                mean(OAI_grid.(region{n}).var_dom_mean((y-1)*12+1:(y-1)*12+12));
+            OAI_grid.(region{n}).u_var_dom_mean_ann(y) = ...
+                mean(OAI_grid.(region{n}).u_var_dom_mean((y-1)*12+1:(y-1)*12+12));
+            time_ann(y) = mean(time((y-1)*12+1:(y-1)*12+12));
+        end
     
         % plot time series
         nexttile; hold on
         set(gca,'fontsize',6);
-        u=fill([time;flipud(time)],...
-            [OAI_grid.(region{n}).var_dom_mean + OAI_grid.(region{n}).u_var_dom_mean;...
-            flipud(OAI_grid.(region{n}).var_dom_mean - OAI_grid.(region{n}).u_var_dom_mean)],...
-            rgb('grey'),'LineStyle','none');
-        p=plot(time,OAI_grid.(region{n}).var_dom_mean,'k','linewidth',1);
+        u=fill([time_ann;flipud(time_ann)],...
+            [OAI_grid.(region{n}).var_dom_mean_ann + OAI_grid.(region{n}).u_var_dom_mean_ann;...
+            flipud(OAI_grid.(region{n}).var_dom_mean_ann - OAI_grid.(region{n}).u_var_dom_mean_ann)],...
+            rgb('grey'),'LineStyle','none','FaceAlpha',0.5);
+        p1=plot(time,OAI_grid.(region{n}).var_dom_mean,'r','linewidth',0.5);
+        p2=plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'k','linewidth',1);
         datetick('x');
         xlim([datenum([1998 1 1]) datenum([2022 1 1])]);
         ylim(y_span(var_num,:));
@@ -108,13 +121,13 @@ for var_num = 1:9
             ' | ' num2str(round(x(2)*12,rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
-            'FontSize',6,'HorizontalAlignment','center');
+            'FontSize',7,'HorizontalAlignment','center');
 
         % add legend
         if n == 11
-            lg=legend([p u],{'Monthly Mean' 'Uncertainty'},'fontsize',20);
-            lg.Position(1) = lg.Position(1)+0.28;
-            lg.Position(2) = lg.Position(2)-0.05;
+            lg=legend([p1 p2 u],{'Annual Mean' 'Monthly Mean' 'Annual Uncertainty'},'fontsize',20);
+            lg.Position(1) = lg.Position(1)+0.3;
+            lg.Position(2) = lg.Position(2)-0.01;
         end
     
         % clean up

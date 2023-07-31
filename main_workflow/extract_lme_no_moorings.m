@@ -1,12 +1,11 @@
-% Extract regional SOCAT data
+% Extract regional SOCAT data (excluding moorings)
 % 
-% This script grids observations of fCO2 and ancillary variables from five
-% US large Marine Ecosystems (Alaska, California Current, Insular Pacific /
-% Hawaii, Gulf of Mexico / Caribbean, and US East Coast) assembled via
-% extractions from SOCATv2022 defined by latitude and longitude bounds.
+% This script grids observations of fCO2 and ancillary variables from
+% eleven US large Marine Ecosystems assembled via extractions from
+% SOCATv2023 defined by latitude and longitude bounds.
 % 
-% Written by J.D. Sharp: 7/26/22
-% Last updated by J.D. Sharp: 5/15/22
+% Written by J.D. Sharp: 7/26/23
+% Last updated by J.D. Sharp: 7/26/23
 % 
 
 %% this script defines the bounds of the eighteen LMEs
@@ -110,19 +109,6 @@ for n = 1:length(region)
     clear tmp_lon vars v
 
     %% visualize number of observations
-%     time = datetime(SOCAT.year,...
-%         SOCAT.month,SOCAT.day);
-%     figure('visible','off');
-%     histogram(time);
-%     ylabel('Number of observations');
-%     xlabel('Year');
-%     clear time
-% 
-%     % save figure
-%     if ~isfolder(['Figures/' region{n}]); mkdir(['Figures/' region{n}]); end
-%     exportgraphics(gcf,['Figures/' region{n} '/hist.png']);
-%     close
-
     if gif_idx == 1
         plot_regional_gif(SOCAT_grid.(region{n}).lim,...
             SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
@@ -153,7 +139,7 @@ for n = 1:length(region)
 
     % save figure
     if ~isfolder(['Figures/' region{n}]); mkdir(['Figures/' region{n}]); end
-    exportgraphics(gcf,['Figures/' region{n} '_num_obs.png']);
+    exportgraphics(gcf,['Figures/' region{n} '_num_obs_no_moorings.png']);
     close
 
     % clean up
@@ -197,7 +183,7 @@ for n = 1:length(region)
 
     % Save gridded pco2 data
     if ~isfolder(['Data/' region{n}]); mkdir(['Data/' region{n}]); end
-    save(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid','-v7.3');
+    save(['Data/' region{n} '/gridded_pco2_no_moorings'],'SOCAT_grid','-v7.3');
 
     % clean up
     clear SOCAT_grid
@@ -249,7 +235,7 @@ plot_land('map');
 mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,'Figures/full/num_obs.png');
+exportgraphics(gcf,'Figures/full/num_obs_no_moorings.png');
 close
 % clean up
 clear n h r tmp_lon c mycolormap 
@@ -298,7 +284,7 @@ plot_land('map');
 mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,'Figures/full/num_obs_clim.png');
+exportgraphics(gcf,'Figures/full/num_obs_clim_no_moorings.png');
 close
 % clean up
 clear n h r tmp_lon c mycolormap 
@@ -315,16 +301,16 @@ set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
 c=colorbar('location','southoutside');
-colormap(parula);
+colormap(parula(20));
 caxis([295 475]);
 c.TickLength = 0;
 c.Label.String = 'Surface {\itf}CO_{2} (\muatm)';
 cbarrow;
 % plot background
 % z = mean(SOCAT_grid.fco2_ave_wtd_detrend,3,'omitnan')';
-z = mean(cat(3,SOCAT_grid.fco2_ave_wtd_detrend(:,:,6:12:end),...
-               SOCAT_grid.fco2_ave_wtd_detrend(:,:,7:12:end),...
-               SOCAT_grid.fco2_ave_wtd_detrend(:,:,8:12:end)),...
+z = mean(cat(3,SOCAT_grid.fco2_ave_wtd_detrend(:,:,9:12:end),...
+               SOCAT_grid.fco2_ave_wtd_detrend(:,:,10:12:end),...
+               SOCAT_grid.fco2_ave_wtd_detrend(:,:,11:12:end)),...
                3,'omitnan')';
 pcolorm(SOCAT_grid.lat,SOCAT_grid.lon,z);
 alpha 0.3
@@ -334,9 +320,9 @@ clear SOCAT_grid
 for n = 1:length(region)
     load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
 %     z = mean(SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,3,'omitnan')';
-    z = mean(cat(3,SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,6:12:end),...
-               SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,7:12:end),...
-               SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,8:12:end)),...
+    z = mean(cat(3,SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,9:12:end),...
+               SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,10:12:end),...
+               SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,11:12:end)),...
                3,'omitnan')';
     pcolorm(SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,z);
     clear SOCAT_grid
@@ -356,7 +342,7 @@ plot_land('map');
 mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,'Figures/full/fCO2_obs_JJA.png');
+exportgraphics(gcf,'Figures/full/fCO2_obs_SON_no_moorings.png');
 close
 % clean up
 clear n z h r c tmp_lon

@@ -4,8 +4,8 @@
 % fCO2 in time-varying clusters defined by a self-organizing map method for
 % US large Marine Ecosystems.
 % 
-% Written by J.D. Sharp: 9/15/22
-% Last updated by J.D. Sharp: 2/23/22
+% Written by J.D. Sharp: 7/26/23
+% Last updated by J.D. Sharp: 7/26/23
 % 
 
 % Set GMM parameters
@@ -17,10 +17,10 @@ for n = 1:length(region)
     disp(['Predicting fCO2 (' region{n} ')']);
 
     %% load gridded fCO2 and predictors
-    load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
-    load(['Data/' region{n} '/variable_arrays'],'Vars_array');
+    load(['Data/' region{n} '/gridded_predictors_no_moorings'],'Preds_grid');
+    load(['Data/' region{n} '/variable_arrays_no_moorings'],'Vars_array');
     load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');
-    load(['Data/' region{n} '/us_lme_models'],'Mods');
+    load(['Data/' region{n} '/us_lme_models_no_moorings'],'Mods');
 
     %% pre-allocate results
     fco2_rfr_tmp = nan(length(Vars_array.(region{n}).X_clust),num_groups(n));
@@ -138,7 +138,7 @@ for n = 1:length(region)
         parula(20),'pCO2','Surface {\itp}CO_{2} (\muatm)',region{n});
 
     %% save estimated fCO2 grid
-    save(['Data/' region{n} '/ML_fCO2'],'OAI_grid','-v7.3');
+    save(['Data/' region{n} '/ML_fCO2_no_moorings'],'OAI_grid','-v7.3');
 
     %% clean up
     clear archs fco2_rfr fco2_rfr_tmp fCO23Didx OAI_grid Preds_grid Vars_array
@@ -148,17 +148,14 @@ end
 if map_idx == 1
 
     %% plot fCO2 across full region
-    plot_temporal_mean_full(295,475,parula,'fCO2','Sea Surface {\itf}_{CO2} (\muatm)',region,lme_shape,lme_idx)
-    plot_temporal_mean_full(295,475,parula,'pCO2','Sea Surface {\itp}CO_{2} (\muatm)',region,lme_shape,lme_idx)
+    plot_temporal_mean_full(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
     
     %% plot fCO2 across full region (seasonally)
-    plot_temporal_mean_full_seas(295,475,parula,'fCO2','Sea Surface {\itf}_{CO2} (\muatm)',region,lme_shape,lme_idx)
-    plot_temporal_mean_full_seas(295,475,parula,'pCO2','Sea Surface {\itp}CO_{2} (\muatm)',region,lme_shape,lme_idx)
+    plot_temporal_mean_full_seas(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
     
     %% plot gif of fCO2 across full region
     if gif_idx == 1
-        plot_full_gif(295,475,parula,'fCO2','Sea Surface {\itf}_{CO2} (\muatm)',region,lme_shape,lme_idx);
-        plot_full_gif(295,475,parula,'pCO2','Sea Surface {\itp}CO_{2} (\muatm)',region,lme_shape,lme_idx);
+        plot_full_gif(295,475,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx);
     end
 
 end

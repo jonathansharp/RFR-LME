@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 1/23/23
 % 
 
-function plot_temporal_mean_full_seas(zmin,zmax,zsp,clrmp,varname,lab,region,lme_shape,lme_idx)
+function plot_temporal_mean_full_seas(zmin,zmax,clrmp,varname,lab,region,lme_shape,lme_idx)
 
 seas_lab = {'DJF' 'MAM' 'JJA' 'SON'};
 seas = [1,2,12;3,4,5;6,7,8;9,10,11];
@@ -26,7 +26,7 @@ for ms = 1:4
     cbarrow;
     % plot regions
     for n = 1:length(region)
-        if any(strcmp(varname,{'DIC' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
+        if any(strcmp(varname,{'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
             type = 'OAI_grid';
             vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
             if strcmp(varname,'H')
@@ -41,7 +41,7 @@ for ms = 1:4
                        vars_grid.(type).(region{n}).(varname)(:,:,seas(ms,2):12:end),...
                        vars_grid.(type).(region{n}).(varname)(:,:,seas(ms,3):12:end)),3,'omitnan')';
         contourfm(vars_grid.(type).(region{n}).lat,vars_grid.(type).(region{n}).lon,...
-            z,zmin:zsp:zmax,'LineStyle','none');
+            z,zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
         clear vars_grid z
     end
     % plot borders around regions

@@ -1,17 +1,17 @@
-% Fit Algorithms
+% Fit Algorithms (no moorings)
 % 
 % This script trains neural networks and random forest regressions for the
 % prediction of sea surface fCO2 in various US LMEs.
 % 
-% Written by J.D. Sharp: 8/26/22
-% Last updated by J.D. Sharp: 5/6/23
+% Written by J.D. Sharp: 7/26/23
+% Last updated by J.D. Sharp: 7/26/23
 % 
 
 for n = 1:length(region)
 
     %% load gridded pCO2, predictors, and clusters
-    load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
-    load(['Data/' region{n} '/variable_arrays'],'Vars_array');
+    load(['Data/' region{n} '/gridded_predictors_no_moorings'],'Preds_grid');
+    load(['Data/' region{n} '/variable_arrays_no_moorings'],'Vars_array');
     if gmm_test_idx == 0
         load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');
     elseif gmm_test_idx == 1
@@ -149,18 +149,18 @@ for n = 1:length(region)
 
     % save figure
     if ~isfolder('Figures'); mkdir('Figures'); end
-    exportgraphics(gcf,['Figures/' region{n} '_delta_fCO2_RFR_gridded.png']);
+    exportgraphics(gcf,['Figures/' region{n} '_delta_fCO2_RFR_gridded_no_moorings.png']);
     close
 
     %% Save models and predictor/target arrays with variable indices
     if rfr_test_idx == 0
-        save(['Data/' region{n} '/us_lme_models'],'Mods','-v7.3');
-        save(['Data/' region{n} '/us_lme_model_evals'],'Val','-v7.3');
+        save(['Data/' region{n} '/us_lme_models_no_moorings'],'Mods','-v7.3');
+        save(['Data/' region{n} '/us_lme_model_evals_no_moorings'],'Val','-v7.3');
     elseif rfr_test_idx == 1
-        save(['Data/' region{n} '/us_lme_models_test'],'Mods','-v7.3');
-        save(['Data/' region{n} '/us_lme_model_evals_test'],'Val','-v7.3');
+        save(['Data/' region{n} '/us_lme_models_test_no_moorings'],'Mods','-v7.3');
+        save(['Data/' region{n} '/us_lme_model_evals_test_no_moorings'],'Val','-v7.3');
     end
-    save(['Data/' region{n} '/variable_arrays'],'Vars_array','-v7.3');
+    save(['Data/' region{n} '/variable_arrays_no_moorings'],'Vars_array','-v7.3');
 
     %% clean up
     clear Mods Val Vars_array
