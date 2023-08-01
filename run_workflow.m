@@ -43,7 +43,7 @@ set_gmm_options
 
 % this script trains self-organizing-maps using the defined predictors to
 % cluster data spatiotemporally for algorithm training
-cluster_on_grid
+% cluster_on_grid
 
 % Set options ((determined via 'RFR_test' in 'run_optimization.m'))
 set_rfr_options

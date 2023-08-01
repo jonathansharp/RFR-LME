@@ -27,7 +27,7 @@ amp_table = nan(length(region),length(var_type));
 % loop through each region
 for n = 1:length(region)
 
-    for var_num = 3%1:length(var_type)
+    for var_num = 1:length(var_type)
 
         % load estimated OA grid
         load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');

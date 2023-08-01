@@ -104,7 +104,7 @@ for n = 1:length(region)
     Val.(region{n}).delta_rfr_grid = ...
         nan(size(Preds_grid.(region{n}).idx_mod));
     Val.(region{n}).delta_rfr_grid(Preds_grid.(region{n}).idx_mod) = ...
-        Val.(region{n}).delta_rfr.all(:,c+1);
+        Val.(region{n}).delta_rfr.all(:,end);
     Val.(region{n}).delta_rfr_grid_abs = ...
         abs(Val.(region{n}).delta_rfr_grid);
     % add dimensions to grid
@@ -122,7 +122,7 @@ for n = 1:length(region)
     x_mids = 2.5:5:997.5;
     y_edges = -1000:10:1000;
     y_mids = -995:10:995;
-    plot_delta(x_edges,x_mids,y_edges,y_mids,Val.(region{n}).Y_fit_rfr.all,...
+    plot_delta(x_edges,x_mids,y_edges,y_mids,Val.(region{n}).Y_fit_rfr.all(:,end),...
         Val.(region{n}).delta_rfr.all,region{n},[200 800],[-300 300],'RFR');
 
     % clean up
