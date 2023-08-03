@@ -70,6 +70,7 @@ clear idx_CODAP idx_tmp_CODAP idx_GLODAP idx_tmp_GLODAP vars v tmp_lon tmp_lat
 %% calculate fCO2, H, and CO3 (CODAP)
 carb = CO2SYS(CODAP.TA,CODAP.DIC,1,2,CODAP.sal,CODAP.tmp,NaN,CODAP.prs,...
     NaN,CODAP.sil,CODAP.phos,0,0,1,10,1,2,2);
+CODAP.pco2 = carb(:,4);
 CODAP.fco2 = carb(:,5);
 CODAP.H = carb(:,15).*10^3;
 CODAP.CO3 = carb(:,7);
@@ -78,6 +79,7 @@ clear carb
 %% calculate fCO2, H, CO3, Omega, and RF (GLODAP)
 carb = CO2SYS(GLODAP.TA,GLODAP.DIC,1,2,GLODAP.sal,GLODAP.tmp,NaN,GLODAP.prs,...
     NaN,GLODAP.sil,GLODAP.phos,0,0,1,10,1,2,2);
+GLODAP.pco2 = carb(:,5);
 GLODAP.fco2 = carb(:,5);
 GLODAP.H = carb(:,15).*10^3;
 GLODAP.CO3 = carb(:,7);
@@ -87,10 +89,11 @@ GLODAP.RF = carb(:,16);
 clear carb
 
 %% load US LME data
-date = '01-Mar-2023';
+date = '02-Aug-2023';
 LME_RFR.lat = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Lat');
 LME_RFR.lon = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Lon');
 LME_RFR.time = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Time');
+LME_RFR.pco2 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'pCO2');
 LME_RFR.fco2 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'fCO2');
 LME_RFR.TA = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'TA');
 LME_RFR.DIC = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'DIC');
@@ -114,12 +117,12 @@ c=colorbar('location','southoutside');
 colormap(parula(18));
 caxis([295 475]);
 c.TickLength = 0;
-c.Label.String = 'Sea Surface {\itf}CO_{2}';
+c.Label.String = 'Sea Surface {\itp}CO_{2}';
 cbarrow;
 % plot regions
 for n = 1:length(region)
      load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
-    z = mean(OAI_grid.(region{n}).fCO2,3,'omitnan')';
+    z = mean(OAI_grid.(region{n}).pCO2,3,'omitnan')';
     contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
         z,295:10:475,'LineStyle','none');
     clear vars_grid z
@@ -146,13 +149,13 @@ if ~isfolder('Figures'); mkdir('Figures'); end
 exportgraphics(gcf,'Figures/CODAP_GLODAP_eval_map.png');
 
 %% variable information
-edges = {1900:10:2300;300:5:500;2000:10:2400;7.8:0.0125:8.3;...
+edges = {1900:10:2300;300:5:500;300:5:500;2000:10:2400;7.8:0.0125:8.3;...
     1:0.1:5;1:0.1:5;7:0.2:14;100:2.5:250;9:0.1:17};
-var_type = {'DIC' 'fco2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
-var_lab = {'{\itC}_{T}' '{\itf}CO_{2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
+var_type = {'DIC' 'fco2' 'pco2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
+var_lab = {'{\itC}_{T}' '{\itf}_{CO2}' '{\itp}CO_{2}' '{\itA}_{T}' 'pH_{T}' '\Omega_{A}' ...
     '\Omega_{C}' '[H^{+}]' '[CO_{3}^{2-}]' 'RF'};
-units = {'\mumol kg^{-1}' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
-rounder = [1 1 1 3 2 2 1 1 2];
+units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' ''};
+rounder = [1 1 1 1 3 2 2 1 1 2];
 
 %% co-locate each CODAP point with an LME-RFR grid cell
 % pre-allocate
@@ -282,6 +285,70 @@ text(200,900,['CODAP ' char(45) ' RFR-LME = ' num2str(round(mean(CODAP.fco2_del,
     ' ' char(177) ' ' num2str(round(std(CODAP.fco2_del,[],'omitnan'),1))]);
 exportgraphics(gcf,'Figures/GLODAP_CODAP_eval_fCO2.png');
 close
+% Both histogram
+figure; hold on;
+histogram(GLODAP.fco2_del);
+histogram(CODAP.fco2_del);
+xlabel('{\itf}_{CO2(discrete)} - {\itf}_{CO2(RFR)}');
+ylabel('Counts');
+xlim([-500 1000]);
+legend({'GLODAP' 'CODAP'});
+exportgraphics(gcf,'Figures/hist_fCO2.png');
+close
+
+%% pCO2
+% CODAP
+figure; hold on;
+title('pCO2');
+scatter(CODAP.pco2,CODAP.pco2_grid,'k.');
+plot([0 1500],[0 1500],'k-');
+xlabel('CODAP');
+ylabel('LME Grid');
+xlim([0 1200]);
+ylim([0 1200]);
+text(200,1000,['CODAP ' char(45) ' RFR-LME = ' num2str(round(mean(CODAP.pco2_del,'omitnan'),1)),...
+    ' ' char(177) ' ' num2str(round(std(CODAP.pco2_del,[],'omitnan'),1))]);
+exportgraphics(gcf,'Figures/CODAP_eval_pCO2.png');
+close
+% GLODAP
+figure; hold on;
+title('pCO2');
+scatter(GLODAP.pco2,GLODAP.pco2_grid,'k.');
+plot([0 1500],[0 1500],'k-');
+xlabel('GLODAP');
+ylabel('LME Grid');
+xlim([0 1200]);
+ylim([0 1200]);
+text(200,1000,['GLODAP ' char(45) ' RFR-LME = ' num2str(round(mean(GLODAP.pco2_del,'omitnan'),1)),...
+    ' ' char(177) ' ' num2str(round(std(GLODAP.pco2_del,[],'omitnan'),1))]);
+exportgraphics(gcf,'Figures/GLODAP_eval_pCO2.png');
+close
+% Both
+figure; hold on;
+scatter(GLODAP.pco2,GLODAP.pco2_grid,'g.');
+scatter(CODAP.pco2,CODAP.pco2_grid,'r.');
+plot([0 1500],[0 1500],'k-');
+xlabel('GLODAP/CODAP {\itp}CO_{2}');
+ylabel('LME Grid {\itp}CO_{2}');
+xlim([0 1200]);
+ylim([0 1200]);
+text(200,1100,['GLODAP ' char(45) ' RFR-LME = ' num2str(round(mean(GLODAP.pco2_del,'omitnan'),1)),...
+    ' ' char(177) ' ' num2str(round(std(GLODAP.pco2_del,[],'omitnan'),1))]);
+text(200,900,['CODAP ' char(45) ' RFR-LME = ' num2str(round(mean(CODAP.pco2_del,'omitnan'),1)),...
+    ' ' char(177) ' ' num2str(round(std(CODAP.pco2_del,[],'omitnan'),1))]);
+exportgraphics(gcf,'Figures/GLODAP_CODAP_eval_pCO2.png');
+close
+% Both histogram
+figure; hold on;
+histogram(GLODAP.pco2_del);
+histogram(CODAP.pco2_del);
+plot([0 0],[0 800],'--k','linewidth',2);
+xlabel('{\itp}CO_{2(discrete)} - {\itp}CO_{2(RFR)}');
+ylabel('Counts');
+xlim([-500 1000]);
+legend({'GLODAP' 'CODAP'});
+exportgraphics(gcf,'Figures/hist_pCO2.png');
+close
 
 %% pH
 % CODAP
@@ -310,6 +377,31 @@ text(7.5,8.4,['GLODAP ' char(45) ' RFR-LME = ' num2str(round(mean(GLODAP.pH_del,
     ' ' char(177) ' ' num2str(round(std(GLODAP.pH_del,[],'omitnan'),3))]);
 exportgraphics(gcf,'Figures/GLODAP_eval_pH.png');
 close
+% Both scatter
+figure; hold on;
+scatter(GLODAP.pH,GLODAP.pH_grid,'g.');
+scatter(CODAP.pH,CODAP.pH_grid,'r.');
+plot([7.3 8.7],[7.3 8.7],'k-');
+xlim([7.4 8.6]);
+ylim([7.4 8.6]);
+xlabel('GLODAP/CODAP pH_{T}');
+ylabel('LME Grid pH_{T}');
+text(7.5,8.5,['GLODAP ' char(45) ' LME = ' num2str(round(mean(GLODAP.pH_del,'omitnan'),3)),...
+    ' ' char(177) ' ' num2str(round(std(GLODAP.pH_del,[],'omitnan'),3))]);
+text(7.5,8.42,['CODAP ' char(45) ' LME = ' num2str(round(mean(CODAP.pH_del,'omitnan'),3)),...
+    ' ' char(177) ' ' num2str(round(std(CODAP.pH_del,[],'omitnan'),3))]);
+exportgraphics(gcf,'Figures/GLODAP_CODAP_eval_pH.png');
+% Both histogram
+figure; hold on;
+histogram(GLODAP.pH_del);
+histogram(CODAP.pH_del);
+plot([0 0],[0 900],'--k','linewidth',2);
+xlabel('pH_{T(discrete)} - pH_{T(RFR)}');
+ylabel('Counts');
+xlim([-1 1]);
+legend({'GLODAP' 'CODAP'});
+exportgraphics(gcf,'Figures/hist_pH.png');
+close
 
 %% OmA
 % CODAP
@@ -335,8 +427,7 @@ text(0.5,4.5,['GLODAP ' char(45) ' LME = ' num2str(round(mean(GLODAP.OmA_del,'om
 exportgraphics(gcf,'Figures/GLODAP_eval_OmA.png');
 close
 % Both scatter
-f=figure; hold on;
-% f.Position(3) = 1.5*f.Position(3);
+figure; hold on;
 scatter(GLODAP.OmA,GLODAP.OmA_grid,'g.');
 scatter(CODAP.OmA,CODAP.OmA_grid,'r.');
 plot([0 5],[0 5],'k-');
@@ -349,3 +440,13 @@ text(0.5,4.4,['CODAP ' char(45) ' LME = ' num2str(round(mean(CODAP.OmA_del,'omit
     ' ' char(177) ' ' num2str(round(std(CODAP.OmA_del,[],'omitnan'),3))]);
 exportgraphics(gcf,'Figures/GLODAP_CODAP_eval_OmA.png');
 % Both histogram
+figure; hold on;
+histogram(GLODAP.OmA_del);
+histogram(CODAP.OmA_del);
+plot([0 0],[0 450],'--k','linewidth',2);
+xlabel('\Omega_{A(discrete)} - \Omega_{A(RFR)}');
+ylabel('Counts');
+xlim([-2.5 2.5]);
+legend({'GLODAP' 'CODAP'});
+exportgraphics(gcf,'Figures/hist_OmA.png');
+close

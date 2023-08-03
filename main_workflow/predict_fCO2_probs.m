@@ -145,6 +145,16 @@ for n = 1:length(region)
 
 end
 
+%% plot relative gridded absolute delta values across region
+cmap_type = 'cmocean';
+cmap_name = 'amp';
+zero_piv = 0;
+cmap_segs = 9;
+plot_rel_delta_mean_full(0,50,cmap_type,cmap_name,...
+    zero_piv,num_groups,'delta_rfr_grid_abs','Relative \Delta{\itf}CO_{2} (% of background variability)',...
+    region,lme_shape,lme_idx,rfr_test_idx);
+
+%% create region-wide plots
 if map_idx == 1
 
     %% plot fCO2 across full region

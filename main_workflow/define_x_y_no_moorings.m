@@ -1,4 +1,4 @@
-% Define X and Y (exclude moorings)
+% Define X and Y (excludloade moorings)
 % 
 % This script defines and assembles training (X) and target (Y, i.e., pCO2)
 % variables for five US large Marine Ecosystems (Alaska, California

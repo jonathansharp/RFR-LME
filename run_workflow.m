@@ -14,12 +14,12 @@ define_regions_eiwg
 
 % this script loads SOCAT fCO2 and ancillary data surrounding North
 % America extracted from the SOCATv2022 database
-% load_socat
+load_socat
 % load_socat_1980
 
 % this script grids fCO2 observations from the SOCAT database into grid
 % cells of resolution: 0.25 deg lat x 0.25 deg lon x 1 month
-% grid_socat
+grid_socat
 % grid_socat_no_moorings
 % grid_socat_moorings_only
 % grid_socat_1980
@@ -27,15 +27,15 @@ define_regions_eiwg
 % this script extracts each of eighteen LMEs from the gridded data
 % surrounding North America
 % extract_lme
-% extract_lme_no_moorings
+extract_lme_no_moorings
 
 % this script loads gridded satellite, model, and reanalysis variables and
 % re-grids them to match the size of the fCO2 grids
-% load_vars
+load_vars
 
 % this script defines predictors variables for algorithm training as X and
 % the target variable for algorithm training (i.e. fCO2) as Y
-% define_x_y
+define_x_y
 % define_x_y_no_moorings
 
 % Set options (determined via 'GMM_test' in 'run_optimization.m')
@@ -43,7 +43,7 @@ set_gmm_options
 
 % this script trains self-organizing-maps using the defined predictors to
 % cluster data spatiotemporally for algorithm training
-% cluster_on_grid
+cluster_on_grid
 
 % Set options ((determined via 'RFR_test' in 'run_optimization.m'))
 set_rfr_options
@@ -68,7 +68,7 @@ predict_fCO2_probs
 % LME
 predict_OA
 
-% plot time series
+% time series and climatology
 OA_summary_stats
 OA_time_series
 OA_climatology

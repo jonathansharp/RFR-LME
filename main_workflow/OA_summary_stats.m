@@ -37,8 +37,9 @@ for n = 1:length(region)
         % calculate area-weighted time series
         OAI_grid.(region{n}).var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
-        area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         for t = 1:OAI_grid.(region{n}).dim.z
+            % establish area_weights
+            area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
             % establish non-ice-covered fraction
             open_per = sum(OAI_grid.(region{n}).idxspc(:,:,t),'all')./...
                 sum(SOCAT_grid.(region{n}).idxspc(:,:,t),'all');

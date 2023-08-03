@@ -4,7 +4,7 @@
 % NetCDF files.
 % 
 % Written by J.D. Sharp: 1/30/23
-% Last updated by J.D. Sharp: 5/17/23
+% Last updated by J.D. Sharp: 8/1/23
 % 
 
 %% this script defines the bounds of the eleven LMEs
@@ -34,14 +34,14 @@ for v = 1:length(Vars_pred)
 end
 
 %% Pre-allocate full grid of OA Indicators
-Vars_OA = {'fCO2' 'DIC' 'TA' 'uTA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
+Vars_OA = {'fCO2' 'pCO2' 'DIC' 'TA' 'uTA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};
 for v = 1:length(Vars_OA)
    US_LME_RFR.(Vars_OA{v}) = ...
        nan(US_LME_RFR.dim.x,US_LME_RFR.dim.y,US_LME_RFR.dim.z);
 end
 
 %% Pre-allocate full grid of OA Indicator uncertaintiess
-uVars_OA = {'ufCO2' 'uDIC' 'uTA' 'upH' 'uOmA' 'uOmC' 'uH' 'uCO3' 'uRF'};
+uVars_OA = {'ufCO2' 'upCO2' 'uDIC' 'uTA' 'upH' 'uOmA' 'uOmC' 'uH' 'uCO3' 'uRF'};
 for v = 1:length(uVars_OA)
    US_LME_RFR.(uVars_OA{v}) = ...
        nan(US_LME_RFR.dim.x,US_LME_RFR.dim.y,US_LME_RFR.dim.z);

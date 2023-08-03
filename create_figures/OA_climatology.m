@@ -53,8 +53,8 @@ for var_num = 1:9
         OAI_grid.(region{n}).pco2_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         OAI_grid.(region{n}).sst_dom_mean = nan(Preds_grid.(region{n}).dim.z,1);
         OAI_grid.(region{n}).sss_dom_mean = nan(Preds_grid.(region{n}).dim.z,1);
-        area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         for t = 1:OAI_grid.(region{n}).dim.z
+            area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
             % remove ice-filled cells
             area_weights(isnan(OAI_grid.(region{n}).(var_type{var_num})(:,:,t))) = NaN;
             OAI_grid.(region{n}).var_dom_mean(t) = ...

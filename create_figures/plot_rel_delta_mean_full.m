@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 1/31/23
 % 
 
-function plot_delta_mean_full(zmin,zmax,cmap_type,cmap_name,cmap_segs,...
+function plot_rel_delta_mean_full(zmin,zmax,cmap_type,cmap_name,...
     zero_piv,num_groups,varname,lab,region,lme_shape,lme_idx,test_idx)
 
 % initialize figure
@@ -18,9 +18,9 @@ c=colorbar('location','southoutside');
 caxis([zmin zmax]);
 if strcmp(cmap_type,'cmocean')
     if zero_piv == 1
-        colormap(cmocean(cmap_name,cmap_segs,'pivot',0));
+        colormap(cmocean(cmap_name,'pivot',0));
     else
-        colormap(cmocean(cmap_name,cmap_segs));
+        colormap(cmocean(cmap_name));
     end
 elseif strcmp(cmap_type,'stnd')
     colormap(cmap_name);
@@ -45,7 +45,9 @@ for en = 1:size(num_groups,2)
 end
 vars_grid.(type).(region{n}).(varname) = ...
     mean(cat(4,vars_grid.Val1.(region{n}).(varname)),4);
-z = mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')';
+load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
+z = 100.*(mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')./...
+    std(OAI_grid.(region{n}).fCO2,[],3,'omitnan'))';
 lat = vars_grid.([type num2str(en)]).(region{n}).lat;
 lon = vars_grid.([type num2str(en)]).(region{n}).lon;
 pcolorm(lat,lon,z)
@@ -62,5 +64,5 @@ end
 plot_land('map');
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,['Figures/full/' varname '.png']);
+exportgraphics(gcf,['Figures/full/rel_' varname '.png']);
 close

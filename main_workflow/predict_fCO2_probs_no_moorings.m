@@ -144,18 +144,18 @@ for n = 1:length(region)
     clear archs fco2_rfr fco2_rfr_tmp fCO23Didx OAI_grid Preds_grid Vars_array
 
 end
-
-if map_idx == 1
-
-    %% plot fCO2 across full region
-    plot_temporal_mean_full(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
-    
-    %% plot fCO2 across full region (seasonally)
-    plot_temporal_mean_full_seas(295,475,10,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
-    
-    %% plot gif of fCO2 across full region
-    if gif_idx == 1
-        plot_full_gif(295,475,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx);
-    end
-
-end
+% 
+% if map_idx == 1
+% 
+%     %% plot fCO2 across full region
+%     plot_temporal_mean_full(295,475,parula,'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
+%     
+%     %% plot fCO2 across full region (seasonally)
+%     plot_temporal_mean_full_seas(295,475,parula,'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx)
+%     
+%     %% plot gif of fCO2 across full region
+%     if gif_idx == 1
+%         plot_full_gif(295,475,parula(18),'fCO2','Sea Surface {\itf}CO_{2}',region,lme_shape,lme_idx);
+%     end
+% 
+% end

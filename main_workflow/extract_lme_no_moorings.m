@@ -15,7 +15,7 @@ define_regions_eiwg
 for n = 1:length(region)
 
     %% load SOCAT grid
-    load('Data/socat_gridded_2023','SOCAT_grid');
+    load('Data/socat_gridded_2023_no_moorings','SOCAT_grid');
 
     %% display status
     disp(['Extracting ' region{n} ' LME from SOCAT grid']);
@@ -192,7 +192,7 @@ end
 
 %% Plot number of all grid cells with data
 % load SOCAT grid
-load('Data/socat_gridded','SOCAT_grid');
+load('Data/socat_gridded_2023_no_moorings','SOCAT_grid');
 % initialize figure
 figure('visible','off'); box on; hold on;
 worldmap([-18 82],[140 302]);
@@ -215,7 +215,7 @@ alpha 0.3
 clear SOCAT_grid
 % plot regions
 for n = 1:length(region)
-    load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
+    load(['Data/' region{n} '/gridded_pco2_no_moorings'],'SOCAT_grid');
     pcolorm(SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
         SOCAT_grid.(region{n}).num_months');
     clear SOCAT_grid
@@ -264,7 +264,7 @@ alpha 0.3
 clear SOCAT_grid
 % plot regions
 for n = 1:length(region)
-    load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
+    load(['Data/' region{n} '/gridded_pco2_no_moorings'],'SOCAT_grid');
     pcolorm(SOCAT_grid.(region{n}).lat,SOCAT_grid.(region{n}).lon,...
         SOCAT_grid.(region{n}).num_months_clim');
     clear SOCAT_grid
@@ -291,7 +291,7 @@ clear n h r tmp_lon c mycolormap
 
 %% Plot all detrended gridded mean pCO2
 % load SOCAT grid
-load('Data/socat_gridded','SOCAT_grid');
+load('Data/socat_gridded_2023_no_moorings','SOCAT_grid');
 % initialize figure
 figure('visible','off'); box on; hold on;
 % title('DJF');
@@ -318,7 +318,7 @@ alpha 0.3
 clear SOCAT_grid
 % plot regions
 for n = 1:length(region)
-    load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
+    load(['Data/' region{n} '/gridded_pco2_no_moorings'],'SOCAT_grid');
 %     z = mean(SOCAT_grid.(region{n}).fco2_ave_wtd_detrend,3,'omitnan')';
     z = mean(cat(3,SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,9:12:end),...
                SOCAT_grid.(region{n}).fco2_ave_wtd_detrend(:,:,10:12:end),...
