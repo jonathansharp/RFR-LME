@@ -26,8 +26,8 @@ grid_socat
 
 % this script extracts each of eighteen LMEs from the gridded data
 % surrounding North America
-% extract_lme
-extract_lme_no_moorings
+extract_lme
+% extract_lme_no_moorings
 
 % this script loads gridded satellite, model, and reanalysis variables and
 % re-grids them to match the size of the fCO2 grids
