@@ -6,13 +6,29 @@
 
 %% define regions of interest
 region = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
-% region = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'HI' ...
-%           'AS' 'JI' 'PK' 'HB' 'JA' 'WI' 'GC'};
 
 %% Pacific Island LMEs
 
 % import LME bounds
-lme_shape = shaperead('eiwg_boundary_2023/eiwg_boundaries_20230512.shp');
+% lme_shape_orig = shaperead('eiwg_boundary_2023/eiwg_boundaries_20230512.shp');
+
+% import LME bounds
+lme_shape_tmp = m_shaperead('eiwg_boundary_2023/eiwg_boundaries_20230512');
+X = cell(16,1);
+Y = cell(16,1);
+BoundingBox = cell(16,1);
+for r = 1:length(lme_shape_tmp.ncst)
+    tmp = lme_shape_tmp.ncst(r);
+    tmp = tmp{1};
+    X{r} = tmp(:,1)';
+    Y{r} = tmp(:,2)';
+    BoundingBox{r} = lme_shape_tmp.mbr(r,:);
+end
+area_km2 = lme_shape_tmp.dbfdata(:,1);
+RegionName = lme_shape_tmp.dbfdata(:,2);
+lme_shape = struct('BoundingBox',BoundingBox,'X',X,'Y',Y,...
+    'area_km2',area_km2,'RegionName',RegionName);
+clear lme_shape_tmp tmp X Y BoundingBox area_km2 RegionName
 
 % define regions according to numbers
 lme_idx.CCS = 4;

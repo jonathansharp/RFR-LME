@@ -206,38 +206,6 @@ for a = 1:length(SOCAT_grid.lon)
 end
 clear ETOPO2 lonidx latidx a b
 
-%% Plot the percentage of grid cells with data
-figure('visible','off');
-worldmap([SOCAT_grid.lim.latmin ...
-    SOCAT_grid.lim.latmax],...
-   [SOCAT_grid.lim.lonmin ...
-    SOCAT_grid.lim.lonmax]);
-setm(gca,'MapProjection','miller');
-set(gca,'fontsize',16);
-pcolorm(repmat(SOCAT_grid.lat',SOCAT_grid.dim.x,1),...
-        repmat(SOCAT_grid.lon,1,SOCAT_grid.dim.y),...
-        SOCAT_grid.num_months);
-land = shaperead('landareas', 'UseGeoCoords',true);
-geoshow(land,'FaceColor',rgb('grey'));
-c=colorbar;
-mycolormap = jet(16);
-mycolormap(1,:) = 1;
-colormap(mycolormap);
-caxis([-1 31]);
-c.TickLength = 0;
-c.Label.String = 'Number of Months Represented';
-cbarrow('up');
-mlabel off;
-plabel off;
-
-% save figure
-if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,'Figures/obs_no_moorings.png');
-close
-
-% clean up
-clear land c mycolormap
-
 %% Detrend gridded pCO2 using domain mean
 % Define area weights
 area_weights = SOCAT_grid.area_km2;
@@ -267,36 +235,6 @@ SOCAT_grid.fco2_dom_mean_detrend(SOCAT_grid.fco2_dom_mean_detrend == 0) = NaN;
 
 % clean up
 clear area_weights yf yr x m
-
-%% Plot detrended gridded mean pCO2
-figure('visible','off');
-worldmap([SOCAT_grid.lim.latmin ...
-    SOCAT_grid.lim.latmax],...
-   [SOCAT_grid.lim.lonmin ...
-    SOCAT_grid.lim.lonmax]);
-setm(gca,'MapProjection','miller');
-set(gca,'fontsize',16);
-pcolorm(repmat(SOCAT_grid.lat',SOCAT_grid.dim.x,1),...
-        repmat(SOCAT_grid.lon,1,SOCAT_grid.dim.y),...
-        mean(SOCAT_grid.fco2_ave_wtd_detrend,3,'omitnan'));
-land = shaperead('landareas', 'UseGeoCoords',true);
-geoshow(land,'FaceColor',rgb('grey'));
-c=colorbar;
-colormap(parula(20));
-caxis([295 475]);
-c.TickLength = 0;
-c.Label.String = 'Surface {\itf}CO_{2} (\muatm)';
-cbarrow;
-mlabel off;
-plabel off;
-
-% save figure
-if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,'Figures/fCO2_no_moorings.png');
-close
-
-% clean up
-clear land c mycolormap
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end

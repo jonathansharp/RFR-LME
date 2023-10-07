@@ -7,7 +7,7 @@
 function plot_full_gif(zmin,zmax,clrmp,varname,lab,region,lme_shape,lme_idx)
 
 % initialize figure
-figure('visible','off');
+figure('visible','on');
 box on; hold on;
 set(gcf,'position',[100 100 900 600],'color','white');
 % initialize axis
@@ -35,6 +35,9 @@ for m = 1:288
         if any(strcmp(varname,{'DIC' 'fCO2' 'ufCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
             type = 'OAI_grid';
             vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
+        elseif any(strcmp(varname,{'fCO2_obs'}))
+            type = 'SOCAT_grid';
+            vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
         else
             type = 'Preds_grid';
             vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
@@ -42,7 +45,7 @@ for m = 1:288
         z = vars_grid.(type).(region{n}).(varname)(:,:,m)';
 %         contourfm(vars_grid.(type).(region{n}).lat,...
 %                   vars_grid.(type).(region{n}).lon,...
-%                   z,zmin:zsp:zmax,'LineStyle','none');
+%                   z,zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
         pcolorm(vars_grid.(type).(region{n}).lat,...
                   vars_grid.(type).(region{n}).lon,z);
     end

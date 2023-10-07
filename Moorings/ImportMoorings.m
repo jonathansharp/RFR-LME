@@ -15,6 +15,7 @@ warning('OFF','MATLAB:table:ModifiedAndSavedVarnames');
 name = []; lat = []; lon = []; date = [];
 time = []; sst = []; sal = [];
 fCO2SW = []; fCO2Air = [];
+pCO2SW = []; pCO2Air = [];
 
 %% CCE1
 MOORING.CCE1.name    = name;
@@ -26,6 +27,8 @@ MOORING.CCE1.sst     = sst;
 MOORING.CCE1.sal     = sal;
 MOORING.CCE1.fCO2SW  = fCO2SW;
 MOORING.CCE1.fCO2Air = fCO2Air;
+MOORING.CCE1.pCO2SW  = pCO2SW;
+MOORING.CCE1.pCO2Air = pCO2Air;
 idx = find(strcmp('CCE1',structnames));
 for n = 1:size(idx,1)
     MOORING.(extractBefore(fnames2{idx(n)},'.')) = ...
@@ -51,9 +54,13 @@ for n = 1:size(idx,1)
     if n == 4 || n == 7 || n == 8
         MOORING.CCE1.fCO2SW  = [MOORING.CCE1.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat__uatm_(idxQC)];
         MOORING.CCE1.fCO2Air = [MOORING.CCE1.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat__uatm_(idxQC)];
+        MOORING.CCE1.pCO2SW  = [MOORING.CCE1.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat__uatm_(idxQC)];
+        MOORING.CCE1.pCO2Air = [MOORING.CCE1.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat__uatm_(idxQC)];
     else
         MOORING.CCE1.fCO2SW  = [MOORING.CCE1.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
         MOORING.CCE1.fCO2Air = [MOORING.CCE1.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+        MOORING.CCE1.pCO2SW  = [MOORING.CCE1.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+        MOORING.CCE1.pCO2Air = [MOORING.CCE1.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
     end
 end
 MOORING.CCE1.date(MOORING.CCE1.date(:,1)<1000)=MOORING.CCE1.date(MOORING.CCE1.date(:,1)<1000)+2000;
@@ -61,6 +68,8 @@ MOORING.CCE1.sst(MOORING.CCE1.sst==-999) = NaN;
 MOORING.CCE1.sal(MOORING.CCE1.sal==-999) = NaN;
 MOORING.CCE1.fCO2SW(MOORING.CCE1.fCO2SW==-999) = NaN;
 MOORING.CCE1.fCO2Air(MOORING.CCE1.fCO2Air==-999) = NaN;
+MOORING.CCE1.pCO2SW(MOORING.CCE1.pCO2SW==-999) = NaN;
+MOORING.CCE1.pCO2Air(MOORING.CCE1.pCO2Air==-999) = NaN;
 MOORING.CCE1.lon(MOORING.CCE1.lon<0) = MOORING.CCE1.lon(MOORING.CCE1.lon<0) + 360;
 
 %% CCE2
@@ -73,6 +82,8 @@ MOORING.CCE2.sst  = sst;
 MOORING.CCE2.sal  = sal;
 MOORING.CCE2.fCO2SW  = fCO2SW;
 MOORING.CCE2.fCO2Air = fCO2Air;
+MOORING.CCE2.pCO2SW  = pCO2SW;
+MOORING.CCE2.pCO2Air = pCO2Air;
 idx = find(strcmp('CCE2',structnames));
 for n = 1:size(idx,1)
     MOORING.(extractBefore(fnames2{idx(n)},'.')) = ...
@@ -98,9 +109,13 @@ for n = 1:size(idx,1)
     if n == 3 || n == 8 || n == 11 || n == 12
         MOORING.CCE2.fCO2SW  = [MOORING.CCE2.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat__uatm_(idxQC)];
         MOORING.CCE2.fCO2Air = [MOORING.CCE2.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat__uatm_(idxQC)];
+        MOORING.CCE2.pCO2SW  = [MOORING.CCE2.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat__uatm_(idxQC)];
+        MOORING.CCE2.pCO2Air = [MOORING.CCE2.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat__uatm_(idxQC)];
     else
         MOORING.CCE2.fCO2SW  = [MOORING.CCE2.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
         MOORING.CCE2.fCO2Air = [MOORING.CCE2.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+        MOORING.CCE2.pCO2SW  = [MOORING.CCE2.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+        MOORING.CCE2.pCO2Air = [MOORING.CCE2.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
     end
 end
 MOORING.CCE2.date(MOORING.CCE2.date(:,1)<1000)=MOORING.CCE2.date(MOORING.CCE2.date(:,1)<1000)+2000;
@@ -108,6 +123,8 @@ MOORING.CCE2.sst(MOORING.CCE2.sst==-999) = NaN;
 MOORING.CCE2.sal(MOORING.CCE2.sal==-999) = NaN;
 MOORING.CCE2.fCO2SW(MOORING.CCE2.fCO2SW==-999) = NaN;
 MOORING.CCE2.fCO2Air(MOORING.CCE2.fCO2Air==-999) = NaN;
+MOORING.CCE2.pCO2SW(MOORING.CCE2.pCO2SW==-999) = NaN;
+MOORING.CCE2.pCO2Air(MOORING.CCE2.pCO2Air==-999) = NaN;
 MOORING.CCE2.lon(MOORING.CCE2.lon<0) = MOORING.CCE2.lon(MOORING.CCE2.lon<0) + 360;
 
 %% Southeast Alaska
@@ -120,6 +137,8 @@ MOORING.Southeast.sst  = sst;
 MOORING.Southeast.sal  = sal;
 MOORING.Southeast.fCO2SW  = fCO2SW;
 MOORING.Southeast.fCO2Air = fCO2Air;
+MOORING.Southeast.pCO2SW  = pCO2SW;
+MOORING.Southeast.pCO2Air = pCO2Air;
 idx = find(strcmp('Southeast',structnames));
 for n = 1:size(idx,1)
     MOORING.(extractBefore(fnames2{idx(n)},'.')) = ...
@@ -140,12 +159,16 @@ for n = 1:size(idx,1)
     MOORING.Southeast.sal     = [MOORING.Southeast.sal;MOORING.(extractBefore(fnames2{idx(n)},'.')).Salinity(idxQC)];
     MOORING.Southeast.fCO2SW  = [MOORING.Southeast.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
     MOORING.Southeast.fCO2Air = [MOORING.Southeast.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+    MOORING.Southeast.pCO2SW  = [MOORING.Southeast.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+    MOORING.Southeast.pCO2Air = [MOORING.Southeast.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
 end
 MOORING.Southeast.date(MOORING.Southeast.date(:,1)<1000)=MOORING.Southeast.date(MOORING.Southeast.date(:,1)<1000)+2000;
 MOORING.Southeast.sst(MOORING.Southeast.sst==-999) = NaN;
 MOORING.Southeast.sal(MOORING.Southeast.sal==-999) = NaN;
 MOORING.Southeast.fCO2SW(MOORING.Southeast.fCO2SW==-999) = NaN;
 MOORING.Southeast.fCO2Air(MOORING.Southeast.fCO2Air==-999) = NaN;
+MOORING.Southeast.pCO2SW(MOORING.Southeast.pCO2SW==-999) = NaN;
+MOORING.Southeast.pCO2Air(MOORING.Southeast.pCO2Air==-999) = NaN;
 MOORING.Southeast.lon(MOORING.Southeast.lon<0) = MOORING.Southeast.lon(MOORING.Southeast.lon<0) + 360;
 
 %% NH10
@@ -158,6 +181,8 @@ MOORING.NH10.sst  = sst;
 MOORING.NH10.sal  = sal;
 MOORING.NH10.fCO2SW  = fCO2SW;
 MOORING.NH10.fCO2Air = fCO2Air;
+MOORING.NH10.pCO2SW  = pCO2SW;
+MOORING.NH10.pCO2Air = pCO2Air;
 idx = find(strcmp('NH10',structnames));
 for n = 1:size(idx,1)
     MOORING.(extractBefore(fnames{idx(n)},'.')) = ...
@@ -182,12 +207,16 @@ for n = 1:size(idx,1)
     MOORING.NH10.sal     = [MOORING.NH10.sal;MOORING.(extractBefore(fnames2{idx(n)},'.')).Salinity(idxQC)];
     MOORING.NH10.fCO2SW  = [MOORING.NH10.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
     MOORING.NH10.fCO2Air = [MOORING.NH10.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+    MOORING.NH10.pCO2SW  = [MOORING.NH10.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+    MOORING.NH10.pCO2Air = [MOORING.NH10.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
 end
 MOORING.NH10.date(MOORING.NH10.date(:,1)<1000)=MOORING.NH10.date(MOORING.NH10.date(:,1)<1000)+2000;
 MOORING.NH10.sst(MOORING.NH10.sst==-999) = NaN;
 MOORING.NH10.sal(MOORING.NH10.sal==-999) = NaN;
 MOORING.NH10.fCO2SW(MOORING.NH10.fCO2SW==-999) = NaN;
 MOORING.NH10.fCO2Air(MOORING.NH10.fCO2Air==-999) = NaN;
+MOORING.NH10.pCO2SW(MOORING.NH10.pCO2SW==-999) = NaN;
+MOORING.NH10.pCO2Air(MOORING.NH10.pCO2Air==-999) = NaN;
 MOORING.NH10.lon(MOORING.NH10.lon<0) = MOORING.NH10.lon(MOORING.NH10.lon<0) + 360;
 
 %% Cape Arrago
@@ -200,6 +229,8 @@ MOORING.CB_06.sst  = sst;
 MOORING.CB_06.sal  = sal;
 MOORING.CB_06.fCO2SW  = fCO2SW;
 MOORING.CB_06.fCO2Air = fCO2Air;
+MOORING.CB_06.pCO2SW  = pCO2SW;
+MOORING.CB_06.pCO2Air = pCO2Air;
 idx = find(strcmp('CB_06',structnames));
 for n = 1:size(idx,1)
     MOORING.(extractBefore(fnames2{idx(n)},'.')) = ...
@@ -221,9 +252,13 @@ for n = 1:size(idx,1)
     if n == 2 || n == 3 || n == 5 || n == 6
         MOORING.CB_06.fCO2SW  = [MOORING.CB_06.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat__uatm_(idxQC)];
         MOORING.CB_06.fCO2Air = [MOORING.CB_06.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat__uatm_(idxQC)];
+        MOORING.CB_06.pCO2SW  = [MOORING.CB_06.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat__uatm_(idxQC)];
+        MOORING.CB_06.pCO2Air = [MOORING.CB_06.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat__uatm_(idxQC)];
     else
         MOORING.CB_06.fCO2SW  = [MOORING.CB_06.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
         MOORING.CB_06.fCO2Air = [MOORING.CB_06.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+        MOORING.CB_06.pCO2SW  = [MOORING.CB_06.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+        MOORING.CB_06.pCO2Air = [MOORING.CB_06.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
     end
 end
 MOORING.CB_06.date(MOORING.CB_06.date(:,1)<1000)=MOORING.CB_06.date(MOORING.CB_06.date(:,1)<1000)+2000;
@@ -231,6 +266,8 @@ MOORING.CB_06.sst(MOORING.CB_06.sst==-999) = NaN;
 MOORING.CB_06.sal(MOORING.CB_06.sal==-999) = NaN;
 MOORING.CB_06.fCO2SW(MOORING.CB_06.fCO2SW==-999) = NaN;
 MOORING.CB_06.fCO2Air(MOORING.CB_06.fCO2Air==-999) = NaN;
+MOORING.CB_06.pCO2SW(MOORING.CB_06.pCO2SW==-999) = NaN;
+MOORING.CB_06.pCO2Air(MOORING.CB_06.pCO2Air==-999) = NaN;
 MOORING.CB_06.lon(MOORING.CB_06.lon<0) = MOORING.CB_06.lon(MOORING.CB_06.lon<0) + 360;
 
 %% Cape Elizabeth
@@ -243,6 +280,8 @@ MOORING.WA.sst  = sst;
 MOORING.WA.sal  = sal;
 MOORING.WA.fCO2SW  = fCO2SW;
 MOORING.WA.fCO2Air = fCO2Air;
+MOORING.WA.pCO2SW  = pCO2SW;
+MOORING.WA.pCO2Air = pCO2Air;
 idx = find(strcmp('WA',structnames));
 for n = 1:size(idx,1)
     HL = 4;
@@ -271,12 +310,16 @@ for n = 1:size(idx,1)
     MOORING.WA.sal     = [MOORING.WA.sal;MOORING.(extractBefore(fnames2{idx(n)},'.')).Salinity(idxQC)];
     MOORING.WA.fCO2SW  = [MOORING.WA.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
     MOORING.WA.fCO2Air = [MOORING.WA.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+    MOORING.WA.pCO2SW  = [MOORING.WA.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+    MOORING.WA.pCO2Air = [MOORING.WA.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
 end
 MOORING.WA.date(MOORING.WA.date(:,1)<1000)=MOORING.WA.date(MOORING.WA.date(:,1)<1000)+2000;
 MOORING.WA.sst(MOORING.WA.sst==-999) = NaN;
 MOORING.WA.sal(MOORING.WA.sal==-999) = NaN;
 MOORING.WA.fCO2SW(MOORING.WA.fCO2SW==-999) = NaN;
 MOORING.WA.fCO2Air(MOORING.WA.fCO2Air==-999) = NaN;
+MOORING.WA.pCO2SW(MOORING.WA.pCO2SW==-999) = NaN;
+MOORING.WA.pCO2Air(MOORING.WA.pCO2Air==-999) = NaN;
 MOORING.WA.lon(MOORING.WA.lon<0) = MOORING.WA.lon(MOORING.WA.lon<0) + 360;
 
 %% Cha ba
@@ -289,6 +332,8 @@ MOORING.LaPush.sst  = sst;
 MOORING.LaPush.sal  = sal;
 MOORING.LaPush.fCO2SW  = fCO2SW;
 MOORING.LaPush.fCO2Air = fCO2Air;
+MOORING.LaPush.pCO2SW  = pCO2SW;
+MOORING.LaPush.pCO2Air = pCO2Air;
 idx = find(strcmp('LaPush',structnames));
 for n = 1:size(idx,1)
     HL = 4; if n == 2; HL = 0; end
@@ -315,9 +360,13 @@ for n = 1:size(idx,1)
     if n == 3 || n == 5 || n == 12 || n == 15
         MOORING.LaPush.fCO2SW  = [MOORING.LaPush.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat__uatm_(idxQC)];
         MOORING.LaPush.fCO2Air = [MOORING.LaPush.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat__uatm_(idxQC)];
+        MOORING.LaPush.pCO2SW  = [MOORING.LaPush.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat__uatm_(idxQC)];
+        MOORING.LaPush.pCO2Air = [MOORING.LaPush.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat__uatm_(idxQC)];
     else
         MOORING.LaPush.fCO2SW  = [MOORING.LaPush.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
         MOORING.LaPush.fCO2Air = [MOORING.LaPush.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+        MOORING.LaPush.pCO2SW  = [MOORING.LaPush.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+        MOORING.LaPush.pCO2Air = [MOORING.LaPush.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
     end
 end
 MOORING.LaPush.date(MOORING.LaPush.date(:,1)<1000)=MOORING.LaPush.date(MOORING.LaPush.date(:,1)<1000)+2000;
@@ -325,6 +374,8 @@ MOORING.LaPush.sst(MOORING.LaPush.sst==-999) = NaN;
 MOORING.LaPush.sal(MOORING.LaPush.sal==-999) = NaN;
 MOORING.LaPush.fCO2SW(MOORING.LaPush.fCO2SW==-999) = NaN;
 MOORING.LaPush.fCO2Air(MOORING.LaPush.fCO2Air==-999) = NaN;
+MOORING.LaPush.pCO2SW(MOORING.LaPush.pCO2SW==-999) = NaN;
+MOORING.LaPush.pCO2Air(MOORING.LaPush.pCO2Air==-999) = NaN;
 MOORING.LaPush.lon(MOORING.LaPush.lon<0) = MOORING.LaPush.lon(MOORING.LaPush.lon<0) + 360;
 
 %% Kodiak
@@ -337,6 +388,8 @@ MOORING.Kodiak.sst  = sst;
 MOORING.Kodiak.sal  = sal;
 MOORING.Kodiak.fCO2SW  = fCO2SW;
 MOORING.Kodiak.fCO2Air = fCO2Air;
+MOORING.Kodiak.pCO2SW  = pCO2SW;
+MOORING.Kodiak.pCO2Air = pCO2Air;
 idx = find(strcmp('Kodiak',structnames));
 for n = 1:size(idx,1)
     HL = 4;
@@ -365,12 +418,16 @@ for n = 1:size(idx,1)
     MOORING.Kodiak.sal     = [MOORING.Kodiak.sal;MOORING.(extractBefore(fnames2{idx(n)},'.')).Salinity(idxQC)];
     MOORING.Kodiak.fCO2SW  = [MOORING.Kodiak.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
     MOORING.Kodiak.fCO2Air = [MOORING.Kodiak.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+    MOORING.Kodiak.pCO2SW  = [MOORING.Kodiak.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+    MOORING.Kodiak.pCO2Air = [MOORING.Kodiak.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
 end
 MOORING.Kodiak.date(MOORING.Kodiak.date(:,1)<1000)=MOORING.Kodiak.date(MOORING.Kodiak.date(:,1)<1000)+2000;
 MOORING.Kodiak.sst(MOORING.Kodiak.sst==-999) = NaN;
 MOORING.Kodiak.sal(MOORING.Kodiak.sal==-999) = NaN;
 MOORING.Kodiak.fCO2SW(MOORING.Kodiak.fCO2SW==-999) = NaN;
 MOORING.Kodiak.fCO2Air(MOORING.Kodiak.fCO2Air==-999) = NaN;
+MOORING.Kodiak.pCO2SW(MOORING.Kodiak.pCO2SW==-999) = NaN;
+MOORING.Kodiak.pCO2Air(MOORING.Kodiak.pCO2Air==-999) = NaN;
 MOORING.Kodiak.lon(MOORING.Kodiak.lon<0) = MOORING.Kodiak.lon(MOORING.Kodiak.lon<0) + 360;
 
 %% GAKOA
@@ -383,6 +440,8 @@ MOORING.GAKOA.sst  = sst;
 MOORING.GAKOA.sal  = sal;
 MOORING.GAKOA.fCO2SW  = fCO2SW;
 MOORING.GAKOA.fCO2Air = fCO2Air;
+MOORING.GAKOA.pCO2SW  = pCO2SW;
+MOORING.GAKOA.pCO2Air = pCO2Air;
 idx = find(strcmp('GAKOA',structnames));
 for n = 1:size(idx,1)
     HL = 4;
@@ -411,12 +470,16 @@ for n = 1:size(idx,1)
     MOORING.GAKOA.sal     = [MOORING.GAKOA.sal;MOORING.(extractBefore(fnames2{idx(n)},'.')).Salinity(idxQC)];
     MOORING.GAKOA.fCO2SW  = [MOORING.GAKOA.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
     MOORING.GAKOA.fCO2Air = [MOORING.GAKOA.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+    MOORING.GAKOA.pCO2SW  = [MOORING.GAKOA.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+    MOORING.GAKOA.pCO2Air = [MOORING.GAKOA.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
 end
 MOORING.GAKOA.date(MOORING.GAKOA.date(:,1)<1000)=MOORING.GAKOA.date(MOORING.GAKOA.date(:,1)<1000)+2000;
 MOORING.GAKOA.sst(MOORING.GAKOA.sst==-999) = NaN;
 MOORING.GAKOA.sal(MOORING.GAKOA.sal==-999) = NaN;
 MOORING.GAKOA.fCO2SW(MOORING.GAKOA.fCO2SW==-999) = NaN;
 MOORING.GAKOA.fCO2Air(MOORING.GAKOA.fCO2Air==-999) = NaN;
+MOORING.GAKOA.pCO2SW(MOORING.GAKOA.pCO2SW==-999) = NaN;
+MOORING.GAKOA.pCO2Air(MOORING.GAKOA.pCO2Air==-999) = NaN;
 MOORING.GAKOA.lon(MOORING.GAKOA.lon<0) = MOORING.GAKOA.lon(MOORING.GAKOA.lon<0) + 360;
 
 %% M2
@@ -429,6 +492,8 @@ MOORING.M2.sst  = sst;
 MOORING.M2.sal  = sal;
 MOORING.M2.fCO2SW  = fCO2SW;
 MOORING.M2.fCO2Air = fCO2Air;
+MOORING.M2.pCO2SW  = pCO2SW;
+MOORING.M2.pCO2Air = pCO2Air;
 idx = find(strcmp('M2',structnames));
 for n = 1:size(idx,1)
     HL = 4;
@@ -457,12 +522,16 @@ for n = 1:size(idx,1)
     MOORING.M2.sal     = [MOORING.M2.sal;MOORING.(extractBefore(fnames2{idx(n)},'.')).Salinity(idxQC)];
     MOORING.M2.fCO2SW  = [MOORING.M2.fCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2SW_sat_Uatm(idxQC)];
     MOORING.M2.fCO2Air = [MOORING.M2.fCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).fCO2Air_sat_Uatm(idxQC)];
+    MOORING.M2.pCO2SW  = [MOORING.M2.pCO2SW;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2SW_sat_Uatm(idxQC)];
+    MOORING.M2.pCO2Air = [MOORING.M2.pCO2Air;MOORING.(extractBefore(fnames2{idx(n)},'.')).pCO2Air_sat_Uatm(idxQC)];
 end
 MOORING.M2.date(MOORING.M2.date(:,1)<1000)=MOORING.M2.date(MOORING.M2.date(:,1)<1000)+2000;
 MOORING.M2.sst(MOORING.M2.sst==-999) = NaN;
 MOORING.M2.sal(MOORING.M2.sal==-999) = NaN;
 MOORING.M2.fCO2SW(MOORING.M2.fCO2SW==-999) = NaN;
 MOORING.M2.fCO2Air(MOORING.M2.fCO2Air==-999) = NaN;
+MOORING.M2.pCO2SW(MOORING.M2.pCO2SW==-999) = NaN;
+MOORING.M2.pCO2Air(MOORING.M2.pCO2Air==-999) = NaN;
 MOORING.M2.lon(MOORING.M2.lon<0) = MOORING.M2.lon(MOORING.M2.lon<0) + 360;
 
 %% Kwakshua Channel 
@@ -618,20 +687,22 @@ idx = idx & ~strcmp(fields,'CB_06');
 MOORING = rmfield(MOORING,fields(idx));
 
 %% Clean up Workspace
-clear date fileinfo fnames fnames2 HL idx lat lon n name filePath
-clear fields fCO2Air fCO2SW sal sst structnames time idxQC hr mn
+clear date fileinfo fnames fnames2 HL idx lat lon n name filePath fields
+clear fCO2Air fCO2SW pCO2Air pCO2SW sal sst structnames time idxQC hr mn
 
 %% Define mooring names
 moornames = fieldnames(MOORING);
 
-%% Bin mooring fCO2s into monthly values
+%% Bin mooring fCO2s and pCO2s into monthly values
 for n = 1:numel(moornames)
     years = unique(MOORING.(moornames{n}).date(:,1));
-    years = sort(years);
+    years = min(years):max(years);
     MOORING.(moornames{n}).sst_monthly = nan(length(years)*12,2);
     MOORING.(moornames{n}).sal_monthly = nan(length(years)*12,2);
     MOORING.(moornames{n}).fCO2SW_monthly = nan(length(years)*12,2);
     MOORING.(moornames{n}).fCO2Air_monthly = nan(length(years)*12,2);
+    MOORING.(moornames{n}).pCO2SW_monthly = nan(length(years)*12,2);
+    MOORING.(moornames{n}).pCO2Air_monthly = nan(length(years)*12,2);
     for y = 1:length(years)
         for m = 1:12
             idx = MOORING.(moornames{n}).date(:,1)==years(y) & ...
@@ -646,6 +717,10 @@ for n = 1:numel(moornames)
                 mean(MOORING.(moornames{n}).fCO2SW(idx),'omitnan');
             MOORING.(moornames{n}).fCO2Air_monthly((y-1)*12+m,1) = ...
                 mean(MOORING.(moornames{n}).fCO2Air(idx),'omitnan');
+            MOORING.(moornames{n}).pCO2SW_monthly((y-1)*12+m,1) = ...
+                mean(MOORING.(moornames{n}).pCO2SW(idx),'omitnan');
+            MOORING.(moornames{n}).pCO2Air_monthly((y-1)*12+m,1) = ...
+                mean(MOORING.(moornames{n}).pCO2Air(idx),'omitnan');
             MOORING.(moornames{n}).sst_monthly((y-1)*12+m,2) = ...
                 std(MOORING.(moornames{n}).sst(idx),[],'omitnan');
             MOORING.(moornames{n}).sal_monthly((y-1)*12+m,2) = ...
@@ -654,17 +729,23 @@ for n = 1:numel(moornames)
                 std(MOORING.(moornames{n}).fCO2SW(idx),[],'omitnan');
             MOORING.(moornames{n}).fCO2Air_monthly((y-1)*12+m,2) = ...
                 std(MOORING.(moornames{n}).fCO2Air(idx),[],'omitnan');
+            MOORING.(moornames{n}).pCO2SW_monthly((y-1)*12+m,2) = ...
+                std(MOORING.(moornames{n}).pCO2SW(idx),[],'omitnan');
+            MOORING.(moornames{n}).pCO2Air_monthly((y-1)*12+m,2) = ...
+                std(MOORING.(moornames{n}).pCO2Air(idx),[],'omitnan');
         end
     end
 end
 clear m n
 
-%% Bin mooring fCO2s into climatological values
+%% Bin mooring fCO2s and pCO2s into climatological values
 for n = 1:numel(moornames)
     MOORING.(moornames{n}).sst_clim = nan(12,2);
     MOORING.(moornames{n}).sal_clim = nan(12,2);
     MOORING.(moornames{n}).fCO2SW_clim = nan(12,2);
     MOORING.(moornames{n}).fCO2Air_clim = nan(12,2);
+    MOORING.(moornames{n}).pCO2SW_clim = nan(12,2);
+    MOORING.(moornames{n}).pCO2Air_clim = nan(12,2);
     % calculate climatological values
     for m = 1:12
         idx = MOORING.(moornames{n}).date(:,2)==m;
@@ -676,6 +757,10 @@ for n = 1:numel(moornames)
             mean(MOORING.(moornames{n}).fCO2SW(idx),'omitnan');
         MOORING.(moornames{n}).fCO2Air_clim(m,1) = ...
             mean(MOORING.(moornames{n}).fCO2Air(idx),'omitnan');
+        MOORING.(moornames{n}).pCO2SW_clim(m,1) = ...
+            mean(MOORING.(moornames{n}).pCO2SW(idx),'omitnan');
+        MOORING.(moornames{n}).pCO2Air_clim(m,1) = ...
+            mean(MOORING.(moornames{n}).pCO2Air(idx),'omitnan');
         MOORING.(moornames{n}).sst_clim(m,2) = ...
             std(MOORING.(moornames{n}).sst(idx),[],'omitnan');
         MOORING.(moornames{n}).sal_clim(m,2) = ...
@@ -684,6 +769,10 @@ for n = 1:numel(moornames)
             std(MOORING.(moornames{n}).fCO2SW(idx),[],'omitnan');
         MOORING.(moornames{n}).fCO2Air_clim(m,2) = ...
             std(MOORING.(moornames{n}).fCO2Air(idx),[],'omitnan');
+        MOORING.(moornames{n}).pCO2SW_clim(m,2) = ...
+            std(MOORING.(moornames{n}).pCO2SW(idx),[],'omitnan');
+        MOORING.(moornames{n}).pCO2Air_clim(m,2) = ...
+            std(MOORING.(moornames{n}).pCO2Air(idx),[],'omitnan');
     end
 end
 clear m n
@@ -719,5 +808,35 @@ for n = 1:numel(moornames)
         MOORING.(moornames{n}).fCO2SW_trend = x(2)*365.25;
     else
         MOORING.(moornames{n}).fCO2SW_trend = NaN;
+    end
+    % index to where pCO2 is available
+    idx = ~isnan(MOORING.(moornames{n}).pCO2SW_monthly(:,1));
+    t = MOORING.(moornames{n}).datetime_monthly;
+    t_idx = MOORING.(moornames{n}).datetime_monthly(idx);
+    dt_idx = t_idx-t(1);
+    pCO2 = MOORING.(moornames{n}).pCO2SW_monthly(idx,1);
+    % fit regression model
+    [~,~,x] = leastsq2(dt_idx,pCO2,0,2,[365.25 365.25/2]);
+    % calculate pCO2 from model
+    dt = t-t(1);
+    freqp1 = 2*pi/365.25;
+    freqp2 = 2*pi/(365.25/2);
+    yf = x(1) + x(2)*dt + x(3)*cos(freqp1*dt) + x(4)*sin(freqp1*dt) + ...
+        x(5)*cos(freqp2*dt) + x(6)*sin(freqp2*dt);
+    % plot
+%     figure; hold on
+%     scatter(t_idx,pCO2);
+%     plot(t,yf);
+    % compute annual mean
+    MOORING.(moornames{n}).pCO2SW_annmean = mean(yf);
+    % compute amplitude
+    yf_no_tr = x(1) + x(3)*cos(freqp1*dt) + x(4)*sin(freqp1*dt) + ...
+        x(5)*cos(freqp2*dt) + x(6)*sin(freqp2*dt);
+    MOORING.(moornames{n}).pCO2SW_amplitude = max(yf_no_tr) - min(yf_no_tr);
+    % compute trend
+    if length(years)>6
+        MOORING.(moornames{n}).pCO2SW_trend = x(2)*365.25;
+    else
+        MOORING.(moornames{n}).pCO2SW_trend = NaN;
     end
 end

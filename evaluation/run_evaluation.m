@@ -114,10 +114,10 @@ set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
 c=colorbar('location','southoutside');
-colormap(parula(18));
+colormap(parula);
 caxis([295 475]);
 c.TickLength = 0;
-c.Label.String = 'Sea Surface {\itp}CO_{2}';
+c.Label.String = 'Sea Surface {\itp}CO_{2(RFR-LME)} (\muatm)';
 cbarrow;
 % plot regions
 for n = 1:length(region)
@@ -289,7 +289,7 @@ close
 figure; hold on;
 histogram(GLODAP.fco2_del);
 histogram(CODAP.fco2_del);
-xlabel('{\itf}_{CO2(discrete)} - {\itf}_{CO2(RFR)}');
+xlabel('{\itf}_{CO2(discrete)} - {\itf}_{CO2(LME-RFR)}');
 ylabel('Counts');
 xlim([-500 1000]);
 legend({'GLODAP' 'CODAP'});
@@ -396,7 +396,7 @@ figure; hold on;
 histogram(GLODAP.pH_del);
 histogram(CODAP.pH_del);
 plot([0 0],[0 900],'--k','linewidth',2);
-xlabel('pH_{T(discrete)} - pH_{T(RFR)}');
+xlabel('pH_{T(discrete)} - pH_{T(LME-RFR)}');
 ylabel('Counts');
 xlim([-1 1]);
 legend({'GLODAP' 'CODAP'});
@@ -444,7 +444,7 @@ figure; hold on;
 histogram(GLODAP.OmA_del);
 histogram(CODAP.OmA_del);
 plot([0 0],[0 450],'--k','linewidth',2);
-xlabel('\Omega_{A(discrete)} - \Omega_{A(RFR)}');
+xlabel('\Omega_{A(discrete)} - \Omega_{A(LME-RFR)}');
 ylabel('Counts');
 xlim([-2.5 2.5]);
 legend({'GLODAP' 'CODAP'});

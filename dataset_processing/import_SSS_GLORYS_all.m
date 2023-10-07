@@ -1,7 +1,21 @@
 % Obtain mixed layer depth from GLORYS reanalysis
 function Salinity = import_SSS_GLORYS_all(lat,lon,month,path)
 
-load([path '/data_to_use/SSS_GLORYS.mat'],'SSS');
+% check for folder existence
+if ~isfolder([pwd '/Data/SSS']); mkdir([pwd '/Data/SSS']); end;
+
+% acquire data
+path = 'https://data.cmems-du.eu/Core/GLOBAL_REANALYSIS_PHY_001_031/';
+folder = 'global-reanalysis-phy-001-031-grepv2-monthly/';
+for y = 1998:2020
+    for m = 1:12
+        year = num2str(y);
+        month = sprintf('%02d',m);
+        % check for file existence
+        websave(['Data/SSS/GLORYS_SSS_' year '_' month '.nc'],...
+            [path folder year '/' month '/grepv2_monthly_' year month '.nc']);
+    end
+end
 
 % Convert longitude
 SSS.lon = convert_lon(SSS.lon);

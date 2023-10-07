@@ -4,14 +4,15 @@
 % Last updated by J.D. Sharp: 7/14/23
 % 
 
-% this script defines the bounds of the eighteen LMEs
+% this script defines the bounds of the eleven LMEs
 define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
 var_type = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'SST' 'SSS' 'TA_DIC'};
 units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' '' 'degC' '' ''};
-rounder = [1 1 1 1 3 2 2 1 1 2 1 1 1];
+rounder = [1 1 1 1 3 3 2 1 1 2 1 1 1];
+tr_rounder = [1 1 1 1 3 3 3 1 1 2 1 1 1];
 
 % preallocate tables
 stats = nan(length(region),length(var_type)*5);
@@ -175,9 +176,9 @@ for n = 1:length(region)
         % plot
         plot(time,OAI_grid.(region{n}).var_dom_mean,'k-','linewidth',1);
         plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'r-','linewidth',3);
-%         fill([time;flipud(time)],[OAI_grid.(region{n}).var_dom_mean+OAI_grid.(region{n}).u_var_dom_mean;...
-%             flipud(OAI_grid.(region{n}).var_dom_mean-OAI_grid.(region{n}).u_var_dom_mean)],'k',...
-%             'FaceAlpha',0.2,'LineStyle','none');
+        fill([time;flipud(time)],[OAI_grid.(region{n}).var_dom_mean+OAI_grid.(region{n}).u_var_dom_mean;...
+            flipud(OAI_grid.(region{n}).var_dom_mean-OAI_grid.(region{n}).u_var_dom_mean)],'k',...
+            'FaceAlpha',0.2,'LineStyle','none');
         fill([time_ann;flipud(time_ann)],[OAI_grid.(region{n}).var_dom_mean_ann+OAI_grid.(region{n}).u_var_dom_mean_ann;...
             flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'k',...
             'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
@@ -192,10 +193,10 @@ for n = 1:length(region)
         plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
         % add text to plot
         title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean,'omitnan'),rounder(var_num))) ...
-            ' ' units{var_num} ' | Tr. = ' num2str(round(x(2),rounder(var_num))) ...
+            ' ' units{var_num} ' | Tr. = ' num2str(round(x(2),tr_rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
-            'FontSize',10,'HorizontalAlignment','center');
+            'FontSize',14,'HorizontalAlignment','center');
         xL = xlim; yL = ylim;
         % Add recent trend indicator
 %         if pos_signif_5
@@ -315,3 +316,4 @@ writetable(monthly,['IndsAndStats/Monthly-Inds-' date '.xls'],'WriteRowNames',tr
 writetable(u_monthly,['IndsAndStats/Monthly-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
 writetable(ann,['IndsAndStats/Annual-Inds-' date '.xls'],'WriteRowNames',true);
 writetable(u_ann,['IndsAndStats/Annual-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
+

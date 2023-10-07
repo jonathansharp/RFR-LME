@@ -33,7 +33,7 @@ for g = 1:size(CHL.longitude,1)
             chl_tmp = squeeze(CHL.chl(g,h,:));
             idx = ~isnan(chl_tmp);
             Chlfit = interp1(month(idx),chl_tmp(idx),month,'linear');
-            % nearest neighbor interpolation
+            % then, nearest neighbor interpolation
             chl_tmp = Chlfit;
             idx = ~isnan(chl_tmp);
             Chlfit = interp1(month(idx),chl_tmp(idx),month,'nearest','extrap');

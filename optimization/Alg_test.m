@@ -15,7 +15,7 @@ define_regions_eiwg
 RMSE = nan(num_nTrees,num_minLeafSize,num_numpredictors);
 
 % for each region
-for n = 1:length(region)
+for n = 8%1:length(region)
 
 % cluster and fit algs
 for i = 1:num_nTrees

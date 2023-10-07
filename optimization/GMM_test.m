@@ -9,7 +9,7 @@
 % define regions for loop
 define_regions_eiwg
 
-for n = 1:length(region)
+for n = 1%:length(region)
 
     %% define and select region
     define_regions_eiwg; % define regions

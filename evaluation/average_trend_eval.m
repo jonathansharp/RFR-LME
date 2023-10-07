@@ -1,7 +1,7 @@
 % Evaluate US LME OA indicators against gridded products
 
 %% load US LME data
-date = '20-May-2023';
+date = '02-Aug-2023';
 LME_RFR = netcdfreader(['Data/US_LME_RFR_Inds_' date '.nc']);
 LME_RFR_u = netcdfreader(['Data/US_LME_RFR_Inds_Uncer_' date '.nc']);
 

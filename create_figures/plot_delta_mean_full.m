@@ -28,6 +28,7 @@ end
 c.TickLength = 0;
 c.Label.String = lab;
 cbarrow;
+mlabel off
 % plot regions
 type = 'Val';
 for n = 1:length(region)
@@ -50,11 +51,7 @@ lat = vars_grid.([type num2str(en)]).(region{n}).lat;
 lon = vars_grid.([type num2str(en)]).(region{n}).lon;
 pcolorm(lat,lon,z)
 % plot borders around regions
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
+    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
     tmp_lat = lme_shape(lme_idx.(region{n})).Y';
     plotm(tmp_lat,tmp_lon,'k','linewidth',1);
 end

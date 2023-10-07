@@ -156,12 +156,12 @@ for v = 1:length(uVars_OA)
     ncwrite(filename,uVars_OA{v},US_LME_RFR.(uVars_OA{v}));
 end
 
-%% plot for sanity
-figure;
-worldmap([US_LME_RFR.lim.latmin US_LME_RFR.lim.latmax],...
-    [US_LME_RFR.lim.lonmin US_LME_RFR.lim.lonmax]);
-pcolorm(US_LME_RFR.lat,US_LME_RFR.lon,mean(US_LME_RFR.fCO2,3,'omitnan')');
-close
+%% plot for sanity (requires mapping toolbox)
+% figure;
+% worldmap([US_LME_RFR.lim.latmin US_LME_RFR.lim.latmax],...
+%     [US_LME_RFR.lim.lonmin US_LME_RFR.lim.lonmax]);
+% pcolorm(US_LME_RFR.lat,US_LME_RFR.lon,mean(US_LME_RFR.fCO2,3,'omitnan')');
+% close
 
 %% Clean up
 clear US_LME_RFR Vars_OA Vars_pred v n time filename
