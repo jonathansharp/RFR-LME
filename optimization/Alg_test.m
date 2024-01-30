@@ -15,7 +15,7 @@ define_regions_eiwg
 RMSE = nan(num_nTrees,num_minLeafSize,num_numpredictors);
 
 % for each region
-for n = 8%1:length(region)
+for nn = 1:length(region)
 
 % cluster and fit algs
 for i = 1:num_nTrees
@@ -24,7 +24,7 @@ for i = 1:num_nTrees
 
             %% define and select region
             define_regions_eiwg; % define regions
-            region = region(n); % select region for test step
+            region = region(nn); % select region for test step
 
             %% Set RFR options
             nTrees = nTrees_vec(i);
@@ -33,8 +33,11 @@ for i = 1:num_nTrees
 
             %% Set GMM options and test indices
             set_gmm_options
-            num_groups = num_groups(n); % select number of groups for test
+            num_groups = num_groups(nn); % select number of groups for test
             rfr_test_idx = 1; % set RFR index to test
+
+            %% Cluster on grid
+            cluster_on_grid;
 
             %% Fit test algorithms
             fit_algs_probs;
@@ -58,7 +61,7 @@ xticks(1:length(minLeafSize_vec));
 xticklabels({'1' '2' '3' '5' '7' '10' '15' '20'});
 xlabel('Minimum Leaf Size');
 ylabel('RMSE');
-exportgraphics(gcf,['Figures/' region{n} '/RMSE_test_algs.png']);
+exportgraphics(gcf,['Figures/' region{1} '/RMSE_test_algs.png']);
 close
 
 end

@@ -34,8 +34,10 @@ for n = 1:length(region)
         % Bering-Chukchi and Beaufort Seas
         if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
             vars = {'MSLP' 'SST' 'Wind'};
+            % vars = {'MSLP' 'SST' 'Wind' 'Lat.' 'Lon.'};
         else
             vars = {'MSLP' 'SST' 'CHL'};
+            % vars = {'MSLP' 'SST' 'CHL' 'Lat.' 'Lon.'};
         end
         % define temporary variables based on clustering strategy
         if strcmp(strat,'abs')

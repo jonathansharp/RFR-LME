@@ -40,4 +40,4 @@ for n = 1:length(region)
 end
 
 %% save table of error statistics
-writetable(error_stats,['Data/ErrorStatistics-no-moorings-' date '.xls']);
+writetable(error_stats,['IndsAndStats/ErrorStatistics-no-moorings-' date '.xls']);

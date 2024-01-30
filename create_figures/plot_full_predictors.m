@@ -1,11 +1,13 @@
-%% plot surface predictor variables across full region
-plot_temporal_mean_full(29.75,38.25,0.5,cmocean('haline',17),'SSS','Sea Surface Salinity',region,lme_shape,lme_idx)
-plot_temporal_mean_full(-0.015,0.105,0.01,parula(12),'SSH','Sea Surface Height Anomaly (m)',region,lme_shape,lme_idx)
-plot_temporal_mean_full(1,31,2,cmocean('thermal',15),'SST',['Sea Surface Temperature (' char(176) 'C)'],region,lme_shape,lme_idx)
-plot_temporal_mean_full(-0.025,1.025,0.05,cmocean('tempo',21),'IceC','Sea Ice Concentration Fraction',region,lme_shape,lme_idx)
-plot_temporal_mean_full(-0.025,1.025,0.05,cmocean('algae',21),'CHL','Sea Surface Chlorophyll (log_{10})',region,lme_shape,lme_idx)
-plot_temporal_mean_full(-0.5,12.5,1,cmocean('amp',13),'WindSpeed','Wind Speed (m s^{-1})',region,lme_shape,lme_idx)
-plot_temporal_mean_full(-125,6125,250,cmocean('deep',25),'Bathy','Bottom Depth (m)',region,lme_shape,lme_idx)
-plot_temporal_mean_full(-2.5,52.5,5,jet(11),'MLD','Mixed Layer Depth (m)',region,lme_shape,lme_idx)
-plot_temporal_mean_full(0.990,1.010,0.001,cmocean('dense',21),'mslp','Sea Level Pressure (atm)',region,lme_shape,lme_idx)
-plot_temporal_mean_full(369.5,390.5,1,cmocean('solar',21),'pCO2_atm','Atmospheric pCO_{2} (\muatm)',region,lme_shape,lme_idx)
+% this script defines the bounds of the eleven LMEs
+define_regions_eiwg
+% plot surface predictor variables across full region
+plot_temporal_mean_full(29.75,38.25,cmocean('haline'),'SSS','Sea Surface Salinity',region,lme_shape,lme_idx)
+plot_temporal_mean_full(-0.025,0.105,parula,'SSH','Sea Surface Height Anomaly (m)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(1,31,cmocean('thermal'),'SST',['Sea Surface Temperature (' char(176) 'C)'],region,lme_shape,lme_idx)
+plot_temporal_mean_full(-0.025,1.025,cmocean('tempo'),'IceC','Sea Ice Concentration Fraction',region,lme_shape,lme_idx)
+plot_temporal_mean_full(-0.025,1.025,cmocean('algae'),'CHL','Sea Surface Chlorophyll (log_{10})',region,lme_shape,lme_idx)
+plot_temporal_mean_full(4.5,10.5,cmocean('amp'),'WindSpeed','Wind Speed (m s^{-1})',region,lme_shape,lme_idx)
+plot_temporal_mean_full(-125,6125,cmocean('deep'),'Bathy','Bottom Depth (m)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(-2.5,52.5,jet,'MLD','Mixed Layer Depth (m)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(0.990,1.010,cmocean('dense'),'mslp','Sea Level Pressure (atm)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(369.5,390.5,cmocean('solar'),'pCO2_atm','Atmospheric pCO_{2} (\muatm)',region,lme_shape,lme_idx)

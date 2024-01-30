@@ -1,10 +1,12 @@
 % Evaluate US LME OA indicators against mooring observations
 
+addpath(genpath(pwd));
+
 %% Import mooring data from csv files
 ImportMoorings
 
 %% load US LME data
-date = '02-Aug-2023';
+date = '06-Oct-2023';
 % data
 LME_RFR = netcdfreader(['Data/US_LME_RFR_Inds_' date '.nc']);
 vars = fieldnames(LME_RFR);
@@ -18,11 +20,10 @@ LME_RFR_u = rmfield(LME_RFR_u,vars(~idx));
 
 %% load SeaFlux
 SeaFlux = netcdfreader('evaluation/SeaFlux_v2021.04_spco2_SOCOM_unfilled_1982-2019.nc');
-fco2atm = netcdfreader('evaluation/SeaFlux.v2023.01_fco2atm_1982-2022.nc');
-seafrac = netcdfreader('evaluation/SeaFlux.v2023.01_seafrac_1982-2022.nc');
+fco2atm = netcdfreader('evaluation/SeaFlux.v2023.02_fco2atm_1982-2022.nc');
+seafrac = netcdfreader('evaluation/SeaFlux.v2023.02_seafrac_1982-2022.nc');
 idx_time = fco2atm.time <= max(SeaFlux.time);
 fco2atm.fco2atm = fco2atm.fco2atm(:,:,idx_time);
-
 % convert time
 SeaFlux.time = datenum(1982,1,1+double(SeaFlux.time));
 
@@ -74,8 +75,9 @@ for n = 1:length(moornames)
     if isnan(SeaFlux.JENA_MLS(lon_idx,lat_idx,1))
         lat_idx = find(abs(SeaFlux.lat - moor_lat) == latdiffs(2));
     end
-    % try moving lon a bit
+    % move lat back,then try moving lon a bit
     if isnan(SeaFlux.JENA_MLS(lon_idx,lat_idx,1))
+        lat_idx = find(abs(SeaFlux.lat - moor_lat) == latdiffs(1));
         lon_idx = find(abs(SeaFlux.lon - moor_lon) == londiffs(2));
     end
     MOORING.(moornames{n}).JENA_MLS_pCO2 = squeeze(SeaFlux.JENA_MLS(lon_idx,lat_idx,:));
@@ -85,8 +87,9 @@ for n = 1:length(moornames)
     if isnan(SeaFlux.CSIR_ML6(lon_idx,lat_idx,1))
         lat_idx = find(abs(SeaFlux.lat - moor_lat) == latdiffs(2));
     end
-    % try moving lon a bit
+    % move lat back,then try moving lon a bit
     if isnan(SeaFlux.CSIR_ML6(lon_idx,lat_idx,1))
+        lat_idx = find(abs(SeaFlux.lat - moor_lat) == latdiffs(1));
         lon_idx = find(abs(SeaFlux.lon - moor_lon) == londiffs(2));
     end
     MOORING.(moornames{n}).CSIR_ML6_pCO2 = squeeze(SeaFlux.CSIR_ML6(lon_idx,lat_idx,:));
@@ -96,8 +99,9 @@ for n = 1:length(moornames)
     if isnan(SeaFlux.JMA_MLR(lon_idx,lat_idx,1))
         lat_idx = find(abs(SeaFlux.lat - moor_lat) == latdiffs(2));
     end
-    % try moving lon a bit
+    % move lat back,then try moving lon a bit
     if isnan(SeaFlux.JMA_MLR(lon_idx,lat_idx,1))
+        lat_idx = find(abs(SeaFlux.lat - moor_lat) == latdiffs(1));
         lon_idx = find(abs(SeaFlux.lon - moor_lon) == londiffs(2));
     end
     MOORING.(moornames{n}).JMA_MLR_pCO2 = squeeze(SeaFlux.JMA_MLR(lon_idx,lat_idx,:));
@@ -191,6 +195,44 @@ for n = 1:length(moornames)
         'color',clrs(6,:),'linewidth',2);
     p7=plot(MOORING.(moornames{n}).JMA_MLR_datetime,MOORING.(moornames{n}).JMA_MLR_pCO2,...
         'color',clrs(7,:),'linewidth',2);
+    s1=scatter(MOORING.(moornames{n}).datetime_monthly,MOORING.(moornames{n}).pCO2SW_monthly(:,1),'ko','filled');
+    xlim([min(MOORING.(moornames{n}).LME_RFR_datetime) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
+%     xlim([MOORING.(moornames{n}).LME_RFR_datetime(96) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
+    datetick('x','yyyy','keeplimits');
+    legend([p1 p2 p3 p4 p5 p6 p7 s1],{'LME-RFR' 'CMEMS-LSCE' ...
+        'OceanSODA-ETHZ' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR' 'Mooring'},...
+        'Location','northwest','NumColumns',4);
+%     legend([p1 s1],{'LME-RFR' 'Mooring'},...
+%         'Location','north','NumColumns',2);
+    exportgraphics(f,['Figures/mooring_comp_' moornames{n} '.png']);
+    close
+    % plot absolute difference between mooring and RFR
+end
+
+%% plot mooring average against RFR
+for n = 1:length(moornames)
+    % plot pCO2 time series
+    clrs = cbrewer('qual','Set1',7);
+    f=figure; hold on;
+    f.Position(3) = 2*f.Position(3);
+    p1=plot(MOORING.(moornames{n}).LME_RFR_datetime,MOORING.(moornames{n}).LME_RFR_pCO2,...
+        'color',clrs(1,:),'linewidth',2);
+    fill([MOORING.(moornames{n}).LME_RFR_datetime;flipud(MOORING.(moornames{n}).LME_RFR_datetime)],...
+        [MOORING.(moornames{n}).LME_RFR_pCO2+MOORING.(moornames{n}).LME_RFR_upCO2;...
+        flipud(MOORING.(moornames{n}).LME_RFR_pCO2-MOORING.(moornames{n}).LME_RFR_upCO2)],...
+        clrs(1,:),'facealpha',0.25,'linestyle','none')
+    p2=plot(MOORING.(moornames{n}).CMEMS_LSCE_datetime,MOORING.(moornames{n}).CMEMS_LSCE_pCO2,...
+        'color',rgb('light grey'),'linewidth',2);
+    p3=plot(MOORING.(moornames{n}).SODA_ETHZ_datetime,MOORING.(moornames{n}).SODA_ETHZ_pCO2,...
+        'color',rgb('light grey'),'linewidth',2);
+    p4=plot(MOORING.(moornames{n}).MPI_SOMFFN_datetime,MOORING.(moornames{n}).MPI_SOMFFN_pCO2,...
+        'color',rgb('light grey'),'linewidth',2);
+    p5=plot(MOORING.(moornames{n}).JENA_MLS_datetime,MOORING.(moornames{n}).JENA_MLS_pCO2,...
+        'color',rgb('light grey'),'linewidth',2);
+    p6=plot(MOORING.(moornames{n}).CSIR_ML6_datetime,MOORING.(moornames{n}).CSIR_ML6_pCO2,...
+        'color',rgb('light grey'),'linewidth',2);
+    p7=plot(MOORING.(moornames{n}).JMA_MLR_datetime,MOORING.(moornames{n}).JMA_MLR_pCO2,...
+        'color',rgb('light grey'),'linewidth',2);
     s1=scatter(MOORING.(moornames{n}).datetime_monthly,MOORING.(moornames{n}).pCO2SW_monthly(:,1),'ko','filled');
     xlim([min(MOORING.(moornames{n}).LME_RFR_datetime) max(MOORING.(moornames{n}).LME_RFR_datetime)]);
 %     xlim([MOORING.(moornames{n}).LME_RFR_datetime(96) max(MOORING.(moornames{n}).LME_RFR_datetime)]);

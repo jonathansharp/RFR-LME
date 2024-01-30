@@ -106,15 +106,18 @@ for n = 1:length(region)
 
         % calculate trend
         [yf,yr,x,err] = ...
-            leastsq2(1:length(OAI_grid.(region{n}).year)/12,...
-            OAI_grid.(region{n}).var_dom_mean_ann,0,0,0);
+            leastsq2(OAI_grid.(region{n}).month,...
+            OAI_grid.(region{n}).var_dom_mean,0,3,[4 6 12]);
+        tr = x(2)*12;
 
         % uncertainty on trend
         [acov,acor,lag,dof] = ...
-            autocov2(1:length(OAI_grid.(region{n}).year)/12,yr,10);
-        edof = dof - 2; % subtract number of parameters to get effective dof
+            autocov2(OAI_grid.(region{n}).month,yr,36);
+        %plot(lag,acor)
+        edof = dof - 8; % subtract number of parameters to get effective dof
+        edof(edof<1) = 1;
         tr_uncer = ... % scale uncertainty using edof
-            err(2)*(sqrt(length(OAI_grid.(region{n}).year)/12)./sqrt(edof));
+            err(2)*(sqrt(length(OAI_grid.(region{n}).month))./sqrt(edof))*12;
     
         % calculate interannual variability
         iav = std(yr);
@@ -133,30 +136,30 @@ for n = 1:length(region)
         else
             amp = NaN;
         end
-
-        % calculate trend over most recent 5 years
-        [yf5,yr5,x5,err5] = ...
-            leastsq2(OAI_grid.(region{n}).month(end-12*5:end),...
-            OAI_grid.(region{n}).var_dom_mean(end-12*5:end),0,2,[6 12]);
-        pos_signif_5 = x5(2)-err5(2) > 0;
-        neg_signif_5 = x5(2)+err5(2) < 0;
-        % calculate mean over most recent 5 years
-        meantot = mean(OAI_grid.(region{n}).var_dom_mean);
-        conf90 = std(OAI_grid.(region{n}).var_dom_mean)*1.645;
-        mean5 = mean(OAI_grid.(region{n}).var_dom_mean(end-12*5:end));
-        pos_mean = mean5 > meantot+conf90;
-        neg_mean = mean5 < meantot-conf90;
-    
+% 
+%         % calculate trend over most recent 5 years
+%         [yf5,yr5,x5,err5] = ...
+%             leastsq2(OAI_grid.(region{n}).month(end-12*5:end),...
+%             OAI_grid.(region{n}).var_dom_mean(end-12*5:end),0,2,[6 12]);
+%         pos_signif_5 = x5(2)-err5(2) > 0;
+%         neg_signif_5 = x5(2)+err5(2) < 0;
+%         % calculate mean over most recent 5 years
+%         meantot = mean(OAI_grid.(region{n}).var_dom_mean);
+%         conf90 = std(OAI_grid.(region{n}).var_dom_mean)*1.645;
+%         mean5 = mean(OAI_grid.(region{n}).var_dom_mean(end-12*5:end));
+%         pos_mean = mean5 > meantot+conf90;
+%         neg_mean = mean5 < meantot-conf90;
+%     
         % fill table with summary statistics
         stats(n,(var_num-1)*5+1) = mean_lt; % mean
-        stats(n,(var_num-1)*5+2) = x(2); % trend
+        stats(n,(var_num-1)*5+2) = tr; % trend
         stats(n,(var_num-1)*5+3) = tr_uncer; % trend uncertainty
         stats(n,(var_num-1)*5+4) = amp; % amplitude
         stats(n,(var_num-1)*5+5) = iav; % interannual variability
 
         % fill individual tables
         means_table(n,var_num) = mean_lt;
-        trends_table(n,(var_num-1)*2+1) = x(2);
+        trends_table(n,(var_num-1)*2+1) = tr;
         trends_table(n,(var_num-1)*2+2) = tr_uncer;
         amp_table(n,var_num) = amp;
         iav_table(n,var_num) = iav;
@@ -189,11 +192,11 @@ for n = 1:length(region)
         datetick('x');
         xlim([datenum([1998 1 1]) datenum([2022 1 1])]);   
         % plot means
-        plot([time(1) time(end-12*5)],[meantot meantot],'k--','linewidth',2);
-        plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
+        plot([time(1) time(end)],[mean_lt mean_lt],'k--','linewidth',2);
+        % plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
         % add text to plot
         title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean,'omitnan'),rounder(var_num))) ...
-            ' ' units{var_num} ' | Tr. = ' num2str(round(x(2),tr_rounder(var_num))) ...
+            ' ' units{var_num} ' | Tr. = ' num2str(round(tr,tr_rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
             'FontSize',14,'HorizontalAlignment','center');

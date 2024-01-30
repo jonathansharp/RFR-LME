@@ -1,4 +1,4 @@
-% Plot temporal mean of spatial surface variable over entire region
+% Plot temporal trend of spatial surface variable over entire region
 % 
 % Written by J.D. Sharp: 10/18/22
 % Last updated by J.D. Sharp: 1/18/23
@@ -34,7 +34,7 @@ for n = 1:length(region)
     tr = nan(vars_grid.(type).(region{n}).dim.x,vars_grid.(type).(region{n}).dim.y);
     for a = 1:vars_grid.(type).(region{n}).dim.x
         for b = 1:vars_grid.(type).(region{n}).dim.y
-            if sum(~isnan(squeeze(vars_grid.(type).(region{n}).(varname)(a,b,:))))>200 % if more than 200 months with observations
+            if sum(~isnan(squeeze(vars_grid.(type).(region{n}).(varname)(a,b,:))))>100 % if more than 200 months with observations
             [~,~,x,~] = leastsq2(vars_grid.(type).(region{n}).month,...
                 squeeze(vars_grid.(type).(region{n}).(varname)(a,b,:)),0,2,[6 12]);
             tr(a,b) = x(2)*12;

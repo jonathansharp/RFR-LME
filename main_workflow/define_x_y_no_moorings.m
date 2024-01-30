@@ -101,7 +101,7 @@ for n = 1:length(region)
 
     % Save predictor/target arrays and gridded predictor data with cluster indices
     save(['Data/' region{n} '/variable_arrays_no_moorings'],'Vars_array','-v7.3');
-    save(['Data/' region{n} '/gridded_predictors_no_moorings'],'Preds_grid','-v7.3');
+    save(['Data/' region{n} '/gridded_predictors'],'Preds_grid','-v7.3');
 
     % clean up
     clear lon_tmp lat_tmp month_of_year_tmp cos_month_of_year_tmp sin_month_of_year_tmp

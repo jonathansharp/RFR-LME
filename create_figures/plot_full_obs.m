@@ -1,4 +1,6 @@
 %% Plot number of all grid cells with data
+% define regions
+define_regions_eiwg
 % load SOCAT grid
 load('Data/socat_gridded','SOCAT_grid');
 % initialize figure
@@ -8,11 +10,13 @@ setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
-c=colorbar('location','southoutside');
+c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
 mycolormap = jet(21);
 mycolormap(1,:) = 1;
 colormap(mycolormap);
 caxis([-1 41]);
+c.FontSize = 10;
+c.FontWeight = 'bold';
 c.TickLength = 0;
 c.Label.String = 'Total Months Represented';
 cbarrow('right');
@@ -40,7 +44,7 @@ for n = 1:length(region)
 end
 % plot land
 plot_land('map');
-mlabel off
+%mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
 exportgraphics(gcf,'Figures/full/num_obs.png');

@@ -9,9 +9,10 @@ setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
-c=colorbar('location','southoutside');
+c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
 colormap(parula);
 caxis([295 475]);
+c.FontWeight = 'bold';
 c.TickLength = 0;
 c.Label.String = 'Surface {\itf}CO_{2} (\muatm)';
 cbarrow;

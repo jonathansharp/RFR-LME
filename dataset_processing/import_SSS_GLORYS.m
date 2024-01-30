@@ -26,7 +26,7 @@ Salinity = nan(length(lon),length(lat),length(month));
 
 % Interpolate onto quarter degree grid
 for t = 1:length(month)
-    % use climatology for 2021
+    % use climatology for 2021 and 2022
     if t <= 276
         t_tmp=t;
     else

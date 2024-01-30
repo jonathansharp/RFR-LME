@@ -16,16 +16,22 @@ CMEMS_SSH.longitude = CMEMS_SSH.longitude(lonidx,latidx,:);
 
 % Interpolate over some gaps in SSH dataset
 for t = 1:length(CMEMS_SSH.year_mon)
+    % use climatology for 2022
+    if t <= 288
+        t_tmp=t;
+    else
+        t_tmp=t-288:12:t-12;
+    end
     % Index where ocean mask and SSH are both true
-    idx = ~isnan(CMEMS_SSH.sla_mon(:,:,t)) & ocean_mask;
+    idx = ~isnan(mean(CMEMS_SSH.sla_mon(:,:,t_tmp),3,'omitnan')) & ocean_mask;
     % Get teporary lat, lon, SSH
     lon_tmp = repmat(lon,1,length(lat));
     lat_tmp = repmat(lat',length(lon),1);
-    ssh_tmp = CMEMS_SSH.sla_mon(:,:,t);
+    ssh_tmp = mean(CMEMS_SSH.sla_mon(:,:,t_tmp),3,'omitnan');
     % Create interpolant over than range
     interp = scatteredInterpolant(lon_tmp(idx),lat_tmp(idx),ssh_tmp(idx));
     % Index where SSH is nan
-    idx = isnan(CMEMS_SSH.sla_mon(:,:,t));
+    idx = isnan(ssh_tmp);
     % Fill that area with interpolated SSH
     ssh_tmp(idx) = interp(lon_tmp(idx),lat_tmp(idx));
     % Remove values outside of ocean mask

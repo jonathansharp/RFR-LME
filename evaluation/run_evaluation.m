@@ -1,8 +1,16 @@
 % Run scripts to evaluate US LME OA indicators
 
+addpath(genpath(pwd));
+
+% RFR-LME file data!
+date = '11-Jan-2024';
+%date = '06-Oct-2023';
+
+new = 1;
+
 %% load CODAP data
 load('CODAP_NA/CODAP_NA_v2020_G2format.mat')
-idx = C1.pressure <= 10 & C1.tco2f == 2 & C1.talkf == 2 & ...
+idx = C1.pressure <= 10 & C1.talkf == 2 & C1.tco2f == 2 & ...
     C1.salinityf == 2 & C1.silicatef == 2 & C1.phosphatef == 2;
 CODAP.lat = C1.latitude(idx);
 CODAP.lon = C1.longitude(idx);
@@ -15,15 +23,11 @@ CODAP.sil = C1.silicate(idx);
 CODAP.phos = C1.phosphate(idx);
 CODAP.DIC = C1.tco2(idx);
 CODAP.TA = C1.talk(idx);
-CODAP.pH = C1.phtsinsitutp(idx);
-CODAP.OmA = C1.aragonite(idx);
-CODAP.OmC = C1.calcite(idx);
-CODAP.RF = C1.revelle(idx);
 clear C1 idx Headers Units
 
 %% load GLODAP data
 load('GLODAPv2.2022/GLODAPv2.2022_Merged_Master_File.mat')
-idx = G2pressure <= 10 & G2tco2f == 2 & G2talkf == 2 & ...
+idx = G2pressure <= 10 & G2talkf == 2 & G2tco2f == 2 & ...
     G2salinityf == 2 & G2silicatef == 2 & G2phosphatef == 2;
 GLODAP.lat = G2latitude(idx);
 GLODAP.lon = G2longitude(idx);
@@ -36,10 +40,14 @@ GLODAP.sil = G2silicate(idx);
 GLODAP.phos = G2phosphate(idx);
 GLODAP.DIC = G2tco2(idx);
 GLODAP.TA = G2talk(idx);
-GLODAP.pH = G2phtsinsitutp(idx);
 clear idx G2* expocode expocodeno
 
 %% remove CODAP data outside LMEs
+if new == 1
+    LME_RFR.time = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'time');
+else
+    LME_RFR.time = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Time');
+end
 % determine LME index
 define_regions_eiwg
 idx_tmp = nan(length(CODAP.lat),length(region));
@@ -55,6 +63,9 @@ for n = 1:length(region)
 end
 idx_CODAP = any(idx_tmp_CODAP,2);
 idx_GLODAP = any(idx_tmp_GLODAP,2);
+% also remove data outside time limits
+idx_CODAP = idx_CODAP & CODAP.time > min(LME_RFR.time) & CODAP.time < max(LME_RFR.time);
+idx_GLODAP = idx_GLODAP & GLODAP.time > min(LME_RFR.time) & GLODAP.time < max(LME_RFR.time);
 % remove outside data (CODAP)
 vars = fieldnames(CODAP);
 for v = 1:length(vars)
@@ -70,26 +81,71 @@ clear idx_CODAP idx_tmp_CODAP idx_GLODAP idx_tmp_GLODAP vars v tmp_lon tmp_lat
 %% calculate fCO2, H, and CO3 (CODAP)
 carb = CO2SYS(CODAP.TA,CODAP.DIC,1,2,CODAP.sal,CODAP.tmp,NaN,CODAP.prs,...
     NaN,CODAP.sil,CODAP.phos,0,0,1,10,1,2,2);
+carb_err = errors(CODAP.TA,CODAP.DIC,1,2,CODAP.sal,CODAP.tmp,NaN,CODAP.prs,...
+    NaN,CODAP.sil,CODAP.phos,0,0,2,2,0.01,0.01,0.1,0.01,0,0,'','',0,1,10,1,2,2);
+carb(carb==-999)=NaN;
+carb_err(carb_err==-999)=NaN;
 CODAP.pco2 = carb(:,4);
+CODAP.pco2_e = carb_err(:,4);
 CODAP.fco2 = carb(:,5);
+CODAP.fco2_e = carb_err(:,5);
+CODAP.pH = carb(:,3);
+CODAP.pH_e = -log10(carb(:,15)./10^6) -  (-log10((carb(:,15)./10^6+carb_err(:,3)./10^9)));
 CODAP.H = carb(:,15).*10^3;
+CODAP.H_e = carb_err(:,3).*10^3;
 CODAP.CO3 = carb(:,7);
-clear carb
+CODAP.CO3_e = carb_err(:,7);
+CODAP.OmA = carb(:,18);
+CODAP.OmA_e = carb_err(:,11);
+CODAP.OmC = carb(:,17);
+CODAP.OmC_e = carb_err(:,10);
+CODAP.RF = carb(:,16);
+CODAP.RF_e = carb_err(:,9);
+clear carb carb_err
 
 %% calculate fCO2, H, CO3, Omega, and RF (GLODAP)
 carb = CO2SYS(GLODAP.TA,GLODAP.DIC,1,2,GLODAP.sal,GLODAP.tmp,NaN,GLODAP.prs,...
     NaN,GLODAP.sil,GLODAP.phos,0,0,1,10,1,2,2);
-GLODAP.pco2 = carb(:,5);
+carb_err = errors(GLODAP.TA,GLODAP.DIC,1,2,GLODAP.sal,GLODAP.tmp,NaN,GLODAP.prs,...
+    NaN,GLODAP.sil,GLODAP.phos,0,0,2,2,0,0,0,0,0,0,'','',0,1,10,1,2,2);
+carb(carb==-999)=NaN;
+carb_err(carb_err==-999)=NaN;
+GLODAP.pco2 = carb(:,4);
+GLODAP.pco2_e = carb_err(:,4);
 GLODAP.fco2 = carb(:,5);
+GLODAP.fco2_e = carb_err(:,5);
+GLODAP.pH = carb(:,3);
+GLODAP.pH_e = -log10(carb(:,15)./10^6) -  (-log10((carb(:,15)./10^6+carb_err(:,3)./10^9)));
 GLODAP.H = carb(:,15).*10^3;
+GLODAP.H_e = carb_err(:,3).*10^3;
 GLODAP.CO3 = carb(:,7);
+GLODAP.CO3_e = carb_err(:,7);
 GLODAP.OmA = carb(:,18);
+GLODAP.OmA_e = carb_err(:,11);
 GLODAP.OmC = carb(:,17);
+GLODAP.OmC_e = carb_err(:,20);
 GLODAP.RF = carb(:,16);
-clear carb
+GLODAP.RF_e = carb_err(:,9);
+clear carb carb_err
 
 %% load US LME data
-date = '02-Aug-2023';
+if new == 1
+% New NetCDF files
+LME_RFR.lat = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'lat');
+LME_RFR.lon = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'lon');
+LME_RFR.time = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'time');
+LME_RFR.pco2 = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'pco2');
+LME_RFR.fco2 = ncread(['Data/NetCDFs_' date '/US_LME_RFR_fCO2.nc'],'fco2');
+LME_RFR.TA = ncread(['Data/NetCDFs_' date '/US_LME_RFR_TA.nc'],'ta');
+LME_RFR.DIC = ncread(['Data/NetCDFs_' date '/US_LME_RFR_DIC.nc'],'dic');
+LME_RFR.pH = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pH.nc'],'ph');
+LME_RFR.OmA = ncread(['Data/NetCDFs_' date '/US_LME_RFR_OmA.nc'],'om_a');
+LME_RFR.OmC = ncread(['Data/NetCDFs_' date '/US_LME_RFR_OmC.nc'],'om_c');
+LME_RFR.H = ncread(['Data/NetCDFs_' date '/US_LME_RFR_H.nc'],'h');
+LME_RFR.CO3 = ncread(['Data/NetCDFs_' date '/US_LME_RFR_CO3.nc'],'co3');
+LME_RFR.RF = ncread(['Data/NetCDFs_' date '/US_LME_RFR_RF.nc'],'rf');
+else
+% Old NetCDF files
 LME_RFR.lat = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Lat');
 LME_RFR.lon = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Lon');
 LME_RFR.time = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Time');
@@ -103,50 +159,51 @@ LME_RFR.OmC = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'OmC');
 LME_RFR.H = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'H');
 LME_RFR.CO3 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'CO3');
 LME_RFR.RF = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'RF');
+end
 
 %% plot data locations
-define_regions_eiwg
-% initialize figure
-figure('visible','on'); box on; hold on;
-worldmap([-18 82],[140 302]);
-setm(gca,'MapProjection','robinson','MLabelParallel','south');
-set(gcf,'position',[100 100 900 600]);
-set(gca,'fontsize',16);
-% figure properties
-c=colorbar('location','southoutside');
-colormap(parula);
-caxis([295 475]);
-c.TickLength = 0;
-c.Label.String = 'Sea Surface {\itp}CO_{2(RFR-LME)} (\muatm)';
-cbarrow;
-% plot regions
-for n = 1:length(region)
-     load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
-    z = mean(OAI_grid.(region{n}).pCO2,3,'omitnan')';
-    contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
-        z,295:10:475,'LineStyle','none');
-    clear vars_grid z
-end
-% plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
-% plot land
-plot_land('map');
-mlabel off
-% add CODAP to plot
-scatterm(CODAP.lat,CODAP.lon,5,'ro')
-% add GLODAP to plot
-scatterm(GLODAP.lat,GLODAP.lon,5,'g.')
-% save figure
-if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,'Figures/CODAP_GLODAP_eval_map.png');
+% define_regions_eiwg
+% % initialize figure
+% figure('visible','on'); box on; hold on;
+% worldmap([-18 82],[140 302]);
+% setm(gca,'MapProjection','robinson','MLabelParallel','south');
+% set(gcf,'position',[100 100 900 600]);
+% set(gca,'fontsize',16);
+% % figure properties
+% c=colorbar('location','southoutside');
+% colormap(flipud(slanCM('romao')));
+% caxis([0 5]);
+% c.TickLength = 0;
+% c.Label.String = 'Sea Surface \Omega_{ar(RFR-LME)} (\muatm)';
+% cbarrow;
+% % plot regions
+% for n = 1:length(region)
+%      load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
+%     z = mean(OAI_grid.(region{n}).OmA,3,'omitnan')';
+%     contourfm(OAI_grid.(region{n}).lat,OAI_grid.(region{n}).lon,...
+%         z,0:5/200:5,'LineStyle','none');
+%     clear vars_grid z
+% end
+% % plot borders around regions
+% for n = 1:length(region)
+%     if n <= 11
+%         tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+%     else
+%         tmp_lon = lme_shape(lme_idx.(region{n})).X';
+%     end
+%     tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+%     plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+% end
+% % plot land
+% plot_land('map');
+% mlabel off
+% % add CODAP to plot
+% scatterm(CODAP.lat,CODAP.lon,10,'magenta','o');
+% % add GLODAP to plot
+% scatterm(GLODAP.lat,GLODAP.lon,10,'green','.');
+% % save figure
+% if ~isfolder('Figures'); mkdir('Figures'); end
+% exportgraphics(gcf,'Figures/CODAP_GLODAP_eval_map.png');
 
 %% variable information
 edges = {1900:10:2300;300:5:500;300:5:500;2000:10:2400;7.8:0.0125:8.3;...
@@ -164,13 +221,16 @@ for v = 1:length(var_type)
 end
 % identify and fill gridded values
 for n = 1:length(CODAP.lat)
+    % lon
     idx_lon = find(abs(LME_RFR.lon - CODAP.lon(n)) == ...
         min(abs(LME_RFR.lon - CODAP.lon(n))));
+    % lat
     idx_lat = find(abs(LME_RFR.lat - CODAP.lat(n)) == ...
         min(abs(LME_RFR.lat - CODAP.lat(n))));
+    % time
     idx_time = find(abs(LME_RFR.time - CODAP.time(n)) == ...
         min(abs(LME_RFR.time - CODAP.time(n))));
-    for v = 2:length(var_type)
+    for v = 1:length(var_type)
         CODAP.([var_type{v} '_grid'])(n) = ...
             LME_RFR.(var_type{v})(idx_lon(1),idx_lat(1),idx_time(1));
     end
@@ -188,13 +248,16 @@ for v = 1:length(var_type)
 end
 % identify and fill gridded values
 for n = 1:length(GLODAP.lat)
+    % lon
     idx_lon = find(abs(LME_RFR.lon - GLODAP.lon(n)) == ...
         min(abs(LME_RFR.lon - GLODAP.lon(n))));
+    % lat
     idx_lat = find(abs(LME_RFR.lat - GLODAP.lat(n)) == ...
         min(abs(LME_RFR.lat - GLODAP.lat(n))));
+    % time
     idx_time = find(abs(LME_RFR.time - GLODAP.time(n)) == ...
         min(abs(LME_RFR.time - GLODAP.time(n))));
-    for v = 2:length(var_type)
+    for v = 1:length(var_type)
         GLODAP.([var_type{v} '_grid'])(n) = ...
             LME_RFR.(var_type{v})(idx_lon(1),idx_lat(1),idx_time(1));
     end
@@ -210,6 +273,185 @@ for v = 1:length(var_type)
     GLODAP.([var_type{v} '_del']) = ...
         GLODAP.(var_type{v}) - GLODAP.([var_type{v} '_grid']);
 end
+
+%% show error stats
+% pCO2
+disp(['Med. delta pCO2 (GLODAP) = ' num2str(round(median(GLODAP.pco2_del,'omitnan'),1))]);
+disp(['IQR pCO2 (GLODAP) = ' num2str(round(iqr(GLODAP.pco2_del),1))]);
+idx = ~isnan(GLODAP.pco2_grid);
+disp(['GLODAP pCO2 ~ RFR-LME pCO2 = ' num2str(round(corr(GLODAP.pco2(idx),GLODAP.pco2_grid(idx)),2))]);
+disp(['Propagated pCO2 Err. (GLODAP) = ' num2str(round(mean(GLODAP.pco2_e,'omitnan'),1))]);
+disp(['Med. delta pCO2 (CODAP) = ' num2str(round(median(CODAP.pco2_del,'omitnan'),1))]);
+disp(['IQR pCO2 (CODAP) = ' num2str(round(iqr(CODAP.pco2_del),1))]);
+idx = ~isnan(CODAP.pco2_grid);
+disp(['CODAP pCO2 ~ RFR-LME pCO2 = ' num2str(round(corr(CODAP.pco2(idx),CODAP.pco2_grid(idx)),2))]);
+disp(['Propagated pCO2 Err. (CODAP) = ' num2str(round(mean(CODAP.pco2_e,'omitnan'),1))]);
+disp(' ');
+% pH
+disp(['Med. delta pH (GLODAP) = ' num2str(round(median(GLODAP.pH_del,'omitnan'),3))]);
+disp(['IQR pH (GLODAP) = ' num2str(round(iqr(GLODAP.pH_del),3))]);
+idx = ~isnan(GLODAP.pH_grid);
+disp(['GLODAP pH ~ RFR-LME pH = ' num2str(round(corr(GLODAP.pH(idx),GLODAP.pH_grid(idx)),2))]);
+disp(['Propagated pH Err. (GLODAP) = ' num2str(round(mean(GLODAP.pH_e,'omitnan'),3))]);
+disp(['Med. delta pH (CODAP) = ' num2str(round(median(CODAP.pH_del,'omitnan'),3))]);
+disp(['IQR pH (CODAP) = ' num2str(round(iqr(CODAP.pH_del),3))]);
+idx = ~isnan(CODAP.pH_grid);
+disp(['CODAP pH ~ RFR-LME pH = ' num2str(round(corr(CODAP.pH(idx),CODAP.pH_grid(idx)),2))]);
+disp(['Propagated pH Err. (CODAP) = ' num2str(round(mean(CODAP.pH_e,'omitnan'),3))]);
+disp(' ');
+% Omega
+disp(['Med. delta OmA (GLODAP) = ' num2str(round(median(GLODAP.OmA_del,'omitnan'),2))]);
+disp(['IQR OmA (GLODAP) = ' num2str(round(iqr(GLODAP.OmA_del),2))]);
+idx = ~isnan(GLODAP.OmA_grid);
+disp(['GLODAP OmA ~ RFR-LME OmA = ' num2str(round(corr(GLODAP.OmA(idx),GLODAP.OmA_grid(idx)),2))]);
+disp(['Propagated OmA Err. (GLODAP) = ' num2str(round(mean(GLODAP.OmA_e,'omitnan'),3))]);
+disp(['Med. delta OmA (CODAP) = ' num2str(round(median(CODAP.OmA_del,'omitnan'),2))]);
+disp(['IQR OmA (CODAP) = ' num2str(round(iqr(CODAP.OmA_del),2))]);
+idx = ~isnan(CODAP.OmA_grid);
+disp(['CODAP OmA ~ RFR-LME OmA = ' num2str(round(corr(CODAP.OmA(idx),CODAP.OmA_grid(idx)),2))]);
+disp(['Propagated OmA Err. (CODAP) = ' num2str(round(mean(CODAP.OmA_e,'omitnan'),3))]);
+disp(' ');
+
+%% aggregate deltas on grid
+lon_grid = round(min(LME_RFR.lon)):round(max(LME_RFR.lon));
+lat_grid = round(min(LME_RFR.lat)):round(max(LME_RFR.lat));
+% Determine bin number of each data point
+[~,~,Xnum] = histcounts([GLODAP.lon;CODAP.lon],lon_grid);
+[~,~,Ynum] = histcounts([GLODAP.lat;CODAP.lat],lat_grid);
+subs = [Xnum, Ynum];
+sz = [length(lon_grid) length(lat_grid)];
+% pCO2
+GLODAP_idx = ~isnan(GLODAP.pco2_del);
+CODAP_idx = ~isnan(CODAP.pco2_del);
+pco2_del_gridded = ...
+    accumarray(subs([GLODAP_idx;CODAP_idx],:),...
+    [GLODAP.pco2_del(GLODAP_idx);CODAP.pco2_del(CODAP_idx)],...
+    sz,@nanmean,NaN);
+% pH
+GLODAP_idx = ~isnan(GLODAP.pH_del);
+CODAP_idx = ~isnan(CODAP.pH_del);
+pH_del_gridded = ...
+    accumarray(subs([GLODAP_idx;CODAP_idx],:),...
+    [GLODAP.pH_del(GLODAP_idx);CODAP.pH_del(CODAP_idx)],...
+    sz,@nanmean,NaN);
+% omA
+GLODAP_idx = ~isnan(GLODAP.OmA_del);
+CODAP_idx = ~isnan(CODAP.OmA_del);
+OmA_del_gridded = ...
+    accumarray(subs([GLODAP_idx;CODAP_idx],:),...
+    [GLODAP.OmA_del(GLODAP_idx);CODAP.OmA_del(CODAP_idx)],...
+    sz,@nanmean,NaN);
+
+%% plot gridded delta pCO2
+define_regions_eiwg
+% initialize figure
+figure('visible','on'); box on; hold on;
+worldmap([-18 82],[140 302]);
+setm(gca,'MapProjection','robinson','MLabelParallel','south');
+set(gcf,'position',[100 100 900 600]);
+set(gca,'fontsize',16);
+% figure properties
+c=colorbar('location','southoutside');
+caxis([-100 100]);
+colormap(cmocean('balance','pivot',0));
+c.TickLength = 0;
+c.Label.String = ['{\itp}CO_{2(discrete)} - {\itp}CO_{2(RFR-LME)}'];
+cbarrow;
+% plot
+pcolorm(double(repmat(lat_grid,length(lon_grid),1)),...
+    double(repmat(convert_lon(lon_grid)',1,length(lat_grid))),...
+    pco2_del_gridded);
+% plot borders around regions
+for n = 1:length(region)
+    if n <= 11
+        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+    else
+        tmp_lon = lme_shape(lme_idx.(region{n})).X';
+    end
+    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+end
+% plot land
+plot_land('map');
+mlabel off
+% save figure
+if ~isfolder('Figures'); mkdir('Figures'); end
+exportgraphics(gcf,'Figures/pCO2_delta_eval_map.png');
+close
+
+%% plot gridded delta pH
+define_regions_eiwg
+% initialize figure
+figure('visible','on'); box on; hold on;
+worldmap([-18 82],[140 302]);
+setm(gca,'MapProjection','robinson','MLabelParallel','south');
+set(gcf,'position',[100 100 900 600]);
+set(gca,'fontsize',16);
+% figure properties
+c=colorbar('location','southoutside');
+caxis([-0.1 0.1]);
+colormap(cmocean('balance','pivot',0));
+c.TickLength = 0;
+c.Label.String = ['pH_{T(discrete)} - pH_{T(RFR-LME)}'];
+cbarrow;
+% plot
+pcolorm(double(repmat(lat_grid,length(lon_grid),1)),...
+    double(repmat(convert_lon(lon_grid)',1,length(lat_grid))),...
+    pH_del_gridded);
+% plot borders around regions
+for n = 1:length(region)
+    if n <= 11
+        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+    else
+        tmp_lon = lme_shape(lme_idx.(region{n})).X';
+    end
+    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+end
+% plot land
+plot_land('map');
+mlabel off
+% save figure
+if ~isfolder('Figures'); mkdir('Figures'); end
+exportgraphics(gcf,'Figures/pH_delta_eval_map.png');
+close
+
+%% plot gridded delta Omega
+define_regions_eiwg
+% initialize figure
+figure('visible','on'); box on; hold on;
+worldmap([-18 82],[140 302]);
+setm(gca,'MapProjection','robinson','MLabelParallel','south');
+set(gcf,'position',[100 100 900 600]);
+set(gca,'fontsize',16);
+% figure properties
+c=colorbar('location','southoutside');
+caxis([-0.2 0.2]);
+colormap(cmocean('balance','pivot',0));
+c.TickLength = 0;
+c.Label.String = ['\Omega_{ar(discrete)} - \Omega_{ar(RFR-LME)}'];
+cbarrow;
+% plot
+pcolorm(double(repmat(lat_grid,length(lon_grid),1)),...
+    double(repmat(convert_lon(lon_grid)',1,length(lat_grid))),...
+    pH_del_gridded);
+% plot borders around regions
+for n = 1:length(region)
+    if n <= 11
+        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
+    else
+        tmp_lon = lme_shape(lme_idx.(region{n})).X';
+    end
+    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
+    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
+end
+% plot land
+plot_land('map');
+mlabel off
+% save figure
+if ~isfolder('Figures'); mkdir('Figures'); end
+exportgraphics(gcf,'Figures/OmA_delta_eval_map.png');
+%close
 
 %% plot figures
 % for v = 2:length(var_type)
@@ -289,7 +531,7 @@ close
 figure; hold on;
 histogram(GLODAP.fco2_del);
 histogram(CODAP.fco2_del);
-xlabel('{\itf}_{CO2(discrete)} - {\itf}_{CO2(LME-RFR)}');
+xlabel('{\itf}CO_{2(discrete)} - {\itf}CO_{2(RFR-LME)}');
 ylabel('Counts');
 xlim([-500 1000]);
 legend({'GLODAP' 'CODAP'});
@@ -343,7 +585,7 @@ figure; hold on;
 histogram(GLODAP.pco2_del);
 histogram(CODAP.pco2_del);
 plot([0 0],[0 800],'--k','linewidth',2);
-xlabel('{\itp}CO_{2(discrete)} - {\itp}CO_{2(RFR)}');
+xlabel('{\itp}CO_{2(discrete)} - {\itp}CO_{2(RFR-LME)}');
 ylabel('Counts');
 xlim([-500 1000]);
 legend({'GLODAP' 'CODAP'});
@@ -396,7 +638,7 @@ figure; hold on;
 histogram(GLODAP.pH_del);
 histogram(CODAP.pH_del);
 plot([0 0],[0 900],'--k','linewidth',2);
-xlabel('pH_{T(discrete)} - pH_{T(LME-RFR)}');
+xlabel('pH_{T(discrete)} - pH_{T(RFR-LME)}');
 ylabel('Counts');
 xlim([-1 1]);
 legend({'GLODAP' 'CODAP'});
@@ -444,9 +686,13 @@ figure; hold on;
 histogram(GLODAP.OmA_del);
 histogram(CODAP.OmA_del);
 plot([0 0],[0 450],'--k','linewidth',2);
-xlabel('\Omega_{A(discrete)} - \Omega_{A(LME-RFR)}');
+xlabel('\Omega_{ar(discrete)} - \Omega_{ar(RFR-LME)}');
 ylabel('Counts');
 xlim([-2.5 2.5]);
 legend({'GLODAP' 'CODAP'});
 exportgraphics(gcf,'Figures/hist_OmA.png');
 close
+
+% clean up
+clear
+close all

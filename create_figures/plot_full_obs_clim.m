@@ -8,11 +8,13 @@ setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
-c=colorbar('location','southoutside');
+c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
 mycolormap = jet(13);
 mycolormap(1,:) = 1;
 colormap(mycolormap);
 caxis([-0.5 12.5]);
+c.FontSize = 10;
+c.FontWeight = 'bold';
 c.TickLength = 0;
 c.Label.String = 'Months of Year Represented';
 % plot background
@@ -39,7 +41,7 @@ for n = 1:length(region)
 end
 % plot land
 plot_land('map');
-mlabel off
+%mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
 exportgraphics(gcf,'Figures/full/num_obs_clim.png');

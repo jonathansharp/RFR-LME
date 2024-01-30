@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 1/31/23
 % 
 
-function plot_delta_mean_full(zmin,zmax,cmap_type,cmap_name,cmap_segs,...
+function plot_delta_mean_full(zmin,zmax,cmap_type,cmap_name,...
     zero_piv,num_groups,varname,lab,region,lme_shape,lme_idx,test_idx)
 
 % initialize figure
@@ -14,21 +14,23 @@ setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
-c=colorbar('location','southoutside');
+c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
 caxis([zmin zmax]);
 if strcmp(cmap_type,'cmocean')
     if zero_piv == 1
-        colormap(cmocean(cmap_name,cmap_segs,'pivot',0));
+        colormap(cmocean(cmap_name,'pivot',0));
     else
-        colormap(cmocean(cmap_name,cmap_segs));
+        colormap(cmocean(cmap_name));
     end
 elseif strcmp(cmap_type,'stnd')
     colormap(cmap_name);
 end
+c.FontWeight = 'bold';
+c.FontSize = 10;
 c.TickLength = 0;
 c.Label.String = lab;
 cbarrow;
-mlabel off
+%mlabel off
 % plot regions
 type = 'Val';
 for n = 1:length(region)

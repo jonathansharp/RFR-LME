@@ -167,32 +167,34 @@ SOCAT_grid.area_km2 = ...
     111.320.*cosd(repmat(SOCAT_grid.lat',SOCAT_grid.dim.x,1))); % longitude distance
 
 %% Determine sea fraction of each grid cell
-load('data_to_use/ETOPO2.mat','ETOPO2');
-ETOPO2.lon = convert_lon(ETOPO2.lon);
+ETOPO.lon = ncread('data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc','lon');
+ETOPO.lat = ncread('data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc','lat');
+ETOPO.bottomdepth = ncread('data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc','z');
+ETOPO.bottomdepth = -ETOPO.bottomdepth;
 %     % limit to LME in question
-%     lonidx = ETOPO2.lon >= SOCAT_grid.lim.lonmin - 360 & ...
-%         ETOPO2.lon <= SOCAT_grid.lim.lonmax - 360;
-%     latidx = ETOPO2.lat >= SOCAT_grid.lim.latmin & ...
-%         ETOPO2.lat <= SOCAT_grid.lim.latmax;
-%     ETOPO2.bottomdepth = ETOPO2.bottomdepth(lonidx,latidx);
-%     ETOPO2.lon = ETOPO2.lon(lonidx);
-%     ETOPO2.lat = ETOPO2.lat(latidx);
+%     lonidx = ETOPO.lon >= SOCAT_grid.lim.lonmin - 360 & ...
+%         ETOPO.lon <= SOCAT_grid.lim.lonmax - 360;
+%     latidx = ETOPO.lat >= SOCAT_grid.lim.latmin & ...
+%         ETOPO.lat <= SOCAT_grid.lim.latmax;
+%     ETOPO.bottomdepth = ETOPO.bottomdepth(lonidx,latidx);
+%     ETOPO.lon = ETOPO.lon(lonidx);
+%     ETOPO.lat = ETOPO.lat(latidx);
 % define points as land (0) or sea (1)
-ETOPO2.sea = ETOPO2.bottomdepth > 0;
+ETOPO.sea = ETOPO.bottomdepth > 0;
 % determine percentage sea in each grid cell
 SOCAT_grid.percent_sea = nan(size(SOCAT_grid.lat));
 for a = 1:length(SOCAT_grid.lon)
     for b = 1:length(SOCAT_grid.lat)
-        lonidx = find(ETOPO2.lon >= (SOCAT_grid.lon(a))-0.125 & ...
-                  ETOPO2.lon < (SOCAT_grid.lon(a))+0.125);
-        latidx = find(ETOPO2.lat >= SOCAT_grid.lat(b)-0.125 & ...
-                  ETOPO2.lat < SOCAT_grid.lat(b)+0.125);
+        lonidx = find(ETOPO.lon >= (SOCAT_grid.lon(a))-0.125 & ...
+                  ETOPO.lon < (SOCAT_grid.lon(a))+0.125);
+        latidx = find(ETOPO.lat >= SOCAT_grid.lat(b)-0.125 & ...
+                  ETOPO.lat < SOCAT_grid.lat(b)+0.125);
         SOCAT_grid.percent_sea(a,b) = ...
-            sum(sum(ETOPO2.sea(lonidx,latidx)))./...
-            (size(ETOPO2.sea(lonidx,latidx),1)*size(ETOPO2.sea(lonidx,latidx),2));
+            sum(sum(ETOPO.sea(lonidx,latidx)))./...
+            (size(ETOPO.sea(lonidx,latidx),1)*size(ETOPO.sea(lonidx,latidx),2));
     end
 end
-clear ETOPO2 lonidx latidx a b
+clear ETOPO lonidx latidx a b
 
 %% Detrend gridded pCO2 using domain mean
 % Define area weights

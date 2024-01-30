@@ -7,7 +7,7 @@
 function plot_full_gif(zmin,zmax,clrmp,varname,lab,region,lme_shape,lme_idx)
 
 % initialize figure
-figure('visible','on');
+figure('visible','off');
 box on; hold on;
 set(gcf,'position',[100 100 900 600],'color','white');
 % initialize axis
@@ -32,12 +32,12 @@ for m = 1:288
     set(gca,'fontsize',16);    
     % plot regions
     for n = 1:length(region)
-        if any(strcmp(varname,{'DIC' 'fCO2' 'ufCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'}))
+        if any(strcmp(varname,{'DIC' 'fCO2' 'ufCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'pCO2'}))
             type = 'OAI_grid';
             vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
-        elseif any(strcmp(varname,{'fCO2_obs'}))
+        elseif any(strcmp(varname,{'fco2_ave_wtd'}))
             type = 'SOCAT_grid';
-            vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
+            vars_grid = load(['Data/' region{n} '/gridded_pco2'],type);
         else
             type = 'Preds_grid';
             vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
@@ -63,13 +63,13 @@ for m = 1:288
     plot_land('map');
     mlabel off
     % add text
-    textm(33,152,[num2str(vars_grid.(type).(region{n}).month_of_year(m)) '/' ...
+    textm(38,152,[num2str(vars_grid.(type).(region{n}).month_of_year(m)) '/' ...
         num2str(vars_grid.(type).(region{n}).year(m))],'fontsize',16);
     % clean up
     clear vars_grid z
     % save frame
     drawnow;
-    frame = getframe(1);
+    frame = getframe(gcf);
     im = frame2im(frame);
     [imind,cm] = rgb2ind(im,256);
     if f == 1

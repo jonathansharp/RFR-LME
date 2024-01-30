@@ -18,9 +18,11 @@ for ms = 1:4
     set(gcf,'position',[100 100 900 600]);
     set(gca,'fontsize',16);
     % figure properties
-    c=colorbar('location','southoutside');
+    c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
     colormap(clrmp);
-    caxis([zmin,zmax]);
+    caxis([zmin zmax]);
+    c.FontSize = 10;
+    c.FontWeight = 'bold';
     c.TickLength = 0;
     c.Label.String = lab;
     cbarrow;
@@ -56,7 +58,7 @@ for ms = 1:4
     end
     % plot land
     plot_land('map');
-    mlabel off
+    %mlabel off
     % save figure
     if ~isfolder('Figures/full'); mkdir('Figures/full'); end
     exportgraphics(gcf,['Figures/full/' varname '_' seas_lab{ms} '.png']);

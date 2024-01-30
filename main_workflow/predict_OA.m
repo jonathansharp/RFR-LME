@@ -58,6 +58,12 @@ for n = 1:length(region)
     % h=pcolor(OAI_grid.(region{n}).lon,OAI_grid.(region{n}).lat,...
     %     OAI_grid.(region{n}).ufCO2');
     % set(h,'EdgeColor','none'); colorbar;
+    
+    % test with interpolation    
+    % OAI_grid.(region{n}).ufCO2_2 = regrid(OAI_grid.(region{n}).lon,...
+    %             OAI_grid.(region{n}).lat,OAI_grid.(region{n}).ufCO2,...
+    %             OAI_grid.(region{n}).lon,OAI_grid.(region{n}).lat);
+    % OAI_grid.(region{n}).ufCO2_2(~Preds_grid.(region{n}).idxspc(:,:,1)) = NaN; % blank out non-ocean cells
 
     % low-pass filter spatial delta fCO2 data
     nan_spc = 1;
@@ -154,8 +160,10 @@ for n = 1:length(region)
 
     % plot scaling factors
     figure('visible','off');
-    plot(1:OAI_grid.(region{n}).dim.z,scaler);
+    plot(datenum(OAI_grid.(region{n}).year,...
+        OAI_grid.(region{n}).month_of_year,15),scaler);
     ylabel('Uncertainty Scaler');
+    datetick('x');
     exportgraphics(gcf,['Figures/err_scalers_' region{n} '.png']);
     close
 
