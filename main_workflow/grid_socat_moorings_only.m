@@ -22,15 +22,15 @@ SOCAT_grid.lim.latmax = round(max(SOCAT.latitude),0);
 SOCAT_grid.lim.lonmin = round(min(SOCAT.longitude),0);
 SOCAT_grid.lim.lonmax = round(max(SOCAT.longitude),0);
 SOCAT_grid.lim.monthmin = 1;
-SOCAT_grid.lim.monthmax = 288;
+SOCAT_grid.lim.monthmax = 300;
 
-%% remove values later than 2021
-idx_21 = SOCAT.month_since_1998 > 288;
+%% remove values later than 2022
+idx_22 = SOCAT.month_since_1998 > 300;
 vars = fieldnames(SOCAT);
 for v = 1:length(vars)
-    SOCAT.(vars{v})(idx_21) = [];
+    SOCAT.(vars{v})(idx_22) = [];
 end
-clear idx_21
+clear idx_22
 
 %% Create 0.25 x 0.25 degree monthly grid
 SOCAT_grid.lon = [SOCAT_grid.lim.lonmin+0.125:0.25:SOCAT_grid.lim.lonmax]';
@@ -41,8 +41,8 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2021,12)';
-SOCAT_grid.month_of_year = repmat(1:12,1,24)';
+SOCAT_grid.year = repelem(1998:2022,12)';
+SOCAT_grid.month_of_year = repmat(1:12,1,25)';
 
 %% include mooring observations only
 plat = unique(SOCAT.expocode);
@@ -179,32 +179,28 @@ SOCAT_grid.area_km2 = ...
     111.320.*cosd(repmat(SOCAT_grid.lat',SOCAT_grid.dim.x,1))); % longitude distance
 
 %% Determine sea fraction of each grid cell
-load('data_to_use/ETOPO2.mat','ETOPO2');
-ETOPO2.lon = convert_lon(ETOPO2.lon);
-%     % limit to LME in question
-%     lonidx = ETOPO2.lon >= SOCAT_grid.lim.lonmin - 360 & ...
-%         ETOPO2.lon <= SOCAT_grid.lim.lonmax - 360;
-%     latidx = ETOPO2.lat >= SOCAT_grid.lim.latmin & ...
-%         ETOPO2.lat <= SOCAT_grid.lim.latmax;
-%     ETOPO2.bottomdepth = ETOPO2.bottomdepth(lonidx,latidx);
-%     ETOPO2.lon = ETOPO2.lon(lonidx);
-%     ETOPO2.lat = ETOPO2.lat(latidx);
+% Obtain bathymetry from ETOPOv2022
+ETOPO.lon = ncread('data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc','lon');
+ETOPO.lat = ncread('data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc','lat');
+ETOPO.bottomdepth = ncread('data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc','z');
+% Convert longitude
+ETOPO.lon = convert_lon(ETOPO.lon);
 % define points as land (0) or sea (1)
-ETOPO2.sea = ETOPO2.bottomdepth > 0;
+ETOPO.sea = ETOPO.bottomdepth < 0;
 % determine percentage sea in each grid cell
 SOCAT_grid.percent_sea = nan(size(SOCAT_grid.lat));
 for a = 1:length(SOCAT_grid.lon)
     for b = 1:length(SOCAT_grid.lat)
-        lonidx = find(ETOPO2.lon >= (SOCAT_grid.lon(a))-0.125 & ...
-                  ETOPO2.lon < (SOCAT_grid.lon(a))+0.125);
-        latidx = find(ETOPO2.lat >= SOCAT_grid.lat(b)-0.125 & ...
-                  ETOPO2.lat < SOCAT_grid.lat(b)+0.125);
+        lonidx = find(ETOPO.lon >= (SOCAT_grid.lon(a))-0.125 & ...
+                  ETOPO.lon < (SOCAT_grid.lon(a))+0.125);
+        latidx = find(ETOPO.lat >= SOCAT_grid.lat(b)-0.125 & ...
+                  ETOPO.lat < SOCAT_grid.lat(b)+0.125);
         SOCAT_grid.percent_sea(a,b) = ...
-            sum(sum(ETOPO2.sea(lonidx,latidx)))./...
-            (size(ETOPO2.sea(lonidx,latidx),1)*size(ETOPO2.sea(lonidx,latidx),2));
+            sum(sum(ETOPO.sea(lonidx,latidx)))./...
+            (size(ETOPO.sea(lonidx,latidx),1)*size(ETOPO.sea(lonidx,latidx),2));
     end
 end
-clear ETOPO2 lonidx latidx a b
+clear ETOPO lonidx latidx a b
 
 %% Plot the percentage of grid cells with data
 figure('visible','off');
@@ -300,7 +296,7 @@ clear land c mycolormap
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_gridded_2023_moorings_only','SOCAT_grid','-v7.3');
+save('Data/socat_gridded_2022_moorings_only','SOCAT_grid','-v7.3');
 
 %% clean up
 clear SOCAT_grid

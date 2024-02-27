@@ -7,7 +7,7 @@
 function plot_temporal_mean_full(zmin,zmax,clrmp,varname,lab,region,lme_shape,lme_idx)
 
 % initialize figure
-figure('visible','on'); box on; hold on;
+figure('visible','off'); box on; hold on;
 worldmap([-18 82],[140 302]);
 setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
@@ -22,28 +22,28 @@ c.TickLength = 0;
 c.Label.String = lab;
 cbarrow;
 % plot regions
-% for n = 1:length(region)
-%     if any(strcmp(varname,{'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'ufCO2' 'upCO2' 'TA_DIC'}))
-%         type = 'OAI_grid';
-%         vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
-%         if strcmp(varname,'H')
-%             vars_grid.(type).(region{n}).(varname) = ...
-%                 (10^9).*vars_grid.(type).(region{n}).(varname);
-%         end
-%     else
-%         type = 'Preds_grid';
-%         vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
-%     end
-%     if ~strcmp(varname,'TA_DIC')
-%         z = mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')';
-%     else
-%         z = mean(vars_grid.(type).(region{n}).TA./ ...
-%             vars_grid.(type).(region{n}).DIC,3,'omitnan')';
-%     end
-%     contourfm(vars_grid.(type).(region{n}).lat,vars_grid.(type).(region{n}).lon,...
-%         z,zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
-%     clear vars_grid z
-% end
+for n = 1:length(region)
+    if any(strcmp(varname,{'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'ufCO2' 'upCO2' 'TA_DIC'}))
+        type = 'OAI_grid';
+        vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
+        if strcmp(varname,'H')
+            vars_grid.(type).(region{n}).(varname) = ...
+                (10^9).*vars_grid.(type).(region{n}).(varname);
+        end
+    else
+        type = 'Preds_grid';
+        vars_grid = load(['Data/' region{n} '/gridded_predictors'],type);
+    end
+    if ~strcmp(varname,'TA_DIC')
+        z = mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')';
+    else
+        z = mean(vars_grid.(type).(region{n}).TA./ ...
+            vars_grid.(type).(region{n}).DIC,3,'omitnan')';
+    end
+    contourfm(vars_grid.(type).(region{n}).lat,vars_grid.(type).(region{n}).lon,...
+        z,zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
+    clear vars_grid z
+end
 % plot borders around regions
 for n = 1:length(region)
     tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');

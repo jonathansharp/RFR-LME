@@ -17,7 +17,7 @@ for n = 1:length(region)
     disp(['Predicting fCO2 (' region{n} ')']);
 
     %% load gridded fCO2 and predictors
-    load(['Data/' region{n} '/gridded_predictors_no_moorings'],'Preds_grid');
+    load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     load(['Data/' region{n} '/variable_arrays_no_moorings'],'Vars_array');
     load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');
     load(['Data/' region{n} '/us_lme_models_no_moorings'],'Mods');

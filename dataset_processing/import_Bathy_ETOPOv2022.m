@@ -1,4 +1,4 @@
-% Obtain bathymetry from ETOPO2
+% Obtain bathymetry from ETOPOv2022
 function Bathy = import_Bathy_ETOPOv2022(lat,lon,ocean_mask,path)
 
 ETOPOv2022.lon = ncread([path '/data_to_use/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lon');

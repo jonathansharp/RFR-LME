@@ -23,7 +23,7 @@ define_regions_eiwg
 % surrounding North America
 % extract_lme
 % this script does the same but excludes mooring observations (for testing)
-extract_lme_no_moorings
+% extract_lme_no_moorings
 
 % this script loads gridded satellite, model, and reanalysis variables and
 % re-grids them to match the size of the fCO2 grids
@@ -33,14 +33,14 @@ extract_lme_no_moorings
 % the target variable for algorithm training (i.e. fCO2) as Y
 % define_x_y
 % this script does the same but excludes mooring observations (for testing)
-define_x_y_no_moorings
+% define_x_y_no_moorings
 
 % Set options (determined via 'GMM_test' in 'run_optimization.m')
 set_gmm_options
 
 % this script trains self-organizing-maps using the defined predictors to
 % cluster data spatiotemporally for algorithm training
-cluster_on_grid
+% cluster_on_grid
 
 % Set options ((determined via 'RFR_test' in 'run_optimization.m'))
 set_rfr_options
@@ -49,13 +49,13 @@ set_rfr_options
 % each cluster
 % fit_algs_probs
 % this script does the same but excludes mooring observations (for testing)
-fit_algs_probs_no_moorings
+% fit_algs_probs_no_moorings
 
 % this script loads error statistics from k-fold algorithm fits and saves
 % them in a table
 % log_errs
 % this script does the same but excludes mooring observations (for testing)
-log_errs_no_moorings
+% log_errs_no_moorings
 
 % this script applies the machine learning algorithms within each cluster
 % to produce fCO2 estimates on the original grids
@@ -69,20 +69,21 @@ predict_fCO2_probs_no_moorings
 % predict_OA
 
 % time series and climatology
-% OA_summary_stats
-% OA_time_series
-% OA_climatology
+OA_summary_stats
+OA_time_series
+OA_climatology
 
 % create plots
 % plot_full_predictors;
 % plot_full_predictors_gif;
 % plot_regional_clusters;
+% plot_regional_cluster_probabilities;
 % plot_regional_deltas;
 % plot_full_indicators;
 % plot_full_indicators_gif;
 
 % create netCDF files
-% matlab_to_netcdf
+matlab_to_netcdf
 
 % evaluation
 

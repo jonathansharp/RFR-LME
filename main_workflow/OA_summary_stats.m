@@ -16,10 +16,10 @@ tr_rounder = [1 1 1 1 3 3 3 1 1 2 1 1 1];
 
 % preallocate tables
 stats = nan(length(region),length(var_type)*5);
-monthly = nan(288,length(region)*length(var_type));
-u_monthly = nan(288,length(region)*length(var_type));
-ann = nan(288/12,length(region)*length(var_type));
-u_ann = nan(288/12,length(region)*length(var_type));
+monthly = nan(300,length(region)*length(var_type));
+u_monthly = nan(300,length(region)*length(var_type));
+ann = nan(300/12,length(region)*length(var_type));
+u_ann = nan(300/12,length(region)*length(var_type));
 means_table = nan(length(region),length(var_type));
 iav_table = nan(length(region),length(var_type));
 trends_table = nan(length(region),length(var_type)*2);
@@ -190,7 +190,7 @@ for n = 1:length(region)
 %             'FaceAlpha',0.2,'LineStyle','none');
         scatter(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,200,'k.');
         datetick('x');
-        xlim([datenum([1998 1 1]) datenum([2022 1 1])]);   
+        xlim([datenum([1998 1 1]) datenum([2023 1 1])]);   
         % plot means
         plot([time(1) time(end)],[mean_lt mean_lt],'k--','linewidth',2);
         % plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
@@ -304,10 +304,10 @@ trend_var_names = [VarNameSt(2:5:end),VarNameSt(3:5:end)]';
 trends_table = array2table(trends_table,'RowNames',region,'VariableNames',trend_var_names);
 amp_table = array2table(amp_table,'RowNames',region,'VariableNames',VarNameSt(4:5:end));
 iav_table = array2table(iav_table,'RowNames',region,'VariableNames',VarNameSt(5:5:end));
-monthly = array2table(monthly,'RowNames',arrayfun(@num2str,1:288,'UniformOutput',0),'VariableNames',VarNameMnAn);
-ann = array2table(ann,'RowNames',arrayfun(@num2str,1997 + (1:288/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
-u_monthly = array2table(u_monthly,'RowNames',arrayfun(@num2str,1:288,'UniformOutput',0),'VariableNames',VarNameMnAn);
-u_ann = array2table(u_ann,'RowNames',arrayfun(@num2str,1997 + (1:288/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
+monthly = array2table(monthly,'RowNames',arrayfun(@num2str,1:300,'UniformOutput',0),'VariableNames',VarNameMnAn);
+ann = array2table(ann,'RowNames',arrayfun(@num2str,1997 + (1:300/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
+u_monthly = array2table(u_monthly,'RowNames',arrayfun(@num2str,1:300,'UniformOutput',0),'VariableNames',VarNameMnAn);
+u_ann = array2table(u_ann,'RowNames',arrayfun(@num2str,1997 + (1:300/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
 
 % save table
 writetable(stats,['IndsAndStats/SummaryStatistics-' date '.xls'],'WriteRowNames',true);

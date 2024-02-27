@@ -2,7 +2,7 @@
 function pCO2_atm = import_pCO2_MBL(lat,lon,month,SSS,SST,mslp,ocean_mask,path)
 
 % Open and scan file
-file = fopen([path '/data_to_use/MBL_1998_2021.txt']);
+file = fopen('data_to_use/MBL_1998_2022.txt');
 NOAA_MBL = textscan(file,'%f','Delimiter',',','CommentStyle','#');
 fclose(file);
 
@@ -25,7 +25,7 @@ MBL.lat = asind(latsin)';
 % Define year fraction interval based on monthly slices
 MBL.year_mon = repmat(min(min(MBL.year)):1/12:max(max(MBL.year)),size(MBL.CO2,1),1);
 MBL.year_mon = MBL.year_mon(:,1:end-1);
-MBL.year_mon = MBL.year_mon + 1/24;
+MBL.year_mon = MBL.year_mon + 1/25;
 
 % Interpolate to monthly time slices 
 MBL.CO2_mon = nan(size(MBL.year_mon));

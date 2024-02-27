@@ -3,7 +3,7 @@
 addpath(genpath(pwd));
 
 % RFR-LME file data!
-date = '11-Jan-2024';
+date = '26-Feb-2024';
 %date = '06-Oct-2023';
 
 new = 1;
@@ -44,9 +44,9 @@ clear idx G2* expocode expocodeno
 
 %% remove CODAP data outside LMEs
 if new == 1
-    LME_RFR.time = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'time');
+    RFR_LME.time = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'time');
 else
-    LME_RFR.time = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Time');
+    RFR_LME.time = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'Time');
 end
 % determine LME index
 define_regions_eiwg
@@ -64,8 +64,8 @@ end
 idx_CODAP = any(idx_tmp_CODAP,2);
 idx_GLODAP = any(idx_tmp_GLODAP,2);
 % also remove data outside time limits
-idx_CODAP = idx_CODAP & CODAP.time > min(LME_RFR.time) & CODAP.time < max(LME_RFR.time);
-idx_GLODAP = idx_GLODAP & GLODAP.time > min(LME_RFR.time) & GLODAP.time < max(LME_RFR.time);
+idx_CODAP = idx_CODAP & CODAP.time > min(RFR_LME.time) & CODAP.time < max(RFR_LME.time);
+idx_GLODAP = idx_GLODAP & GLODAP.time > min(RFR_LME.time) & GLODAP.time < max(RFR_LME.time);
 % remove outside data (CODAP)
 vars = fieldnames(CODAP);
 for v = 1:length(vars)
@@ -131,34 +131,34 @@ clear carb carb_err
 %% load US LME data
 if new == 1
 % New NetCDF files
-LME_RFR.lat = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'lat');
-LME_RFR.lon = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'lon');
-LME_RFR.time = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'time');
-LME_RFR.pco2 = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pCO2.nc'],'pco2');
-LME_RFR.fco2 = ncread(['Data/NetCDFs_' date '/US_LME_RFR_fCO2.nc'],'fco2');
-LME_RFR.TA = ncread(['Data/NetCDFs_' date '/US_LME_RFR_TA.nc'],'ta');
-LME_RFR.DIC = ncread(['Data/NetCDFs_' date '/US_LME_RFR_DIC.nc'],'dic');
-LME_RFR.pH = ncread(['Data/NetCDFs_' date '/US_LME_RFR_pH.nc'],'ph');
-LME_RFR.OmA = ncread(['Data/NetCDFs_' date '/US_LME_RFR_OmA.nc'],'om_a');
-LME_RFR.OmC = ncread(['Data/NetCDFs_' date '/US_LME_RFR_OmC.nc'],'om_c');
-LME_RFR.H = ncread(['Data/NetCDFs_' date '/US_LME_RFR_H.nc'],'h');
-LME_RFR.CO3 = ncread(['Data/NetCDFs_' date '/US_LME_RFR_CO3.nc'],'co3');
-LME_RFR.RF = ncread(['Data/NetCDFs_' date '/US_LME_RFR_RF.nc'],'rf');
+RFR_LME.lat = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'lat');
+RFR_LME.lon = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'lon');
+RFR_LME.time = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'time');
+RFR_LME.pco2 = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'pco2');
+RFR_LME.fco2 = ncread(['Data/NetCDFs_' date '/US_RFR_LME_fCO2.nc'],'fco2');
+RFR_LME.TA = ncread(['Data/NetCDFs_' date '/US_RFR_LME_TA.nc'],'ta');
+RFR_LME.DIC = ncread(['Data/NetCDFs_' date '/US_RFR_LME_DIC.nc'],'dic');
+RFR_LME.pH = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pH.nc'],'ph');
+RFR_LME.OmA = ncread(['Data/NetCDFs_' date '/US_RFR_LME_OmA.nc'],'om_a');
+RFR_LME.OmC = ncread(['Data/NetCDFs_' date '/US_RFR_LME_OmC.nc'],'om_c');
+RFR_LME.H = ncread(['Data/NetCDFs_' date '/US_RFR_LME_H.nc'],'h');
+RFR_LME.CO3 = ncread(['Data/NetCDFs_' date '/US_RFR_LME_CO3.nc'],'co3');
+RFR_LME.RF = ncread(['Data/NetCDFs_' date '/US_RFR_LME_RF.nc'],'rf');
 else
 % Old NetCDF files
-LME_RFR.lat = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Lat');
-LME_RFR.lon = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Lon');
-LME_RFR.time = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'Time');
-LME_RFR.pco2 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'pCO2');
-LME_RFR.fco2 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'fCO2');
-LME_RFR.TA = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'TA');
-LME_RFR.DIC = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'DIC');
-LME_RFR.pH = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'pH');
-LME_RFR.OmA = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'OmA');
-LME_RFR.OmC = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'OmC');
-LME_RFR.H = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'H');
-LME_RFR.CO3 = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'CO3');
-LME_RFR.RF = ncread(['Data/US_LME_RFR_Inds_' date '.nc'],'RF');
+RFR_LME.lat = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'Lat');
+RFR_LME.lon = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'Lon');
+RFR_LME.time = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'Time');
+RFR_LME.pco2 = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'pCO2');
+RFR_LME.fco2 = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'fCO2');
+RFR_LME.TA = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'TA');
+RFR_LME.DIC = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'DIC');
+RFR_LME.pH = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'pH');
+RFR_LME.OmA = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'OmA');
+RFR_LME.OmC = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'OmC');
+RFR_LME.H = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'H');
+RFR_LME.CO3 = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'CO3');
+RFR_LME.RF = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'RF');
 end
 
 %% plot data locations
@@ -222,17 +222,17 @@ end
 % identify and fill gridded values
 for n = 1:length(CODAP.lat)
     % lon
-    idx_lon = find(abs(LME_RFR.lon - CODAP.lon(n)) == ...
-        min(abs(LME_RFR.lon - CODAP.lon(n))));
+    idx_lon = find(abs(RFR_LME.lon - CODAP.lon(n)) == ...
+        min(abs(RFR_LME.lon - CODAP.lon(n))));
     % lat
-    idx_lat = find(abs(LME_RFR.lat - CODAP.lat(n)) == ...
-        min(abs(LME_RFR.lat - CODAP.lat(n))));
+    idx_lat = find(abs(RFR_LME.lat - CODAP.lat(n)) == ...
+        min(abs(RFR_LME.lat - CODAP.lat(n))));
     % time
-    idx_time = find(abs(LME_RFR.time - CODAP.time(n)) == ...
-        min(abs(LME_RFR.time - CODAP.time(n))));
+    idx_time = find(abs(RFR_LME.time - CODAP.time(n)) == ...
+        min(abs(RFR_LME.time - CODAP.time(n))));
     for v = 1:length(var_type)
         CODAP.([var_type{v} '_grid'])(n) = ...
-            LME_RFR.(var_type{v})(idx_lon(1),idx_lat(1),idx_time(1));
+            RFR_LME.(var_type{v})(idx_lon(1),idx_lat(1),idx_time(1));
     end
 end
 % calculate differences
@@ -249,17 +249,17 @@ end
 % identify and fill gridded values
 for n = 1:length(GLODAP.lat)
     % lon
-    idx_lon = find(abs(LME_RFR.lon - GLODAP.lon(n)) == ...
-        min(abs(LME_RFR.lon - GLODAP.lon(n))));
+    idx_lon = find(abs(RFR_LME.lon - GLODAP.lon(n)) == ...
+        min(abs(RFR_LME.lon - GLODAP.lon(n))));
     % lat
-    idx_lat = find(abs(LME_RFR.lat - GLODAP.lat(n)) == ...
-        min(abs(LME_RFR.lat - GLODAP.lat(n))));
+    idx_lat = find(abs(RFR_LME.lat - GLODAP.lat(n)) == ...
+        min(abs(RFR_LME.lat - GLODAP.lat(n))));
     % time
-    idx_time = find(abs(LME_RFR.time - GLODAP.time(n)) == ...
-        min(abs(LME_RFR.time - GLODAP.time(n))));
+    idx_time = find(abs(RFR_LME.time - GLODAP.time(n)) == ...
+        min(abs(RFR_LME.time - GLODAP.time(n))));
     for v = 1:length(var_type)
         GLODAP.([var_type{v} '_grid'])(n) = ...
-            LME_RFR.(var_type{v})(idx_lon(1),idx_lat(1),idx_time(1));
+            RFR_LME.(var_type{v})(idx_lon(1),idx_lat(1),idx_time(1));
     end
 end
 % eliminate NaN and -999
@@ -313,8 +313,8 @@ disp(['Propagated OmA Err. (CODAP) = ' num2str(round(mean(CODAP.OmA_e,'omitnan')
 disp(' ');
 
 %% aggregate deltas on grid
-lon_grid = round(min(LME_RFR.lon)):round(max(LME_RFR.lon));
-lat_grid = round(min(LME_RFR.lat)):round(max(LME_RFR.lat));
+lon_grid = round(min(RFR_LME.lon)):round(max(RFR_LME.lon));
+lat_grid = round(min(RFR_LME.lat)):round(max(RFR_LME.lat));
 % Determine bin number of each data point
 [~,~,Xnum] = histcounts([GLODAP.lon;CODAP.lon],lon_grid);
 [~,~,Ynum] = histcounts([GLODAP.lat;CODAP.lat],lat_grid);

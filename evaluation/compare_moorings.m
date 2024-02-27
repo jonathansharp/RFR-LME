@@ -7,7 +7,7 @@
 % Last updated by J.D. Sharp: 8/31/23
 
 %% Load gridded mooring observations
-load('Data/socat_gridded_2023_moorings_only','SOCAT_grid');
+load('Data/socat_gridded_2022_moorings_only','SOCAT_grid');
 % define mooring indices by grid cells that include data
 [a,b] = find(~isnan(mean(SOCAT_grid.fco2_ave_wtd,3,'omitnan')));
 

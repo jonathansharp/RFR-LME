@@ -10,7 +10,7 @@
 for n = 1:length(region)
 
     %% load gridded pCO2, predictors, and clusters
-    load(['Data/' region{n} '/gridded_predictors_no_moorings'],'Preds_grid');
+    load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     load(['Data/' region{n} '/variable_arrays_no_moorings'],'Vars_array');
     if gmm_test_idx == 0
         load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');

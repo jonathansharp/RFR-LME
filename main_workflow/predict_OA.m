@@ -52,7 +52,8 @@ for n = 1:length(region)
     %% scale uncertainty over space
     % take gridded absolute delta values
     OAI_grid.(region{n}).ufCO2 = mean(Val.(region{n}).delta_rfr_grid_abs,3,'omitnan');
-    
+    clear Val
+
     % test plot of original gridded absolute delta values
     % figure;
     % h=pcolor(OAI_grid.(region{n}).lon,OAI_grid.(region{n}).lat,...
@@ -65,19 +66,32 @@ for n = 1:length(region)
     %             OAI_grid.(region{n}).lon,OAI_grid.(region{n}).lat);
     % OAI_grid.(region{n}).ufCO2_2(~Preds_grid.(region{n}).idxspc(:,:,1)) = NaN; % blank out non-ocean cells
 
-    % low-pass filter spatial delta fCO2 data
-    nan_spc = 1;
+    % low-pass filter spatial delta fCO2 data twice
+%     nan_spc = 1;
     num_cells = 2;
-    while nan_spc > 0 % filter until all grid cells are filled
+%     while nan_spc > 0 % filter until all grid cells are filled
+    for num_filt = 1:2
         OAI_grid.(region{n}).ufCO2 = ... % filter
             smooth2a(OAI_grid.(region{n}).ufCO2,num_cells,num_cells);
-        OAI_grid.(region{n}).ufCO2(~Preds_grid.(region{n}).idxspc(:,:,1)) = NaN; % blank out non-ocean cells
-        % check to see if all ocean cells are filled
-        nan_chk = Preds_grid.(region{n}).idxspc(:,:,1) - ~isnan(OAI_grid.(region{n}).ufCO2);
-        nan_spc = sum(nan_chk(:));
-        num_cells = num_cells+1;
+%         % check to see if all ocean cells are filled
+%         nan_chk = Preds_grid.(region{n}).idxspc(:,:,1) - ~isnan(OAI_grid.(region{n}).ufCO2);
+%         nan_spc = sum(nan_chk(:));
+%         num_cells = num_cells+1;
     end
-
+    % filter a third time for PI region
+    % RF error was going toward infinity for a few data points
+    if n==11
+        OAI_grid.(region{n}).ufCO2 = ... % filter
+            smooth2a(OAI_grid.(region{n}).ufCO2,num_cells,num_cells);
+    end
+    % fill unfilled cells with nearest neighbors
+    idx = isnan(OAI_grid.(region{n}).ufCO2);
+    lon_grid = repmat(OAI_grid.(region{n}).lon,1,OAI_grid.(region{n}).dim.y);
+    lat_grid = repmat(OAI_grid.(region{n}).lat',OAI_grid.(region{n}).dim.x,1);
+    interp = scatteredInterpolant(lon_grid(~idx),lat_grid(~idx),OAI_grid.(region{n}).ufCO2(~idx),'nearest');
+    OAI_grid.(region{n}).ufCO2(idx) = interp(lon_grid(idx),lat_grid(idx));
+    OAI_grid.(region{n}).ufCO2(~Preds_grid.(region{n}).idxspc(:,:,1)) = NaN; % blank out non-ocean cells
+    
     % replicate uncertainties over time
     OAI_grid.(region{n}).ufCO2 = ...
         repmat(OAI_grid.(region{n}).ufCO2,1,1,OAI_grid.(region{n}).dim.z);
@@ -167,17 +181,15 @@ for n = 1:length(region)
     exportgraphics(gcf,['Figures/err_scalers_' region{n} '.png']);
     close
 
+    % clean up
+    clear SOCAT_grid
+
     %% calculate other OA Indicators
     fCO2 = OAI_grid.(region{n}).fCO2(Preds_grid.(region{n}).idxspc);
-    fCO2_err = OAI_grid.(region{n}).ufCO2(Preds_grid.(region{n}).idxspc);
     carb_system = CO2SYS(data.TA,fCO2,1,5,sal,tmp,NaN,1,NaN,...
         data.silicate,data.phosphate,0,0,1,10,1,2,2);
-    u_carb_system = errors(data.TA,fCO2,1,5,sal,tmp,NaN,1,NaN,...
-        data.silicate,data.phosphate,0,0,u_data.TA,fCO2_err,0,0,...
-        u_data.silicate,u_data.phosphate,0,0,'','',0,1,10,1,2,2);
     % convert -999 to NaN
     carb_system(carb_system==-999) = NaN;
-    u_carb_system(u_carb_system==-999) = NaN;
     % pre-allocate OA indicators
     OAI_grid.(region{n}).DIC = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).pH = nan(size(Preds_grid.(region{n}).idxspc));
@@ -194,6 +206,21 @@ for n = 1:length(region)
     OAI_grid.(region{n}).H(Preds_grid.(region{n}).idxspc) = 10.^-carb_system(:,3);
     OAI_grid.(region{n}).CO3(Preds_grid.(region{n}).idxspc) = carb_system(:,7);
     OAI_grid.(region{n}).RF(Preds_grid.(region{n}).idxspc) = carb_system(:,16);
+    % clean up
+    clear carb_system
+
+    %% calculate other OA Indicator uncertaintiess
+    fCO2_err = OAI_grid.(region{n}).ufCO2(Preds_grid.(region{n}).idxspc);
+    u_carb_system = errors(data.TA,fCO2,1,5,sal,tmp,NaN,1,NaN,...
+        data.silicate,data.phosphate,0,0,u_data.TA,fCO2_err,0,0,...
+        u_data.silicate,u_data.phosphate,0,0,'','',0,1,10,1,2,2);
+    % tried to pass single precision through but got messed up RF
+    % uncertainties. weird rounding?
+%     u_carb_system = errors(single(data.TA),single(fCO2),1,5,single(sal),single(tmp),NaN,1,NaN,...
+%         single(data.silicate),single(data.phosphate),0,0,single(u_data.TA),single(fCO2_err),0,0,...
+%         single(u_data.silicate),single(u_data.phosphate),0,0,'','',0,1,10,1,2,2);
+    % convert -999 to NaN
+    u_carb_system(u_carb_system==-999) = NaN;
     % pre-allocate OA indicator uncertainties
     OAI_grid.(region{n}).uDIC = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).upCO2 = nan(size(Preds_grid.(region{n}).idxspc));
@@ -207,7 +234,9 @@ for n = 1:length(region)
     OAI_grid.(region{n}).uDIC(Preds_grid.(region{n}).idxspc) = u_carb_system(:,2);
     OAI_grid.(region{n}).upCO2(Preds_grid.(region{n}).idxspc) = u_carb_system(:,4);
     OAI_grid.(region{n}).upH(Preds_grid.(region{n}).idxspc) = ... % pH ucertainty by adjusting pH by u[H+]
-        carb_system(:,3) + log10(10.^-carb_system(:,3)+(u_carb_system(:,3)./10^9));
+        OAI_grid.(region{n}).pH(Preds_grid.(region{n}).idxspc) + ...
+        log10(10.^-OAI_grid.(region{n}).pH(Preds_grid.(region{n}).idxspc) + ...
+        (u_carb_system(:,3)./10^9));
     OAI_grid.(region{n}).uOmA(Preds_grid.(region{n}).idxspc) = u_carb_system(:,11);
     OAI_grid.(region{n}).uOmC(Preds_grid.(region{n}).idxspc) = u_carb_system(:,10);
     OAI_grid.(region{n}).uH(Preds_grid.(region{n}).idxspc) = (u_carb_system(:,3)./10^9);
@@ -218,6 +247,7 @@ for n = 1:length(region)
     save(['Data/' region{n} '/ML_fCO2'],'OAI_grid','-v7.3');
 
     %% clean up
-    clear carb_system u_carb_system depth fCO2 lat lon OAI_grid Preds_grid sal TA tmp uTA
+    clear data carb_system u_carb_system depth fCO2 fCO2_err lat lon
+    clear OAI_grid Preds_grid sal TA tmp uTA
 
 end

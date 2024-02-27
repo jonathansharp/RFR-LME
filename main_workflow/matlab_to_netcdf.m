@@ -11,7 +11,7 @@
 define_regions_eiwg
 
 %% full data grid structure
-load('Data/socat_gridded','SOCAT_grid');
+load('Data/socat_gridded_2022','SOCAT_grid');
 US_RFR_LME.lim = SOCAT_grid.lim;
 US_RFR_LME.dim = SOCAT_grid.dim;
 US_RFR_LME.lon = single(SOCAT_grid.lon);
