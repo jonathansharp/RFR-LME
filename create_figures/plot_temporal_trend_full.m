@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 1/18/23
 % 
 
-function plot_temporal_trend_full(zmin,zmax,varname,lab,region,lme_shape,lme_idx)
+function plot_temporal_trend_full(zmin,zmax,clrmp,varname,lab,region,lme_shape,lme_idx)
 
 % initialize figure
 worldmap([-18 82],[140 302]); box on; hold on;
@@ -34,7 +34,7 @@ for n = 1:length(region)
     tr = nan(vars_grid.(type).(region{n}).dim.x,vars_grid.(type).(region{n}).dim.y);
     for a = 1:vars_grid.(type).(region{n}).dim.x
         for b = 1:vars_grid.(type).(region{n}).dim.y
-            if sum(~isnan(squeeze(vars_grid.(type).(region{n}).(varname)(a,b,:))))>100 % if more than 200 months with observations
+            if sum(~isnan(squeeze(vars_grid.(type).(region{n}).(varname)(a,b,:))))>1 % if more than 200 months with observations
             [~,~,x,~] = leastsq2(vars_grid.(type).(region{n}).month,...
                 squeeze(vars_grid.(type).(region{n}).(varname)(a,b,:)),0,2,[6 12]);
             tr(a,b) = x(2)*12;

@@ -35,40 +35,46 @@ for n = 1:length(region)
         load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');
         load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     
+        % establish area_weights
+        area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
+        area_weights = repmat(area_weights,1,1,12);
+        % establish climatological index of only cells that are always
+        spatial_index = nan(OAI_grid.(region{n}).dim.x,OAI_grid.(region{n}).dim.y,12);
+        for m = 1:12
+            spatial_index(:,:,m) = ...
+                sum(OAI_grid.(region{n}).idxspc(:,:,m:12:end),3) == ...
+                    OAI_grid.(region{n}).dim.z/12;
+        end
+        area_weights(~spatial_index) = NaN;
+        area_weights = repmat(area_weights,1,1,OAI_grid.(region{n}).dim.z/12);
+
         % calculate area-weighted time series
         OAI_grid.(region{n}).var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         for t = 1:OAI_grid.(region{n}).dim.z
-            % establish area_weights
-            area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
-            % establish non-ice-covered fraction
-            open_per = sum(OAI_grid.(region{n}).idxspc(:,:,t),'all')./...
-                sum(SOCAT_grid.(region{n}).idxspc(:,:,t),'all');
-            % remove ice-filled cells from area weights
-            area_weights(~OAI_grid.(region{n}).idxspc(:,:,t)) = NaN;
             % calculate area-weighted means
             if strcmp(var_type{var_num},'SST') || strcmp(var_type{var_num},'SSS')
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum(Preds_grid.(region{n}).(var_type{var_num})(:,:,t).*...
-                        area_weights,1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
+                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));
                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
             elseif strcmp(var_type{var_num},'TA_DIC')
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum((OAI_grid.(region{n}).TA(:,:,t)./...
                     OAI_grid.(region{n}).DIC(:,:,t)).*...
-                        area_weights,1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
+                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));
                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
             else
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum(OAI_grid.(region{n}).(var_type{var_num})(:,:,t).*...
-                        area_weights,1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));
+                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));
                 OAI_grid.(region{n}).u_var_dom_mean(t) = ...
                     squeeze(sum(sum(OAI_grid.(region{n}).(['u' var_type{var_num}])(:,:,t).*...
-                        area_weights,1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights,1,'omitnan'),2,'omitnan'));                
+                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));                
             end
             % remove means when region is >50% ice (retaining these for now)
 %             if open_per < 0.5
@@ -113,7 +119,7 @@ for n = 1:length(region)
         % uncertainty on trend
         [acov,acor,lag,dof] = ...
             autocov2(OAI_grid.(region{n}).month,yr,36);
-        %plot(lag,acor)
+        plot(lag,acor)
         edof = dof - 8; % subtract number of parameters to get effective dof
         edof(edof<1) = 1;
         tr_uncer = ... % scale uncertainty using edof

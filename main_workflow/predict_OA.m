@@ -33,7 +33,9 @@ for n = 1:length(region)
     sal = Preds_grid.(region{n}).SSS(Preds_grid.(region{n}).idxspc);
     tmp = Preds_grid.(region{n}).SST(Preds_grid.(region{n}).idxspc);
     % predict TA using ESPER-Mixed
+
     [data,u_data] = ESPER_Mixed([1 4 6],[lon lat depth],[sal tmp],[1 2],'Equations',8);
+    
     % pre-allocate TA and nutrients
     OAI_grid.(region{n}).TA = nan(size(Preds_grid.(region{n}).idxspc));
     OAI_grid.(region{n}).uTA = nan(size(Preds_grid.(region{n}).idxspc));

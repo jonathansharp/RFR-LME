@@ -55,13 +55,22 @@ dom_mean = struct();
 stats_table = nan(6,length(var_type_1));
 
 %% calculate area-weighted time series
-% define area weights
+
+% establish area_weights
 area_weights = SOCAT_grid.area_km2.*SOCAT_grid.percent_sea;
-area_weights = repmat(area_weights,1,1,SOCAT_grid.dim.z);
-% remove ice-filled cells from area weights
-area_weights(isnan(RFR_LME.fco2)) = NaN;
+area_weights = repmat(area_weights,1,1,12);
+% establish climatological index of only cells that are always
+spatial_index = nan(SOCAT_grid.dim.x,SOCAT_grid.dim.y,12);
+for m = 1:12
+    spatial_index(:,:,m) = ...
+        sum(~isnan(RFR_LME.fco2(:,:,m:12:end)),3) == ...
+            SOCAT_grid.dim.z/12;
+end
+area_weights(~spatial_index) = NaN;
+area_weights = repmat(area_weights,1,1,SOCAT_grid.dim.z/12);
+
+% calculate area-weighted means
 for v = 1:length(var_type_1)
-        % calculate area-weighted means
         dom_mean.(var_type_1{v}) = ...
             squeeze(sum(sum(RFR_LME.(var_type_2{v}).*...
                 area_weights,1,'omitnan'),2,'omitnan'))./...

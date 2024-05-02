@@ -116,7 +116,7 @@ for d = 1:length(datasets)
     c.TickLength = 0;
     c.Label.String = ['Sea Surface {\itp}CO_{2(' strrep(datasets{d},'_','-') ')} (\muatm)'];
     clim([295 475]);
-    colormap(parula);
+    colormap(flipud(slanCM('romao')));
     cbarrow;
     mlabel off;
     % plot differences

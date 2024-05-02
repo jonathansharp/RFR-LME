@@ -35,7 +35,8 @@ plot_temporal_mean_full(0,0.1,cmocean('amp'),'uRF','Sea Surface RF Uncer.',regio
 plot_temporal_mean_full(1.05,1.25,flipud(slanCM('romao')),'TA_DIC','Sea Surface TA/DIC_{(RFR-LME)}',region,lme_shape,lme_idx)
 
 %% plot OA indicators trends across full region
-%plot_temporal_trend_full(2050,2400,flipud(cmocean('deep')),'TA','Sea Surface {\itA}_{T(RFR-LME)} (\mumol kg^{-1})',region,lme_shape,lme_idx)
+plot_temporal_trend_full(-0.002,0.002,cmocean('amp'),'pH','Sea Surface pH_{T(RFR-LME)} Trend',region,lme_shape,lme_idx)
+plot_temporal_trend_full(2050,2400,flipud(cmocean('deep')),'TA','Sea Surface {\itA}_{T(RFR-LME)} (\mumol kg^{-1})',region,lme_shape,lme_idx)
 
 %% plot OA indicators across full region (seasonally)
 plot_temporal_mean_full_seas(2000,2400,flipud(slanCM('romao')),'TA','Sea Surface {\itA}_{T(RFR-LME)} (\mumol kg^{-1})',region,lme_shape,lme_idx)
