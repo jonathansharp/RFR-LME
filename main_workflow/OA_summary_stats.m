@@ -9,16 +9,18 @@ define_regions_eiwg
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 % variable information
-var_type = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'SST' 'SSS' 'TA_DIC'};
-units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' '' 'degC' '' ''};
-rounder = [1 1 1 1 3 3 2 1 1 2 1 1 1];
-tr_rounder = [1 1 1 1 3 3 3 1 1 2 1 1 1];
+var_type = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'SST' 'SSS' 'TA_DIC' 'SSH' 'CHL' 'WindSpeed' 'MLD'};
+units = {'\mumol kg^{-1}' '\muatm' '\muatm' '\mumol kg^{-1}' '' '' '' 'nmol kg^{-1}' '\mumol kg^{-1}' '' 'degC' '' '' 'm' 'mg/m2' 'm/s' 'm'};
+rounder = [1 1 1 1 3 3 2 1 1 2 1 1 1 1 1 1 1];
+tr_rounder = [1 1 1 1 3 3 3 1 1 2 1 1 1 1 1 1 1];
 
 % preallocate tables
 stats = nan(length(region),length(var_type)*5);
 monthly = nan(300,length(region)*length(var_type));
+monthly_anom = nan(300,length(region)*length(var_type));
 u_monthly = nan(300,length(region)*length(var_type));
 ann = nan(300/12,length(region)*length(var_type));
+ann_anom = nan(300/12,length(region)*length(var_type));
 u_ann = nan(300/12,length(region)*length(var_type));
 means_table = nan(length(region),length(var_type));
 iav_table = nan(length(region),length(var_type));
@@ -53,7 +55,9 @@ for n = 1:length(region)
         OAI_grid.(region{n}).u_var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
         for t = 1:OAI_grid.(region{n}).dim.z
             % calculate area-weighted means
-            if strcmp(var_type{var_num},'SST') || strcmp(var_type{var_num},'SSS')
+            if strcmp(var_type{var_num},'SST') || strcmp(var_type{var_num},'SSS') || ...
+               strcmp(var_type{var_num},'SSH') || strcmp(var_type{var_num},'CHL') || ...
+               strcmp(var_type{var_num},'WindSpeed') || strcmp(var_type{var_num},'MLD')
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum(Preds_grid.(region{n}).(var_type{var_num})(:,:,t).*...
                         area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
@@ -94,39 +98,27 @@ for n = 1:length(region)
                 OAI_grid.(region{n}).month_of_year ...
                 repmat(15,OAI_grid.(region{n}).dim.z,1)]);
 
-        % calculate annual means
-        time_ann = nan(length(OAI_grid.(region{n}).year)/12,1);
-        OAI_grid.(region{n}).var_dom_mean_ann = nan(length(OAI_grid.(region{n}).year)/12,1);
-        OAI_grid.(region{n}).u_var_dom_mean_ann = nan(length(OAI_grid.(region{n}).year)/12,1);
-        for y = 1:length(OAI_grid.(region{n}).year)/12
-            time_ann(y) = ...
-                mean(time((y-1)*12+1:(y-1)*12+12));
-            OAI_grid.(region{n}).var_dom_mean_ann(y) = ...
-                mean(OAI_grid.(region{n}).var_dom_mean((y-1)*12+1:(y-1)*12+12),'omitnan');
-            OAI_grid.(region{n}).u_var_dom_mean_ann(y) = ...
-                mean(OAI_grid.(region{n}).u_var_dom_mean((y-1)*12+1:(y-1)*12+12),'omitnan');
-        end
-    
         % calculate long-term mean
         mean_lt = mean(OAI_grid.(region{n}).var_dom_mean,'omitnan');
 
         % calculate trend
-        [yf,yr,x,err] = ...
+        [yf,OAI_grid.(region{n}).var_dom_mean_anom,x,err] = ...
             leastsq2(OAI_grid.(region{n}).month,...
             OAI_grid.(region{n}).var_dom_mean,0,3,[4 6 12]);
         tr = x(2)*12;
 
         % uncertainty on trend
         [acov,acor,lag,dof] = ...
-            autocov2(OAI_grid.(region{n}).month,yr,36);
-        plot(lag,acor)
+            autocov2(OAI_grid.(region{n}).month,...
+            OAI_grid.(region{n}).var_dom_mean_anom,36);
+        % plot(lag,acor)
         edof = dof - 8; % subtract number of parameters to get effective dof
         edof(edof<1) = 1;
         tr_uncer = ... % scale uncertainty using edof
             err(2)*(sqrt(length(OAI_grid.(region{n}).month))./sqrt(edof))*12;
     
         % calculate interannual variability
-        iav = std(yr);
+        iav = std(OAI_grid.(region{n}).var_dom_mean_anom);
 
         % determine average modelled climatology
         clim = nan(12,1);
@@ -141,6 +133,21 @@ for n = 1:length(region)
             amp = max(clim) - min(clim);
         else
             amp = NaN;
+        end
+
+        % calculate annual means
+        time_ann = nan(length(OAI_grid.(region{n}).year)/12,1);
+        OAI_grid.(region{n}).var_dom_mean_ann = nan(length(OAI_grid.(region{n}).year)/12,1);
+        OAI_grid.(region{n}).u_var_dom_mean_ann = nan(length(OAI_grid.(region{n}).year)/12,1);
+        for y = 1:length(OAI_grid.(region{n}).year)/12
+            time_ann(y) = ...
+                mean(time((y-1)*12+1:(y-1)*12+12));
+            OAI_grid.(region{n}).var_dom_mean_ann(y) = ...
+                mean(OAI_grid.(region{n}).var_dom_mean((y-1)*12+1:(y-1)*12+12),'omitnan');
+            OAI_grid.(region{n}).var_dom_mean_ann_anom(y) = ...
+                mean(OAI_grid.(region{n}).var_dom_mean_anom((y-1)*12+1:(y-1)*12+12),'omitnan');
+            OAI_grid.(region{n}).u_var_dom_mean_ann(y) = ...
+                mean(OAI_grid.(region{n}).u_var_dom_mean((y-1)*12+1:(y-1)*12+12),'omitnan');
         end
 % 
 %         % calculate trend over most recent 5 years
@@ -172,10 +179,12 @@ for n = 1:length(region)
 
         % fill table with monthly values
         monthly(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean;
+        monthly_anom(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean_anom;
         u_monthly(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).u_var_dom_mean;
 
         % fill table with annual values
         ann(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean_ann;
+        ann_anom(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean_ann_anom;
         u_ann(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).u_var_dom_mean_ann;
 
         %% plot time series
@@ -312,6 +321,8 @@ amp_table = array2table(amp_table,'RowNames',region,'VariableNames',VarNameSt(4:
 iav_table = array2table(iav_table,'RowNames',region,'VariableNames',VarNameSt(5:5:end));
 monthly = array2table(monthly,'RowNames',arrayfun(@num2str,1:300,'UniformOutput',0),'VariableNames',VarNameMnAn);
 ann = array2table(ann,'RowNames',arrayfun(@num2str,1997 + (1:300/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
+monthly_anom = array2table(monthly_anom,'RowNames',arrayfun(@num2str,1:300,'UniformOutput',0),'VariableNames',VarNameMnAn);
+ann_anom = array2table(ann_anom,'RowNames',arrayfun(@num2str,1997 + (1:300/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
 u_monthly = array2table(u_monthly,'RowNames',arrayfun(@num2str,1:300,'UniformOutput',0),'VariableNames',VarNameMnAn);
 u_ann = array2table(u_ann,'RowNames',arrayfun(@num2str,1997 + (1:300/12),'UniformOutput',0),'VariableNames',VarNameMnAn);
 
@@ -322,7 +333,9 @@ writetable(trends_table,['IndsAndStats/TrendsTable-' date '.xls'],'WriteRowNames
 writetable(amp_table,['IndsAndStats/AmplitudeTable-' date '.xls'],'WriteRowNames',true);
 writetable(iav_table,['IndsAndStats/IAVTable-' date '.xls'],'WriteRowNames',true);
 writetable(monthly,['IndsAndStats/Monthly-Inds-' date '.xls'],'WriteRowNames',true);
+writetable(monthly_anom,['IndsAndStats/Monthly-Anom-Inds-' date '.xls'],'WriteRowNames',true);
 writetable(u_monthly,['IndsAndStats/Monthly-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
 writetable(ann,['IndsAndStats/Annual-Inds-' date '.xls'],'WriteRowNames',true);
+writetable(ann_anom,['IndsAndStats/Annual-Anom-Inds-' date '.xls'],'WriteRowNames',true);
 writetable(u_ann,['IndsAndStats/Annual-Inds-Uncer-' date '.xls'],'WriteRowNames',true);
 

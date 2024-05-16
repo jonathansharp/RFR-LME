@@ -8,7 +8,7 @@ function plot_delta_mean_full(zmin,zmax,cmap_type,cmap_name,...
     zero_piv,num_groups,varname,lab,region,lme_shape,lme_idx,test_idx)
 
 % initialize figure
-figure('visible','off'); hold on;
+figure('visible','on'); hold on;
 worldmap([-18 82],[140 302]);
 setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
@@ -52,11 +52,9 @@ z = mean(vars_grid.(type).(region{n}).(varname),3,'omitnan')';
 lat = vars_grid.([type num2str(en)]).(region{n}).lat;
 lon = vars_grid.([type num2str(en)]).(region{n}).lon;
 pcolorm(lat,lon,z)
-% plot borders around regions
-    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
 end
+% plot borders around regions
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 % save figure

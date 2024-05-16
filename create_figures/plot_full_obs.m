@@ -2,7 +2,7 @@
 % define regions
 define_regions_eiwg
 % load SOCAT grid
-load('Data/socat_gridded','SOCAT_grid');
+load('Data/socat_gridded_2022','SOCAT_grid');
 % initialize figure
 figure('visible','off'); box on; hold on;
 worldmap([-18 82],[140 302]);
@@ -33,15 +33,7 @@ for n = 1:length(region)
     clear SOCAT_grid
 end
 % plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 %mlabel off

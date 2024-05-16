@@ -6,7 +6,7 @@ addpath(genpath(pwd));
 ImportMoorings
 
 %% load US LME data
-date = '06-Oct-2023';
+date = '08-May-2024';
 % data
 LME_RFR = netcdfreader(['Data/US_LME_RFR_Inds_' date '.nc']);
 vars = fieldnames(LME_RFR);

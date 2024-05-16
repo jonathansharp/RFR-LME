@@ -11,6 +11,7 @@ set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16,'XTick',[],'YTick',[],'XTickLabel',[],'YTickLabel',[]);
 xlim([169 305]); ylim([5 82]);
 xlabel('');
+% plot regions
 for n = 1:length(region)
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     z = mean(Preds_grid.(region{n}).(varname),3,'omitnan')';
@@ -18,13 +19,11 @@ for n = 1:length(region)
     set(h,'alphadata',~isnan(z));
     clear Preds_grid
 end
-for n = 1:length(region)
-    for r = 1:length(lme_idx.(region{n}))
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})(r)).X);
-        plot(tmp_lon,lme_shape(lme_idx.(region{n})(r)).Y,'k','linewidth',1);
-    end
-end
+% plot borders around regions
+plot_lme_borders(region,lme_shape,lme_idx);
+% plot land
 plot_land('xy');
+% figure properties
 c=colorbar;
 colormap(parula(lev));
 caxis([zmin,zmax]);

@@ -26,16 +26,16 @@ Salinity = nan(length(lon),length(lat),length(month));
 
 % Interpolate onto quarter degree grid
 for t = 1:length(month)
-    % use climatology for 2021 and 2022
-    if t <= 276
-        t_tmp=t;
-    else
-        t_tmp=t-276:12:t-12;
-    end
+%     % use climatology for 2021 and 2022 (not anymore)
+%     if t <= 276
+%         t_tmp=t;
+%     else
+%         t_tmp=t-276:12:t-12;
+%     end
     % Index where SSS is true
-    idx = ~isnan(mean(SSS.sss(:,:,t_tmp),3));
+    idx = ~isnan(mean(SSS.sss(:,:,t),3));
     % Get teporary SSS
-    sss_tmp = mean(SSS.sss(:,:,t_tmp),3);
+    sss_tmp = mean(SSS.sss(:,:,t),3);
     % Create interpolant over than range
     interp = scatteredInterpolant(SSS.latitude(idx),SSS.longitude(idx),sss_tmp(idx));
     % Fill grid with interpolated SSS

@@ -3,7 +3,7 @@
 addpath(genpath(pwd));
 
 % RFR-LME file data!
-date = '26-Feb-2024';
+date = '08-May-2024';
 %date = '06-Oct-2023';
 
 new = 1;
@@ -362,15 +362,7 @@ pcolorm(double(repmat(lat_grid,length(lon_grid),1)),...
     double(repmat(convert_lon(lon_grid)',1,length(lat_grid))),...
     pco2_del_gridded);
 % plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 mlabel off
@@ -399,15 +391,7 @@ pcolorm(double(repmat(lat_grid,length(lon_grid),1)),...
     double(repmat(convert_lon(lon_grid)',1,length(lat_grid))),...
     pH_del_gridded);
 % plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 mlabel off
@@ -436,15 +420,7 @@ pcolorm(double(repmat(lat_grid,length(lon_grid),1)),...
     double(repmat(convert_lon(lon_grid)',1,length(lat_grid))),...
     pH_del_gridded);
 % plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 mlabel off

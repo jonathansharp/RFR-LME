@@ -1,6 +1,6 @@
 %% load US LME data
 % set date
-date = '26-Feb-2024';
+date = '08-May-2024';
 new = 1;
 % load indicators
 if new == 1

@@ -10,7 +10,7 @@ plot_temporal_mean_full(295,475,flipud(slanCM('romao')),'fCO2','Sea Surface {\it
 plot_temporal_mean_full(295,475,flipud(slanCM('romao')),'pCO2','Sea Surface {\itp}CO_{2(RFR-LME)} (\muatm)',region,lme_shape,lme_idx)
  
 % plot pCO2 trends across full region
-plot_temporal_trend_full(-5,5,'pCO2','Sea Surface {\itp}CO_{2(RFR-LME)} Trend (\muatm yr^{-1})',region,lme_shape,lme_idx)
+plot_temporal_trend_full(-5,5,cmocean('amp'),'pCO2','Sea Surface {\itp}CO_{2(RFR-LME)} Trend (\muatm yr^{-1})',region,lme_shape,lme_idx)
 
 % plot pCO2 IAV across full region
 plot_temporal_iav_full(0,30,'pCO2','Sea Surface {\itp}CO_{2(RFR-LME)} IAV (\muatm)',region,lme_shape,lme_idx)
@@ -31,6 +31,8 @@ plot_temporal_mean_full(0,300,flipud(slanCM('romao')),'CO3','Sea Surface [CO_{3}
 plot_temporal_mean_full(6,18,flipud(slanCM('romao')),'RF','Sea Surface RF_{(RFR-LME)}',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,50,cmocean('amp'),'upCO2','Sea Surface {\itp}CO_{2(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,50,cmocean('amp'),'ufCO2','Sea Surface {\itf}CO_{2(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(0,0.1,cmocean('amp'),'upH','Sea Surface pH_{T(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(0,0.5,cmocean('amp'),'uOmA','Sea Surface \Omega_{ar(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,0.1,cmocean('amp'),'uRF','Sea Surface RF Uncer.',region,lme_shape,lme_idx)
 plot_temporal_mean_full(1.05,1.25,flipud(slanCM('romao')),'TA_DIC','Sea Surface TA/DIC_{(RFR-LME)}',region,lme_shape,lme_idx)
 

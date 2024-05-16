@@ -23,7 +23,8 @@ c.Label.String = lab;
 cbarrow;
 % plot regions
 for n = 1:length(region)
-    if any(strcmp(varname,{'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF' 'ufCO2' 'upCO2' 'TA_DIC'}))
+    if any(strcmp(varname,{'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' ...
+            'CO3' 'RF' 'ufCO2' 'upCO2' 'upH' 'uOmA' 'uOmC' 'uRF' 'TA_DIC'}))
         type = 'OAI_grid';
         vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
         if strcmp(varname,'H')
@@ -45,16 +46,7 @@ for n = 1:length(region)
     clear vars_grid z
 end
 % plot borders around regions
-for n = 1:length(region)
-    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    if n == 3 % remove line at 180 for AI
-      idx=tmp_lon<180.01&tmp_lon>179.99;
-     plotm(tmp_lat(~idx),tmp_lon(~idx),'k','linewidth',1);
-    else
-        plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-    end
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 %mlabel off

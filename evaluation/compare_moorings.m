@@ -321,6 +321,7 @@ end
 %         datenum(datetime_temp(:,1),datetime_temp(:,2),15);
 % end
 
+
 %% plot mooring timeseries comparisons
 clrs = cbrewer('qual','Set1',8);
 datasets = {'US_LME_RFR' 'US_LME_RFR_NM' 'CMEMS_LSCE' 'NIES_FNN' ...
@@ -366,39 +367,123 @@ end
 %% calculate and save error and summary stats
 datasets = {'US_LME_RFR' 'US_LME_RFR_NM' 'CMEMS_LSCE' 'NIES_FNN' ...
     'MPI_SOMFFN' 'JENA_MLS' 'CSIR_ML6' 'JMA_MLR'};
+% pre-allocate stats
 mean_err = nan(7,length(moor_nums));
 std_err = nan(7,length(moor_nums));
 med_err = nan(7,length(moor_nums));
 rmse_err = nan(7,length(moor_nums));
 iqr_err = nan(7,length(moor_nums));
+resid_corr = nan(7,length(moor_nums));
+amp_diff = nan(7,length(moor_nums));
+% loop through moorings
 for m = 1:length(moor_nums)
+    % fit mooring observations to timeseries
+    [yf,mooring.(moor_nums{m}).pCO2_resids,x] = ...
+        leastsq2(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
+        mooring.(moor_nums{m}).pCO2,datenum(1998,1,15),...
+        2,[365.25/2 365.25]);
+    moor_amp = sqrt(x(3)^2 + x(4)^2 + x(5)^2 + x(6)^2);
+    % loop through datasets
     for d = 1:8
+        % log dates of gridded values (with month and year)
         if d == 1 || d == 2
             grid_date = datevec(mooring.(moor_nums{m}).US_LME_RFR_datetime);
         else
             grid_date = datevec(mooring.(moor_nums{m}).([datasets{d} '_datetime']));
         end
         grid_date = datenum(grid_date(:,1),grid_date(:,2),1);
+        % log dates of mooring values (with month and year)
         moor_date = datevec(mooring.(moor_nums{m}).time);
         moor_date = datenum(moor_date(:,1),moor_date(:,2),1);
         % first, get index of grid values for mooring dates
         idx_grid = grid_date >= min(moor_date) & grid_date <= max(moor_date);
         % then, get index of mooring values for grid dates
         idx_moor = moor_date >= min(grid_date) & moor_date <= max(grid_date);
+        % extract mooring residuals
+        mooring_resids = mooring.(moor_nums{m}).pCO2_resids(idx_moor);
         if d == 1
+            % for LME-RFR grid
+            % calculate differences
             diffs = mooring.(moor_nums{m}).pCO2(idx_moor,1)-...
                 mooring.(moor_nums{m}).US_LME_RFR_pCO2_full(idx_grid);
+            % date time difference
+            dt = mooring.(moor_nums{m}).US_LME_RFR_datetime - datenum(1998,1,15);
+            % residuals
+            mooring.(moor_nums{m}).US_LME_RFR_pCO2_full_resids = ...
+                mooring.(moor_nums{m}).US_LME_RFR_pCO2_full - ...
+                (x(1) + x(2).*dt + ...
+                x(3).*cos((2.*pi/(365.25/2)).*dt) + x(4).*sin((2.*pi/(365.25/2)).*dt) + ...
+                x(5).*cos((2.*pi/(365.25)).*dt) + x(6).*sin((2.*pi/(365.25)).*dt));
+            grid_resids = mooring.(moor_nums{m}).US_LME_RFR_pCO2_full_resids(idx_grid);
+            % calculate amplitude
+            if any(~isnan(mooring.(moor_nums{m}).US_LME_RFR_pCO2_full))
+                [~,~,x] = leastsq2(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
+                    mooring.(moor_nums{m}).US_LME_RFR_pCO2_full,datenum(1998,1,15),...
+                    2,[365.25/2 365.25]);
+                amp = sqrt(x(3)^2 + x(4)^2 + x(5)^2 + x(6)^2);
+            else
+                amp = NaN;
+            end
         elseif d == 2
+            % for LME-RFR grid (no moorings)
+            % calculate differences
             diffs = mooring.(moor_nums{m}).pCO2(idx_moor,1)-...
                 mooring.(moor_nums{m}).US_LME_RFR_pCO2_no_moorings(idx_grid);
+            % date time difference
+            dt = mooring.(moor_nums{m}).US_LME_RFR_datetime - datenum(1998,1,15);
+            % residuals
+            mooring.(moor_nums{m}).US_LME_RFR_pCO2_no_moorings_resids = ...
+                mooring.(moor_nums{m}).US_LME_RFR_pCO2_no_moorings - ...
+                (x(1) + x(2).*dt + ...
+                x(3).*cos((2.*pi/(365.25/2)).*dt) + x(4).*sin((2.*pi/(365.25/2)).*dt) + ...
+                x(5).*cos((2.*pi/(365.25)).*dt) + x(6).*sin((2.*pi/(365.25)).*dt));
+                grid_resids = mooring.(moor_nums{m}).US_LME_RFR_pCO2_no_moorings_resids(idx_grid);
+            % calculate amplitude
+            if any(~isnan(mooring.(moor_nums{m}).US_LME_RFR_pCO2_full))
+                [~,~,x] = leastsq2(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
+                    mooring.(moor_nums{m}).US_LME_RFR_pCO2_no_moorings,datenum(1998,1,15),...
+                    2,[365.25/2 365.25]);
+                amp = sqrt(x(3)^2 + x(4)^2 + x(5)^2 + x(6)^2);
+            else
+                amp = NaN;
+            end
         else
+            % for other gridded products
+            % calculate differences
             diffs = mooring.(moor_nums{m}).pCO2(idx_moor,1)-...
                 mooring.(moor_nums{m}).([datasets{d} '_pCO2'])(idx_grid);
+            % date time difference
+            dt = mooring.(moor_nums{m}).([datasets{d} '_datetime']) - datenum(1998,1,15);
+            % residuals
+            mooring.(moor_nums{m}).([datasets{d} '_pCO2_resids']) = ...
+                mooring.(moor_nums{m}).([datasets{d} '_pCO2']) - ...
+                (x(1) + x(2).*dt + ...
+                x(3).*cos((2.*pi/(365.25/2)).*dt) + x(4).*sin((2.*pi/(365.25/2)).*dt) + ...
+                x(5).*cos((2.*pi/(365.25)).*dt) + x(6).*sin((2.*pi/(365.25)).*dt));
+            grid_resids = mooring.(moor_nums{m}).([datasets{d} '_pCO2_resids'])(idx_grid);
+            % calculate amplitude
+            if any(~isnan(mooring.(moor_nums{m}).US_LME_RFR_pCO2_full))
+                [~,~,x] = leastsq2(mooring.(moor_nums{m}).([datasets{d} '_datetime']),...
+                    mooring.(moor_nums{m}).([datasets{d} '_pCO2']),datenum(1998,1,15),...
+                    2,[365.25/2 365.25]);
+                amp = sqrt(x(3)^2 + x(4)^2 + x(5)^2 + x(6)^2);
+            else
+                amp = NaN;
+            end
         end
+        % log residual correlation
+        idx = ~isnan(mooring_resids) & ~isnan(grid_resids);
+        if sum(idx) > 0
+            resid_corr(d,m) = corr(mooring_resids(idx),grid_resids(idx));
+        else
+            resid_corr(d,m) = NaN;
+        end
+        % log other elements
         mean_err(d,m) = mean(diffs,'omitnan');
         std_err(d,m) = std(diffs,[],'omitnan');
         med_err(d,m) = median(diffs,'omitnan');
         rmse_err(d,m) = sqrt(mean(diffs.^2,'omitnan'));
+        amp_diff(d,m) = moor_amp - amp;
         if any(~isnan(diffs))
         iqr_err(d,m) = iqr(diffs);
         else
@@ -411,11 +496,103 @@ std_table = array2table(std_err,'VariableNames',moor_nums,'RowNames',datasets);
 med_table = array2table(med_err,'VariableNames',moor_nums,'RowNames',datasets);
 rmse_table = array2table(rmse_err,'VariableNames',moor_nums,'RowNames',datasets);
 iqr_table = array2table(iqr_err,'VariableNames',moor_nums,'RowNames',datasets);
+resid_corr_table = array2table(resid_corr,'VariableNames',moor_nums,'RowNames',datasets);
+amp_diff_table = array2table(amp_diff,'VariableNames',moor_nums,'RowNames',datasets);
 writetable(mean_table,'IndsAndStats/mooring_mean_diffs_all_seaflux.csv');
 writetable(std_table,'IndsAndStats/mooring_std_diffs_all_seaflux.csv');
 writetable(med_table,'IndsAndStats/mooring_med_diffs_all_seaflux.csv');
 writetable(rmse_table,'IndsAndStats/mooring_rmse_diffs_all_seaflux.csv');
 writetable(iqr_table,'IndsAndStats/mooring_iqr_diffs_all_seaflux.csv');
+writetable(resid_corr_table,'IndsAndStats/mooring_resid_corr_all_seaflux.csv');
+writetable(amp_diff_table,'IndsAndStats/mooring_amp_diff_all_seaflux.csv');
+
+%% plot mooring timeseries residuals comparisons
+clrs = cbrewer('qual','Set1',8);
+datasets = {'US_LME_RFR' 'US_LME_RFR_NM' 'CMEMS_LSCE' 'NIES_FNN' ...
+    'MPI_SOMFFN' 'JENA_MLS' 'CSIR_ML6' 'JMA_MLR'};
+for m = 1:length(moor_nums)
+    % create plot
+    f=figure; hold on;
+    f.Position(3) = 2*f.Position(3);
+    title([num2str(mooring.(moor_nums{m}).US_LME_RFR_lat) char(176) 'N, ' ...
+        num2str(mooring.(moor_nums{m}).US_LME_RFR_lon) char(176) 'E']);
+    p.p1=plot(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
+        mooring.(moor_nums{m}).US_LME_RFR_pCO2_full_resids,...
+        '-','color',clrs(1,:),'linewidth',2);
+    p.p2=plot(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
+        mooring.(moor_nums{m}).US_LME_RFR_pCO2_no_moorings_resids,...
+        '--','color',clrs(2,:),'linewidth',2);
+    for d = 3:8
+        p.(['p' num2str(d)])=...
+            plot(mooring.(moor_nums{m}).([datasets{d} '_datetime']),...
+            mooring.(moor_nums{m}).([datasets{d} '_pCO2_resids']),...
+            '-','color',[clrs(d,:) 0.4],'linewidth',1);
+    end
+    s1=scatter(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
+        mooring.(moor_nums{m}).pCO2_resids,...
+        'MarkerFaceColor','k','MarkerEdgeColor','k');
+    % add figure properties
+    xlim([min(mooring.(moor_nums{m}).US_LME_RFR_datetime) ...
+        max(mooring.(moor_nums{m}).US_LME_RFR_datetime)]);
+    ylabel('{\itp}CO_{2} (\muatm)');
+    datetick('x','yyyy','keeplimits');
+    if mooring.(moor_nums{m}).lat == 59.875
+        ylim([150 500]);
+    end
+    legend([p.p1 p.p2 p.p3 p.p4 p.p5 p.p6 p.p7 p.p8],...
+        {'LME-RFR' 'LME-RFR_{NM}' 'CMEMS-LSCE' 'NIES-FNN' ...
+        'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+        'Location','northwest','NumColumns',4);
+    % export figure
+    exportgraphics(gcf,['Figures/moorings/m' moor_nums{m} '_resid.png']);
+    close
+end
+
+%% plot box and whisker figures
+% index to only within LMEs
+idx = ~isnan(mean_err(1,:));
+% establish figure
+figure;
+set(gcf,'Position',[100 100 1000 800])
+gap = [0.09,0.08];
+% median errors
+subtightplot(2,2,1,gap);
+h=boxplot(med_err(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
+    'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+    'BoxStyle','outline','Symbol','.k','Colors','k');
+set(h,'linew',1.5);
+yline(0);
+ylim([-100 100]);
+ylabel('Median \Delta{\itp}CO_{2} (\muatm)');
+% IQR errors
+subtightplot(2,2,2,gap);
+h=boxplot(iqr_err(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
+    'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+    'BoxStyle','outline','Symbol','.k','Colors','k');
+set(h,'linew',1.5);
+ylim([0 140]);
+ylabel('\Delta{\itp}CO_{2} IQR (\muatm)');
+% amplitude difference errors
+subtightplot(2,2,3,gap);
+h=boxplot(amp_diff(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
+    'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+    'BoxStyle','outline','Symbol','.k','Colors','k');
+set(h,'linew',1.5);
+yline(0);
+ylim([-20 130]);
+ylabel('\Delta {\itp}CO_{2} Amplitude (\muatm)');
+% residual correlation errors
+subtightplot(2,2,4,gap)
+h=boxplot(resid_corr(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
+    'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+    'BoxStyle','outline','Symbol','.k','Colors','k');
+set(h,'linew',1.5);
+yline(0);
+ylim([-0.5 1]);
+ylabel('{\itp}CO_{2} Residual Correlation');
+% export plots
+exportgraphics(gcf,'Figures/boxplots_moorings.png');
+close;
 
 %% plot box and whisker figure
 % index to only within LMEs
@@ -470,6 +647,28 @@ ylim([0 140]);
 ylabel('\Delta{\itp}CO_{2} IQR (\muatm)');
 exportgraphics(gcf,['Figures/iqr_boxplot_moorings.png']);
 close;
+% residual correlation errors
+figure;
+h=boxplot(resid_corr(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
+    'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+    'BoxStyle','outline','Symbol','.k','Colors','k');
+set(h,'linew',1.5);
+yline(0);
+ylim([-0.5 1]);
+ylabel('{\itp}CO_{2} Residual Correlation');
+exportgraphics(gcf,['Figures/resid_corr_boxplot_moorings.png']);
+close;
+% amplitude difference errors
+figure;
+h=boxplot(amp_diff(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
+    'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
+    'BoxStyle','outline','Symbol','.k','Colors','k');
+set(h,'linew',1.5);
+yline(0);
+ylim([-20 130]);
+ylabel('\Delta {\itp}CO_{2} Amplitude (\muatm)');
+exportgraphics(gcf,['Figures/amp_diff_boxplot_moorings.png']);
+close;
 
 %% plot mean map with moorings
 figure('visible','on'); box on; hold on;
@@ -493,15 +692,7 @@ for n = 1:length(region)
     clear vars_grid z
 end
 % plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 mlabel off
@@ -549,15 +740,7 @@ for n = 1:length(region)
     clear vars_grid z
 end
 % plot borders around regions
-for n = 1:length(region)
-    if n <= 11
-        tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X');
-    else
-        tmp_lon = lme_shape(lme_idx.(region{n})).X';
-    end
-    tmp_lat = lme_shape(lme_idx.(region{n})).Y';
-    plotm(tmp_lat,tmp_lon,'k','linewidth',1);
-end
+plot_lme_borders(region,lme_shape,lme_idx);
 % plot land
 plot_land('map');
 mlabel off
