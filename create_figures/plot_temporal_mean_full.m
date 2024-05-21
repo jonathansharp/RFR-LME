@@ -24,7 +24,7 @@ cbarrow;
 % plot regions
 for n = 1:length(region)
     if any(strcmp(varname,{'DIC' 'fCO2' 'pCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' ...
-            'CO3' 'RF' 'ufCO2' 'upCO2' 'upH' 'uOmA' 'uOmC' 'uRF' 'TA_DIC'}))
+            'CO3' 'RF' 'ufCO2' 'upCO2' 'upH' 'uOmA' 'uOmC' 'uRF' 'uTA' 'TA_DIC'}))
         type = 'OAI_grid';
         vars_grid = load(['Data/' region{n} '/ML_fCO2'],type);
         if strcmp(varname,'H')

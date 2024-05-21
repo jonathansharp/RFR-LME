@@ -40,15 +40,24 @@ for n = 1:length(region)
         % establish area_weights
         area_weights = SOCAT_grid.(region{n}).area_km2.*SOCAT_grid.(region{n}).percent_sea;
         area_weights = repmat(area_weights,1,1,12);
-        % establish climatological index of only cells that are always
+        % establish climatological index of only cells that are always uncovered
         spatial_index = nan(OAI_grid.(region{n}).dim.x,OAI_grid.(region{n}).dim.y,12);
         for m = 1:12
             spatial_index(:,:,m) = ...
                 sum(OAI_grid.(region{n}).idxspc(:,:,m:12:end),3) == ...
                     OAI_grid.(region{n}).dim.z/12;
         end
-        area_weights(~spatial_index) = NaN;
-        area_weights = repmat(area_weights,1,1,OAI_grid.(region{n}).dim.z/12);
+        % mask out grid cells that are sometimes ice-covered
+        area_weights_masked = area_weights;
+        area_weights_masked(~spatial_index) = NaN;
+        % determine climatological percent of region
+        region_percent = 100.*(sum(reshape(area_weights_masked,...
+            [OAI_grid.(region{n}).dim.x.*OAI_grid.(region{n}).dim.y 12]),'omitnan')./...
+            sum(reshape(area_weights,...
+            [OAI_grid.(region{n}).dim.x.*OAI_grid.(region{n}).dim.y 12]),'omitnan'));
+        % replicate area weights and index over time
+        area_weights_masked = repmat(area_weights_masked,1,1,OAI_grid.(region{n}).dim.z/12);
+        spatial_index = repmat(spatial_index,1,1,OAI_grid.(region{n}).dim.z/12);
 
         % calculate area-weighted time series
         OAI_grid.(region{n}).var_dom_mean = nan(OAI_grid.(region{n}).dim.z,1);
@@ -58,27 +67,29 @@ for n = 1:length(region)
             if strcmp(var_type{var_num},'SST') || strcmp(var_type{var_num},'SSS') || ...
                strcmp(var_type{var_num},'SSH') || strcmp(var_type{var_num},'CHL') || ...
                strcmp(var_type{var_num},'WindSpeed') || strcmp(var_type{var_num},'MLD')
+                Preds_grid.(region{n}).(var_type{var_num})(~spatial_index) = NaN;
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum(Preds_grid.(region{n}).(var_type{var_num})(:,:,t).*...
-                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));
+                        area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'));
                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
             elseif strcmp(var_type{var_num},'TA_DIC')
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum((OAI_grid.(region{n}).TA(:,:,t)./...
                     OAI_grid.(region{n}).DIC(:,:,t)).*...
-                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));
+                        area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'));
                 OAI_grid.(region{n}).u_var_dom_mean(t) = NaN;
             else
+                OAI_grid.(region{n}).(var_type{var_num})(~spatial_index) = NaN;
                 OAI_grid.(region{n}).var_dom_mean(t) = ...
                     squeeze(sum(sum(OAI_grid.(region{n}).(var_type{var_num})(:,:,t).*...
-                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));
+                        area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'));
                 OAI_grid.(region{n}).u_var_dom_mean(t) = ...
                     squeeze(sum(sum(OAI_grid.(region{n}).(['u' var_type{var_num}])(:,:,t).*...
-                        area_weights(:,:,t),1,'omitnan'),2,'omitnan'))./...
-                        squeeze(sum(sum(area_weights(:,:,t),1,'omitnan'),2,'omitnan'));                
+                        area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'))./...
+                        squeeze(sum(sum(area_weights_masked(:,:,t),1,'omitnan'),2,'omitnan'));                
             end
             % remove means when region is >50% ice (retaining these for now)
 %             if open_per < 0.5
@@ -191,6 +202,7 @@ for n = 1:length(region)
         % initialize figure
         figure('Visible','on'); hold on;
         set(gcf,'position',[10 10 900 400]);
+        set(gca,'FontSize',12);
         % plot
         plot(time,OAI_grid.(region{n}).var_dom_mean,'k-','linewidth',1);
         plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'r-','linewidth',3);
@@ -214,8 +226,21 @@ for n = 1:length(region)
             ' ' units{var_num} ' | Tr. = ' num2str(round(tr,tr_rounder(var_num))) ...
             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
-            'FontSize',14,'HorizontalAlignment','center');
+            'FontSize',15,'HorizontalAlignment','center');
         xL = xlim; yL = ylim;
+        % Plot percent of region
+        if var_num == 2
+            axes('position',[.7 .15 .2 .2]);
+        else
+            axes('position',[.7 .7 .2 .2]);
+        end
+        hold on; box on;
+        plot(1:12,region_percent,'LineWidth',2);
+        ylim([-35 135]); xlim([-1.5 13]);
+        xticks([]); yticks([]);
+        text(7,120,'Percent of Region','FontWeight','bold','HorizontalAlignment','center');
+        text(1:12,repmat(-17,1,12),{'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'},'HorizontalAlignment','center')
+        text([-.3 -.3 -.3],[0 50 100],{'0' '50' '100'},'HorizontalAlignment','center','VerticalAlignment','middle');
         % Add recent trend indicator
 %         if pos_signif_5
 %             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
@@ -288,7 +313,7 @@ for n = 1:length(region)
             ['IndsAndStats/' region{n} '/annual_' var_type{var_num} '.csv'],'WriteRowNames',true);
 
         %% clean up
-        clear SOCAT_grid OAI_grid area_weights t time
+        clear SOCAT_grid OAI_grid area_weights area_weights_masked t time
 
         %% save LME-specific indicator time series
 

@@ -32,8 +32,9 @@ plot_temporal_mean_full(6,18,flipud(slanCM('romao')),'RF','Sea Surface RF_{(RFR-
 plot_temporal_mean_full(0,50,cmocean('amp'),'upCO2','Sea Surface {\itp}CO_{2(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,50,cmocean('amp'),'ufCO2','Sea Surface {\itf}CO_{2(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,0.1,cmocean('amp'),'upH','Sea Surface pH_{T(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
-plot_temporal_mean_full(0,0.5,cmocean('amp'),'uOmA','Sea Surface \Omega_{ar(RFR-LME)} Uncer. (\muatm)',region,lme_shape,lme_idx)
+plot_temporal_mean_full(0,0.5,cmocean('amp'),'uOmA','Sea Surface \Omega_{ar(RFR-LME)} Uncer.',region,lme_shape,lme_idx)
 plot_temporal_mean_full(0,0.1,cmocean('amp'),'uRF','Sea Surface RF Uncer.',region,lme_shape,lme_idx)
+plot_temporal_mean_full(0,50,cmocean('amp'),'uTA','Sea Surface {\itA}_{T(ESPER)} Uncer. (\mumol kg^{-1})',region,lme_shape,lme_idx)
 plot_temporal_mean_full(1.05,1.25,flipud(slanCM('romao')),'TA_DIC','Sea Surface TA/DIC_{(RFR-LME)}',region,lme_shape,lme_idx)
 
 %% plot OA indicators trends across full region
