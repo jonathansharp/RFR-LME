@@ -90,13 +90,7 @@ for v = 1:length(var_type_1)
     for m = 1:12
         clim(m) = mean(dom_mean.(var_type_1{v})(m:12:end),'omitnan');
     end
-    % calculate amplitude
-    if sum(~isnan(clim)) > 8
-        amp = max(clim) - min(clim);
-    else
-        amp = NaN;
-    end
-    stats_table(3,v) = amp; % amplitude
+    % calculate trend
     [yf,yr,x,err] = ...
         leastsq2(RFR_LME.time,dom_mean.(var_type_1{v}),RFR_LME.time(1),3,[365/3 365/2 365]);
     stats_table(4,v) = std(yr); % iav
@@ -106,6 +100,13 @@ for v = 1:length(var_type_1)
     %edof<1 = 1;
     stats_table(6,v) = ... % scale uncertainty using edof
         err(2)*(sqrt(length(RFR_LME.time./sqrt(edof))))*365;
+    % calculate amplitude
+    if sum(~isnan(clim)) > 8
+        amp = sqrt(x(7)^2+x(8)^2)*2;
+    else
+        amp = NaN;
+    end
+    stats_table(3,v) = amp; % amplitude
 end
 
 %% save table

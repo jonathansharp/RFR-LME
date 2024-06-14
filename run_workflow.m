@@ -38,7 +38,7 @@ define_x_y
 % Set options (determined via 'GMM_test' in 'run_optimization.m')
 set_gmm_options
 
-% this script trains self-organizing-maps using the defined predictors to
+% this script trains Gaussian mixture models using the defined predictors to
 % cluster data spatiotemporally for algorithm training
 cluster_on_grid
 
