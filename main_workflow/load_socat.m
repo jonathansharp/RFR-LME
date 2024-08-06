@@ -1,7 +1,7 @@
 % Load North American SOCAT data
 % 
 % This script loads observations of fCO2 and ancillary variables around
-% North America extracted from SOCATv2022 defined by latitude and longitude
+% North America extracted from SOCATv2024 defined by latitude and longitude
 % bounds.
 % 
 % Written by J.D. Sharp: 7/26/22
@@ -12,7 +12,7 @@
 disp('Downloading SOCAT Data');
 
 %% load regional SOCAT file
-% this is obtained by running 'Read_SOCATv3_v2022.m' in the SOCATv2022
+% this is obtained by running 'Read_SOCATv2019_v2024.m' in the SOCATv2024
 % subfolder with the latitude limits of -18 to 82 degrees north and the
 % longitude limits of 140 to 302 degrees east
 load('data_to_use/SOCATv2023_USA.mat');
@@ -90,4 +90,4 @@ close
 
 %% Save SOCAT structure
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_structure_2023','SOCAT','-v7.3');
+save('Data/socat_structure_2024','SOCAT','-v7.3');

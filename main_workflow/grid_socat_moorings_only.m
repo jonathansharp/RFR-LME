@@ -2,15 +2,15 @@
 % 
 % This script grids observations of fCO2 and ancillary variables into
 % eleven US large Marine Ecosystems assembled via extractions from
-% SOCATv2023 defined by latitude and longitude bounds.
+% SOCATv2024 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/23
-% Last updated by J.D. Sharp: 7/26/23
+% Last updated by J.D. Sharp: 7/5/24
 % 
 
 %% load SOCAT structure
 if ~exist('SOCAT','var')
-    load('Data/socat_structure_2023','SOCAT');
+    load('Data/socat_structure_2024','SOCAT');
 end
 
 %% display status
@@ -22,15 +22,15 @@ SOCAT_grid.lim.latmax = round(max(SOCAT.latitude),0);
 SOCAT_grid.lim.lonmin = round(min(SOCAT.longitude),0);
 SOCAT_grid.lim.lonmax = round(max(SOCAT.longitude),0);
 SOCAT_grid.lim.monthmin = 1;
-SOCAT_grid.lim.monthmax = 300;
+SOCAT_grid.lim.monthmax = 312;
 
-%% remove values later than 2022
-idx_22 = SOCAT.month_since_1998 > 300;
+%% remove values later than 2023
+idx_23 = SOCAT.month_since_1998 > 312;
 vars = fieldnames(SOCAT);
 for v = 1:length(vars)
-    SOCAT.(vars{v})(idx_22) = [];
+    SOCAT.(vars{v})(idx_23) = [];
 end
-clear idx_22
+clear idx_23
 
 %% Create 0.25 x 0.25 degree monthly grid
 SOCAT_grid.lon = [SOCAT_grid.lim.lonmin+0.125:0.25:SOCAT_grid.lim.lonmax]';
@@ -41,7 +41,7 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2022,12)';
+SOCAT_grid.year = repelem(1998:2023,12)';
 SOCAT_grid.month_of_year = repmat(1:12,1,25)';
 
 %% include mooring observations only
@@ -296,7 +296,7 @@ clear land c mycolormap
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_gridded_2022_moorings_only','SOCAT_grid','-v7.3');
+save('Data/socat_gridded_2023_moorings_only','SOCAT_grid','-v7.3');
 
 %% clean up
 clear SOCAT_grid

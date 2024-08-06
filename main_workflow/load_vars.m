@@ -1,9 +1,8 @@
 % Load Variables
 % 
-% This script loads satellite and reanalysis variables for five US large
-% Marine Ecosystems (Alaska, California Current, Insular Pacific / Hawaii,
-% Gulf of Mexico / Caribbean, and US East Coast) and regrids them in
-% preparation for clustering and machine learning algorithm fits.
+% This script loads satellite and reanalysis variables for eleven US large
+% Marine Ecosystems and regrids them in preparation for clustering and
+% machine learning algorithm fits.
 % 
 % Written by J.D. Sharp: 8/19/22
 % Last updated by J.D. Sharp: 11/30/22

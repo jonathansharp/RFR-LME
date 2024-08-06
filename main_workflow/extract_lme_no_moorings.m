@@ -2,10 +2,10 @@
 % 
 % This script grids observations of fCO2 and ancillary variables from
 % eleven US large Marine Ecosystems assembled via extractions from
-% SOCATv2023 defined by latitude and longitude bounds.
+% SOCATv2024 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/23
-% Last updated by J.D. Sharp: 7/26/23
+% Last updated by J.D. Sharp: 7/5/24
 % 
 
 %% this script defines the bounds of the eighteen LMEs
@@ -15,7 +15,7 @@ define_regions_eiwg
 for n = 1:length(region)
 
     %% load SOCAT grid
-    load('Data/socat_gridded_2022_no_moorings','SOCAT_grid');
+    load('Data/socat_gridded_2023_no_moorings','SOCAT_grid');
 
     %% display status
     disp(['Extracting ' region{n} ' LME from SOCAT grid']);

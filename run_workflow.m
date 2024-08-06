@@ -10,7 +10,7 @@ addpath(genpath(pwd));
 define_regions_eiwg
 
 % this script loads SOCAT fCO2 and ancillary data surrounding North
-% America extracted from the SOCATv2022 database
+% America extracted from the SOCATv2024 database
 load_socat
 
 % this script grids fCO2 observations from the SOCAT database into grid

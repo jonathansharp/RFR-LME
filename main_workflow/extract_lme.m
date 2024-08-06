@@ -3,10 +3,10 @@
 % This script grids observations of fCO2 and ancillary variables from five
 % US large Marine Ecosystems (Alaska, California Current, Insular Pacific /
 % Hawaii, Gulf of Mexico / Caribbean, and US East Coast) assembled via
-% extractions from SOCATv2022 defined by latitude and longitude bounds.
+% extractions from SOCATv2024 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/22
-% Last updated by J.D. Sharp: 5/15/22
+% Last updated by J.D. Sharp: 7/5/24
 % 
 
 %% this script defines the bounds of the eleven LMEs
@@ -16,7 +16,7 @@ define_regions_eiwg
 for n = 1:length(region)
 
     %% load SOCAT grid
-    load('Data/socat_gridded_2022','SOCAT_grid');
+    load('Data/socat_gridded_2023','SOCAT_grid');
 
     %% display status
     disp(['Extracting ' region{n} ' LME from SOCAT grid']);

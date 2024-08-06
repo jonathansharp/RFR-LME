@@ -1,6 +1,6 @@
 % Load Variables
 % 
-% This script loads satellite and reanalysis variables for 18 US large
+% This script loads satellite and reanalysis variables for 11 US large
 % Marine Ecosystems and regrids them in preparation for clustering and
 % machine learning algorithm fits.
 % 
