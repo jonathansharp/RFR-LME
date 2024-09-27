@@ -1,18 +1,41 @@
 % import SSS
-function data = import_SSS(dpath,type,lat,lon,time)
+function data_interp = import_SSS(dpath,vrs,type,lat,lon,time,varargin)
+
+% process optional inputs
+plot_option = 0;
+for i = 1:2:length(varargin)
+    if strcmp(varargin{i},'plot_option')
+        plot_option = varargin{i+1};
+    end
+end
 
 % Import based on "type"
 if strcmp(type,'GLORYS')
-    data = import_SSS_GLORYS(type,dpath,lat,lon,time);
+    data_interp = import_SSS_GLORYS(dpath,lat,lon,time);
 elseif strcmp(type,'BASS')
-    data = import_SSS_BASS(type,dpath,lat,lon,time);
+    data_interp = import_SSS_BASS(dpath,lat,lon,time);
 else
     error('Input variable "type" must be "GLORYS" or "BASS"');
 end
 
+% create sst animation
+if plot_option == 1
+    create_animation('SSS',type,time,lat,lon,data_interp,cmocean('haline'),[33 37],'Salinity','');
+    create_animation('SSS_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Salinity Anomaly','');
+    if strcmp(type,'BASS')
+        % create_animation('uSSS',time,lat,lon,data_uncer_interp,cmocean('haline'),[33 37],'Salinity');
+    end
+end
 
-% embedded function to import BASS GLORYS
-function data = import_SSS_GLORYS(type,dpath,lat,lon,time)
+% save data file
+ncsave_3d(['Data/SSS_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+    {'lat' lat 'latitude' 'degrees north'},{'time' time 'time' 'days since 1950-1-1'},...
+    {'SSS' data_interp 'sea surface salinity' ''});
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% embedded function to import GLORYS SSS
+function data_interp = import_SSS_GLORYS(dpath,lat,lon,time)
     % files obtained with the copernicusmarine python toolbox:
     %     > cd dpath/CMEMS
     %     > conda activate copernicusmarine
@@ -87,7 +110,7 @@ end
 
 
 % embedded function to import BASS SSS
-function data = import_SSS_BASS(type,dpath,lat,lon,time)
+function data_interp = import_SSS_BASS(dpath,lat,lon,time)
 
     % obtain BASS file and NODC climatology file
     url = 'https://ftp.cpc.ncep.noaa.gov/precip/BASS/';
@@ -165,52 +188,6 @@ function data = import_SSS_BASS(type,dpath,lat,lon,time)
     %     data_uncer_interp(:,:,t) = griddata(data_lon_grid,...
     %         data_lat_grid,data_uncer(:,:,t)',lon_grid,lat_grid);
     % end
-
-end
-
-% create sst animation
-create_animation(time,lat,lon,data_interp,cmocean('haline'),[33 37],'Salinity');
-% create_animation(time,lat,lon,data_uncer_interp,cmocean('haline'),[33 37],'Salinity');
-
-% save data file
-save(['Data/SSS_' type '_' vrs],'data_interp');
-
-% embedded function to create animations
-function create_animation(time,lat,lon,z,cmap,colorlims,colorlabel)
-
-    % establish figure
-    f = figure; set(f,'color','w','visible','off');
-
-    % loop through months and plot each one
-    for m = 1:length(time)
-        m_proj('Robinson','lat',[min(lat) max(lat)],'lon',[min(lon) max(lon)]);
-        m_pcolor(lon-0.5,lat-0.5,z(:,:,m))
-        title(gca,extractAfter(datestr(time(m)),'-'));
-        colormap(cmap);
-        m_coast('patch',[0.7 0.7 0.7]);
-        m_grid('linestyle','-','xticklabels',[],'yticklabels',[],'ytick',-90:30:90);
-        clim(colorlims);
-        c=colorbar;
-        c.Limits = colorlims;
-        c.Label.String = colorlabel;
-        c.TickLength = 0;
-        % save frame
-        if ~isfolder('Figures/SSS/Monthly'); mkdir('Figures/SSS/Monthly'); end
-        exportgraphics(f,['Figures/SSS/Monthly/m' num2str(m) '_' strrep(colorlabel,' ','_') '.png']);
-        % capture frame
-        frame = getframe(f);
-        im = frame2im(frame);
-        [imind,cm] = rgb2ind(im,256);
-        % write to file
-        if m == 1
-            imwrite(imind,cm,['Figures/SSS/' strrep(colorlabel,' ','_') '_Animation.gif'],...
-                'gif','Loopcount',inf,'DelayTime',0.1);
-        else
-            imwrite(imind,cm,['Figures/SSS/' strrep(colorlabel,' ','_') '_Animation.gif'],...
-                'gif','WriteMode','append','DelayTime',0.1);
-        end
-        clf; % clear frame
-    end
 
 end
 
