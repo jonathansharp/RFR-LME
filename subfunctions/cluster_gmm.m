@@ -18,7 +18,8 @@ silhouette(X_norm,clusters); hold on
 yL = ylim;
 plot([mean(sil) mean(sil)],[yL(1) yL(2)],'k--','linewidth',2);
 title([reg ', Clusters = ' num2str(num_groups)]);
-exportgraphics(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'])
+% exportgraphics(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'])
+export_fig(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'],'-transparent')
 close
 
 % Fill group grids

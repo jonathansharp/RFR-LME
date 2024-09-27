@@ -4,7 +4,8 @@
 % Last updated by J.D. Sharp: 1/18/23
 % 
 
-function plot_regional_gif(lim,lat,lon,z,clrmp,varname,lab,year,month_of_year,reg,shape)
+function plot_regional_gif(lim,lat,lon,z,clrmp,varname,lab,year,...
+    month_of_year,reg,shape)
 
 % initialize figure
 h=figure('visible','off');
@@ -13,10 +14,10 @@ box on; hold on;
 % determine mean and limits
 zmean = mean(z,3,'omitnan');
 if ~contains(varname,'_var') && ~startsWith(varname,'u')
-    zmax = mean(zmean(:),'omitnan')+3.*std(zmean(:),[],'omitnan');
-    zmin = mean(zmean(:),'omitnan')-3.*std(zmean(:),[],'omitnan');
+    zmax = mean(zmean(:),'omitnan')+2.*std(zmean(:),[],'omitnan');
+    zmin = mean(zmean(:),'omitnan')-2.*std(zmean(:),[],'omitnan');
 else
-    zmax = mean(zmean(:),'omitnan')+5.*std(zmean(:),[],'omitnan');
+    zmax = mean(zmean(:),'omitnan')+4.*std(zmean(:),[],'omitnan');
     zmin = 0;
 end
 % colorbar properties
@@ -30,11 +31,12 @@ cbarrow;
 filename = ['Figures/' reg '_' varname '_monthly.gif'];
 f=1;
 % loop through months
-for m = 1:288
+for m = 1:length(month_of_year)
     % initialize axis
     worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
     % plot
-    p=pcolorm(lat,lon,z(:,:,m)');
+    %pcolorm(lat,lon,z(:,:,m)');
+    contourfm(lat,lon,z(:,:,m)',zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
     % plot land
     plot_land('map');
     % plot border

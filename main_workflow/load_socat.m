@@ -15,7 +15,7 @@ disp('Downloading SOCAT Data');
 % this is obtained by running 'Read_SOCATv2019_v2024.m' in the SOCATv2024
 % subfolder with the latitude limits of -18 to 82 degrees north and the
 % longitude limits of 140 to 302 degrees east
-load('data_to_use/SOCATv2023_USA.mat');
+load('data_to_use/SOCATv2024_USA.mat');
 
 %% assemble data into a structure
 SOCAT.expocode = Expocode;
@@ -33,7 +33,7 @@ SOCAT.year = yr;
 SOCAT.dist_to_land = dist_to_land;
 SOCAT.fCO2 = fCO2rec;
 SOCAT.fCO2_flag = fCO2rec_flag;
-SOCAT.fCO2_src = fCO2rec_src;
+% SOCAT.fCO2_src = fCO2rec_src;
 SOCAT.flag = QC_Flag;
 % clean up
 clearvars -except SOCAT SOCAT_grid region n map_idx gif_idx lme_* 

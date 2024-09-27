@@ -22,7 +22,8 @@ for n = 1:length(region)
     c.Ticks = 1:levs;
     % save figure
     if ~isfolder('Figures'); mkdir('Figures'); end
-    exportgraphics(gcf,['Figures/' region{n} '_Clusts_gmm_var_' num2str(levs) '.png']);
+    % exportgraphics(gcf,['Figures/' region{n} '_Clusts_gmm_var_' num2str(levs) '.png']);
+    export_fig(gcf,['Figures/' region{n} '_Clusts_gmm_var_' num2str(levs) '.png'],'-transparent');
     close all
 end
 % clean up

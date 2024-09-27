@@ -28,7 +28,7 @@ trends_table = nan(length(region),length(var_type)*2);
 amp_table = nan(length(region),length(var_type));
 
 % loop through each region
-for n = 1:length(region)
+for n = 6%1:length(region)
 
     for var_num = 1:length(var_type)
 
@@ -207,107 +207,107 @@ for n = 1:length(region)
         ann_anom(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).var_dom_mean_ann_anom;
         u_ann(:,(n-1)*length(var_type)+var_num) = OAI_grid.(region{n}).u_var_dom_mean_ann;
 
-%         %% plot time series
-%         % initialize figure
-%         figure('Visible','on'); hold on;
-%         set(gcf,'position',[10 10 900 400]);
-%         set(gca,'FontSize',12);
-%         % plot
-%         plot(time,OAI_grid.(region{n}).var_dom_mean,'k-','linewidth',1);
-%         plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'r-','linewidth',3);
-%         fill([time;flipud(time)],[OAI_grid.(region{n}).var_dom_mean+OAI_grid.(region{n}).u_var_dom_mean;...
-%             flipud(OAI_grid.(region{n}).var_dom_mean-OAI_grid.(region{n}).u_var_dom_mean)],'k',...
-%             'FaceAlpha',0.2,'LineStyle','none');
+        %% plot time series
+        % initialize figure
+        figure('Visible','on'); hold on;
+        set(gcf,'position',[10 10 900 400]);
+        set(gca,'FontSize',12);
+        % plot
+        plot(time,OAI_grid.(region{n}).var_dom_mean,'k-','linewidth',1);
+        plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'r-','linewidth',3);
+        fill([time;flipud(time)],[OAI_grid.(region{n}).var_dom_mean+OAI_grid.(region{n}).u_var_dom_mean;...
+            flipud(OAI_grid.(region{n}).var_dom_mean-OAI_grid.(region{n}).u_var_dom_mean)],'k',...
+            'FaceAlpha',0.2,'LineStyle','none');
+        fill([time_ann;flipud(time_ann)],[OAI_grid.(region{n}).var_dom_mean_ann+OAI_grid.(region{n}).u_var_dom_mean_ann;...
+            flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'k',...
+            'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
 %         fill([time_ann;flipud(time_ann)],[OAI_grid.(region{n}).var_dom_mean_ann+OAI_grid.(region{n}).u_var_dom_mean_ann;...
-%             flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'k',...
-%             'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
-% %         fill([time_ann;flipud(time_ann)],[OAI_grid.(region{n}).var_dom_mean_ann+OAI_grid.(region{n}).u_var_dom_mean_ann;...
-% %             flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'r',...
-% %             'FaceAlpha',0.2,'LineStyle','none');
-%         scatter(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,200,'k.');
-%         datetick('x');
-%         xlim([datenum([1998 1 1]) datenum([2023 1 1])]);   
-%         % plot means
-%         plot([time(1) time(end)],[mean_lt mean_lt],'k--','linewidth',2);
-%         % plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
-%         % add text to plot
-%         title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean,'omitnan'),rounder(var_num))) ...
-%             ' ' units{var_num} ' | Tr. = ' num2str(round(tr,tr_rounder(var_num))) ...
-%             ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
-%             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
-%             'FontSize',15,'HorizontalAlignment','center');
-%         xL = xlim; yL = ylim;
-%         % Plot percent of region
-%         if var_num == 2
-%             axes('position',[.7 .15 .2 .2]);
+%             flipud(OAI_grid.(region{n}).var_dom_mean_ann-OAI_grid.(region{n}).u_var_dom_mean_ann)],'r',...
+%             'FaceAlpha',0.2,'LineStyle','none');
+        scatter(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,200,'k.');
+        datetick('x');
+        xlim([datenum([1998 1 1]) datenum([2023 1 1])]);   
+        % plot means
+        plot([time(1) time(end)],[mean_lt mean_lt],'k--','linewidth',2);
+        % plot([time(end-12*5) time(end)],[mean5 mean5],'k--','linewidth',2);
+        % add text to plot
+        title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean,'omitnan'),rounder(var_num))) ...
+            ' ' units{var_num} ' | Tr. = ' num2str(round(tr,tr_rounder(var_num))) ...
+            ' ' units{var_num} ' yr^{-1} | Amp. = ' ...
+            num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
+            'FontSize',15,'HorizontalAlignment','center');
+        xL = xlim; yL = ylim;
+        % Plot percent of region
+        if var_num == 2
+            axes('position',[.7 .15 .2 .2]);
+        else
+            axes('position',[.7 .7 .2 .2]);
+        end
+        hold on; box on;
+        plot(1:12,region_percent,'LineWidth',2);
+        ylim([-35 135]); xlim([-1.5 13]);
+        xticks([]); yticks([]);
+        text(7,120,'Percent of Region','FontWeight','bold','HorizontalAlignment','center');
+        text(1:12,repmat(-17,1,12),{'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'},'HorizontalAlignment','center')
+        text([-.3 -.3 -.3],[0 50 100],{'0' '50' '100'},'HorizontalAlignment','center','VerticalAlignment','middle');
+        % Add recent trend indicator
+%         if pos_signif_5
+%             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
+%         elseif neg_signif_5
+%             text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
 %         else
-%             axes('position',[.7 .7 .2 .2]);
+%             text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
 %         end
-%         hold on; box on;
-%         plot(1:12,region_percent,'LineWidth',2);
-%         ylim([-35 135]); xlim([-1.5 13]);
-%         xticks([]); yticks([]);
-%         text(7,120,'Percent of Region','FontWeight','bold','HorizontalAlignment','center');
-%         text(1:12,repmat(-17,1,12),{'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'},'HorizontalAlignment','center')
-%         text([-.3 -.3 -.3],[0 50 100],{'0' '50' '100'},'HorizontalAlignment','center','VerticalAlignment','middle');
-%         % Add recent trend indicator
-% %         if pos_signif_5
-% %             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
-% %         elseif neg_signif_5
-% %             text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
-% %         else
-% %             text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
-% %         end
-%         % Add recent mean indicator
-% %         if pos_mean
-% %             text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
-% %         elseif neg_mean
-% %             text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
-% %         else
-% %             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
-% %         end
-%         % save figure
-%         exportgraphics(gcf,['Figures/' region{n} '_time_series_' var_type{var_num} '.png']);
-%         close
-% 
-%         %% plot climatology
-%         % initialize figure
-%         figure('Visible','on'); hold on;
-%         set(gcf,'position',[10 10 700 400]);
-%         % plot
-%         plot(1:12,clim,'k-','linewidth',3);
-%         fill([1:12,fliplr(1:12)]',[clim+clim_uncer;...
-%             flipud(clim-clim_uncer)],'k',...
-%             'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
-%         scatter(1:12,clim,200,'k.');
-%         xlim([0.5 12.5]);
-%         xticks(1:12);
-%         xticklabels({'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'})
-%         % add text to plot
-%         title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean),rounder(var_num))) ...
-%             ' ' units{var_num} ' | Amp. = ' ...
-%             num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
-%             'FontSize',10,'HorizontalAlignment','center');
-%         % Add recent trend indicator
-% %         if pos_signif_5
-% %             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
-% %         elseif neg_signif_5
-% %             text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
-% %         else
-% %             text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
-% %         end
-%         % Add recent mean indicator
-% %         if pos_mean
-% %             text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
-% %         elseif neg_mean
-% %             text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
-% %         else
-% %             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
-% %         end
-%         % save figure
-%         exportgraphics(gcf,['Figures/' region{n} '_climatology_' var_type{var_num} '.png']);
-%         close
-% 
+        % Add recent mean indicator
+%         if pos_mean
+%             text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         elseif neg_mean
+%             text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         else
+%             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         end
+        % save figure
+        exportgraphics(gcf,['Figures/' region{n} '_time_series_' var_type{var_num} '.png']);
+        close
+
+        %% plot climatology
+        % initialize figure
+        figure('Visible','on'); hold on;
+        set(gcf,'position',[10 10 700 400]);
+        % plot
+        plot(1:12,clim,'k-','linewidth',3);
+        fill([1:12,fliplr(1:12)]',[clim+clim_uncer;...
+            flipud(clim-clim_uncer)],'k',...
+            'FaceColor','r','FaceAlpha',0.2,'LineStyle','none');
+        scatter(1:12,clim,200,'k.');
+        xlim([0.5 12.5]);
+        xticks(1:12);
+        xticklabels({'J' 'F' 'M' 'A' 'M' 'J' 'J' 'A' 'S' 'O' 'N' 'D'})
+        % add text to plot
+        title([reg_lab{n} ' | \mu = ' num2str(round(mean(OAI_grid.(region{n}).var_dom_mean),rounder(var_num))) ...
+            ' ' units{var_num} ' | Amp. = ' ...
+            num2str(round(amp,rounder(var_num))) ' ' units{var_num}],...
+            'FontSize',10,'HorizontalAlignment','center');
+        % Add recent trend indicator
+%         if pos_signif_5
+%             text(xL(2),yL(2),'up','HorizontalAlignment','right','VerticalAlignment','top');
+%         elseif neg_signif_5
+%             text(xL(2),yL(2),'down','HorizontalAlignment','right','VerticalAlignment','top');
+%         else
+%             text(xL(2),yL(2),'steady','HorizontalAlignment','right','VerticalAlignment','top');
+%         end
+        % Add recent mean indicator
+%         if pos_mean
+%             text(xL(2),yL(1),'+','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         elseif neg_mean
+%             text(xL(2),yL(1),'-','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         else
+%             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
+%         end
+        % save figure
+        exportgraphics(gcf,['Figures/' region{n} '_climatology_' var_type{var_num} '.png']);
+        close
+
         %% save LME-specific indicator time series
         if ~exist(['IndsAndStats/' region{n}],'dir')
             mkdir(['IndsAndStats/' region{n}]);

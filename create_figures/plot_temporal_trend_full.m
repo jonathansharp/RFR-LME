@@ -7,15 +7,21 @@
 function plot_temporal_trend_full(zmin,zmax,clrmp,varname,lab,region,lme_shape,lme_idx)
 
 % initialize figure
-worldmap([-18 82],[140 302]); box on; hold on;
+figure('visible','off'); box on; hold on;
+worldmap([-18 82],[140 302]);
 setm(gca,'MapProjection','robinson','MLabelParallel','south');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
-c=colorbar('location','southoutside');
-clim([zmin zmax]);
+c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
+caxis([zmin zmax]);
 colormap(cmocean('balance','pivot',0));
+c.FontSize = 10;
+c.FontWeight = 'bold';
 c.TickLength = 0;
+if varname == 'pH'
+    c.TickLabels = {'-2' '-1' '0' '1' '2'};
+end
 c.Label.String = lab;
 cbarrow;
 % plot regions

@@ -7,7 +7,7 @@ load('Data/socat_gridded_2022','SOCAT_grid');
 figure('visible','on'); box on; hold on;
 % title('DJF');
 worldmap([-18 82],[140 302]);
-setm(gca,'MapProjection','robinson','MLabelParallel','south');
+setm(gca,'MapProjection','robinson','MLabelParallel','south','ffacecolor','w');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
@@ -39,7 +39,7 @@ plot_land('map');
 %mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,'Figures/full/fCO2_obs.png');
+export_fig(gcf,'Figures/full/fCO2_obs.png','-transparent');
 close
 % clean up
 clear

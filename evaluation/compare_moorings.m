@@ -328,10 +328,11 @@ datasets = {'US_LME_RFR' 'US_LME_RFR_NM' 'CMEMS_LSCE' 'NIES_FNN' ...
     'MPI_SOMFFN' 'JENA_MLS' 'CSIR_ML6' 'JMA_MLR'};
 for m = 1:length(moor_nums)
     % create plot
-    f=figure; hold on;
+    f=figure('visible','off'); hold on;
+    set(gca,'fontsize',14);
     f.Position(3) = 2*f.Position(3);
     title([num2str(mooring.(moor_nums{m}).US_LME_RFR_lat) char(176) 'N, ' ...
-        num2str(mooring.(moor_nums{m}).US_LME_RFR_lon) char(176) 'E']);
+        num2str(mooring.(moor_nums{m}).US_LME_RFR_lon) char(176) 'E'],'fontweight','bold');
     p.p1=plot(mooring.(moor_nums{m}).US_LME_RFR_datetime,...
         mooring.(moor_nums{m}).US_LME_RFR_pCO2_full,...
         '-','color',clrs(1,:),'linewidth',2);
@@ -350,7 +351,7 @@ for m = 1:length(moor_nums)
     % add figure properties
     xlim([min(mooring.(moor_nums{m}).US_LME_RFR_datetime) ...
         max(mooring.(moor_nums{m}).US_LME_RFR_datetime)]);
-    ylabel('{\itp}CO_{2} (\muatm)');
+    ylabel('{\itp}CO_{2} (\muatm)','fontsize',16);
     datetick('x','yyyy','keeplimits');
     if mooring.(moor_nums{m}).lat == 59.875
         ylim([150 500]);
@@ -360,7 +361,8 @@ for m = 1:length(moor_nums)
         'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
         'Location','northwest','NumColumns',4);
     % export figure
-    exportgraphics(gcf,['Figures/moorings/m' moor_nums{m} '.png']);
+    % exportgraphics(gcf,['Figures/moorings/m' moor_nums{m} '.png']);
+    export_fig(gcf,['Figures/moorings/m' moor_nums{m} '.png'],'-transparent');
     close
 end
 
@@ -544,7 +546,8 @@ for m = 1:length(moor_nums)
         'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
         'Location','northwest','NumColumns',4);
     % export figure
-    exportgraphics(gcf,['Figures/moorings/m' moor_nums{m} '_resid.png']);
+    % exportgraphics(gcf,['Figures/moorings/m' moor_nums{m} '_resid.png']);
+    export_fig(gcf,['Figures/moorings/m' moor_nums{m} '_resid.png'],'-transparent');
     close
 end
 
@@ -591,7 +594,8 @@ yline(0);
 ylim([-0.5 1]);
 ylabel('{\itp}CO_{2} Residual Correlation');
 % export plots
-exportgraphics(gcf,'Figures/boxplots_moorings.png');
+% exportgraphics(gcf,'Figures/boxplots_moorings.png');
+export_fig(gcf,'Figures/boxplots_moorings.png','-transparent');
 close;
 
 %% plot box and whisker figure
@@ -605,7 +609,8 @@ set(h,'linew',1.5);
 yline(0);
 ylim([-100 100]);
 ylabel('Median \Delta{\itp}CO_{2} (\muatm)');
-exportgraphics(gcf,['Figures/median_boxplot_moorings.png']);
+% exportgraphics(gcf,['Figures/median_boxplot_moorings.png']);
+export_fig(gcf,['Figures/median_boxplot_moorings.png'],'-transparent');
 close;
 % mean errors
 h=boxplot(mean_err(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
@@ -615,7 +620,8 @@ set(h,'linew',1.5);
 yline(0);
 ylim([-100 100]);
 ylabel('Mean \Delta{\itp}CO_{2} (\muatm)');
-exportgraphics(gcf,['Figures/mean_boxplot_moorings.png']);
+% exportgraphics(gcf,['Figures/mean_boxplot_moorings.png']);
+export_fig(gcf,['Figures/mean_boxplot_moorings.png'],'-transparent');
 close;
 % RMSE errors
 figure;
@@ -624,8 +630,9 @@ h=boxplot(rmse_err(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
     'BoxStyle','outline','Symbol','.k','Colors','k');
 set(h,'linew',1.5);
 ylim([0 140]);
-ylabel('{\itp}CO_{2} RMSD (\muatm)');
-exportgraphics(gcf,['Figures/rmse_boxplot_moorings.png']);
+ylabel('\Delta{\itp}CO_{2} RMSD (\muatm)');
+% exportgraphics(gcf,['Figures/rmse_boxplot_moorings.png']);
+export_fig(gcf,['Figures/rmse_boxplot_moorings.png'],'-transparent');
 close;
 % stdev errors
 figure;
@@ -635,17 +642,19 @@ h=boxplot(std_err(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
 set(h,'linew',1.5);
 ylim([0 140]);
 ylabel('{\itp}CO_{2} StDev (\muatm)');
-exportgraphics(gcf,['Figures/std_boxplot_moorings.png']);
+% exportgraphics(gcf,['Figures/std_boxplot_moorings.png']);
+export_fig(gcf,['Figures/std_boxplot_moorings.png'],'-transparent');
 close;
 % IQR errors
-figure;
+figure; set(gcf,'Position',[100 100 700 600]);
 h=boxplot(iqr_err(:,idx)',{'RFR-LME' 'RFR-LME-NM' 'CMEMS-LSCE' ...
     'NIES-FNN' 'MPI-SOMFFN' 'JENA-MLS' 'CSIR-ML6' 'JMA-MLR'},...
     'BoxStyle','outline','Symbol','.k','Colors','k');
 set(h,'linew',1.5);
 ylim([0 140]);
 ylabel('\Delta{\itp}CO_{2} IQR (\muatm)');
-exportgraphics(gcf,['Figures/iqr_boxplot_moorings.png']);
+% exportgraphics(gcf,['Figures/iqr_boxplot_moorings.png']);
+export_fig(gcf,['Figures/iqr_boxplot_moorings.png'],'-transparent');
 close;
 % residual correlation errors
 figure;
@@ -656,7 +665,8 @@ set(h,'linew',1.5);
 yline(0);
 ylim([-0.5 1]);
 ylabel('{\itp}CO_{2} Residual Correlation');
-exportgraphics(gcf,['Figures/resid_corr_boxplot_moorings.png']);
+% exportgraphics(gcf,['Figures/resid_corr_boxplot_moorings.png']);
+export_fig(gcf,['Figures/resid_corr_boxplot_moorings.png'],'-transparent');
 close;
 % amplitude difference errors
 figure;
@@ -667,7 +677,8 @@ set(h,'linew',1.5);
 yline(0);
 ylim([-20 130]);
 ylabel('\Delta {\itp}CO_{2} Amplitude (\muatm)');
-exportgraphics(gcf,['Figures/amp_diff_boxplot_moorings.png']);
+% exportgraphics(gcf,['Figures/amp_diff_boxplot_moorings.png']);
+export_fig(gcf,['Figures/amp_diff_boxplot_moorings.png'],'-transparent');
 close;
 
 %% plot mean map with moorings
@@ -704,7 +715,8 @@ for m = 1:length(moor_nums)
 end
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,['Figures/full/pCO2_with_moorings.png']);
+% exportgraphics(gcf,['Figures/full/pCO2_with_moorings.png']);
+export_fig(gcf,['Figures/full/pCO2_with_moorings.png'],'-transparent');
 close
 
 %% plot trend map with moorings
@@ -757,7 +769,8 @@ for m = 1:length(moor_nums)
 end
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,['Figures/full/pCO2_tr_with_moorings.png']);
+% exportgraphics(gcf,['Figures/full/pCO2_tr_with_moorings.png']);
+export_fig(gcf,['Figures/full/pCO2_tr_with_moorings.png'],'-transparent');
 close
 
 %% caluclate climatologies

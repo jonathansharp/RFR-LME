@@ -9,13 +9,13 @@ function plot_temporal_mean_full(zmin,zmax,clrmp,varname,lab,region,lme_shape,lm
 % initialize figure
 figure('visible','off'); box on; hold on;
 worldmap([-18 82],[140 302]);
-setm(gca,'MapProjection','robinson','MLabelParallel','south');
+setm(gca,'MapProjection','robinson','MLabelParallel','south','ffacecolor','w');
 set(gcf,'position',[100 100 900 600]);
 set(gca,'fontsize',16);
 % figure properties
 c=colorbar('location','south','Position',[0.45 0.2 0.3 0.025]);
-colormap(clrmp);
 caxis([zmin zmax]);
+colormap(clrmp);
 c.FontSize = 10;
 c.FontWeight = 'bold';
 c.TickLength = 0;
@@ -52,5 +52,6 @@ plot_land('map');
 %mlabel off
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end
-exportgraphics(gcf,['Figures/full/' varname '.png']);
+% exportgraphics(gcf,['Figures/full/' varname '.png']);
+export_fig(gcf,['Figures/full/' varname '.png'],'-transparent');
 close
