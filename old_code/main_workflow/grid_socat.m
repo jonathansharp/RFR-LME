@@ -42,7 +42,7 @@ SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
 SOCAT_grid.year = repelem(1998:2023,12)';
-SOCAT_grid.month_of_year = repmat(1:12,1,25)';
+SOCAT_grid.month_of_year = repmat(1:12,1,26)';
 
 %% Determine bin number of each data point
 [~,~,Xnum] = histcounts(SOCAT.longitude,...

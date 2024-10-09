@@ -1,5 +1,5 @@
 % Import CMEMS SSH
-function SSH = import_SSH_CMEMS(lat,lon,ocean_mask,path)
+function SSH = import_SSH_CMEMS(lat,lon,month,ocean_mask,path)
 
 load([path '/data_to_use/CMEMS_SSH.mat'],'CMEMS_SSH');
 
@@ -15,19 +15,19 @@ CMEMS_SSH.latitude = CMEMS_SSH.latitude(lonidx,latidx,:);
 CMEMS_SSH.longitude = CMEMS_SSH.longitude(lonidx,latidx,:);
 
 % Interpolate over some gaps in SSH dataset
-for t = 1:length(CMEMS_SSH.year_mon)
-    % use climatology for 2022
-%     if t <= 288
-%         t_tmp=t;
-%     else
-%         t_tmp=t-288:12:t-12;
-%     end
+for t = 1:length(month)
+    % use climatology for 2023
+    if t <= 300
+        t_tmp=t;
+    else
+        t_tmp=t-300:12:t-12;
+    end
     % Index where ocean mask and SSH are both true
-    idx = ~isnan(mean(CMEMS_SSH.sla_mon(:,:,t),3,'omitnan')) & ocean_mask;
+    idx = ~isnan(mean(CMEMS_SSH.sla_mon(:,:,t_tmp),3,'omitnan')) & ocean_mask;
     % Get teporary lat, lon, SSH
     lon_tmp = repmat(lon,1,length(lat));
     lat_tmp = repmat(lat',length(lon),1);
-    ssh_tmp = mean(CMEMS_SSH.sla_mon(:,:,t),3,'omitnan');
+    ssh_tmp = mean(CMEMS_SSH.sla_mon(:,:,t_tmp),3,'omitnan');
     % Create interpolant over than range
     interp = scatteredInterpolant(lon_tmp(idx),lat_tmp(idx),ssh_tmp(idx));
     % Index where SSH is nan

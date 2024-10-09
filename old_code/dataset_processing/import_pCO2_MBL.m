@@ -42,14 +42,14 @@ for m = 1:size(MBL.year_mon,2)
     xCO2_atm(:,m) = interp1(MBL.lat,MBL.CO2_mon(:,m),lat);
 end
 
-% % Extend to 2021 using linear interpolation for each month
-% for m = 1:12 % for each month
-%     for l = 1:size(xCO2_atm,1) % for each latitude
-%         xCO2_atm(l,m+size(MBL.year_mon,2)) = ...
-%             interp1(MBL.year_mon(1,m:12:size(MBL.year_mon,2)),...
-%             xCO2_atm(l,m:12:size(MBL.year_mon,2)),(m-1)/12+2021,'linear','extrap');
-%     end
-% end
+% Extend to 2023 using linear interpolation for each month
+for m = 1:12 % for each month
+    for l = 1:size(xCO2_atm,1) % for each latitude
+        xCO2_atm(l,m+size(MBL.year_mon,2)) = ...
+            interp1(MBL.year_mon(1,m:12:size(MBL.year_mon,2)),...
+            xCO2_atm(l,m:12:size(MBL.year_mon,2)),(m-1)/12+2023,'linear','extrap');
+    end
+end
 
 % Replicate across longitudes
 xCO2_atm = repmat(permute(xCO2_atm,[3 1 2]),length(lon),1,1);

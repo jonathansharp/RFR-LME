@@ -98,7 +98,7 @@ for var_num = 1:length(var_type)
         p1=plot(time,OAI_grid.(region{n}).var_dom_mean,'r','linewidth',0.5);
         p2=plot(time_ann,OAI_grid.(region{n}).var_dom_mean_ann,'k','linewidth',1);
         datetick('x');
-        xlim([datenum([1998 1 1]) datenum([2022 1 1])]);
+        xlim([datenum([1998 1 1]) datenum([2023 1 1])]);
         ylim(y_span(var_num,:));
     
         % calculate trend

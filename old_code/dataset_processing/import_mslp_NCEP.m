@@ -20,7 +20,7 @@ for t = 1:length(month)
 end
 
 % Convert Pascals to Atmospheres
-mslp = mslp./101325;
+mslp = mslp./1013.25;
 
 % Remove values outside of ocean mask
 for t = 1:length(month)

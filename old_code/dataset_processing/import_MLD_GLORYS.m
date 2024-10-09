@@ -26,10 +26,16 @@ Mixed_Layer = nan(length(lon),length(lat),length(month));
 
 % Interpolate onto quarter degree grid
 for t = 1:length(month)
+    % use climatology for 2023
+    if t <= 300
+        t_tmp=t;
+    else
+        t_tmp=t-300:12:t-12;
+    end
     % Index where MLD is true
-    idx = ~isnan(mean(MLD.mld(:,:,t),3));
+    idx = ~isnan(mean(MLD.mld(:,:,t_tmp),3));
     % Get teporary MLD
-    mld_tmp = mean(MLD.mld(:,:,t),3);
+    mld_tmp = mean(MLD.mld(:,:,t_tmp),3);
     % Create interpolant over than range
     interp = scatteredInterpolant(MLD.latitude(idx),MLD.longitude(idx),mld_tmp(idx));
     % Fill grid with interpolated SSS

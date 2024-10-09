@@ -25,7 +25,10 @@ cbarrow;
 filename = ['Figures/full/' varname '_monthly.gif'];
 f=1;
 % loop through months
-for m = 1:300
+tmp = load(['Data/' region{1} '/gridded_pco2']);
+t = tmp.SOCAT_grid.(region{1}).dim.z;
+clear tmp
+for m = 1:t
     % initialize axis
     worldmap([-18 82],[140 302]);
     setm(gca,'MapProjection','robinson','MLabelParallel','south');
