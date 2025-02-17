@@ -4,10 +4,10 @@
 % mooring observation sites, obtained from SOCAT
 % 
 % Written by J.D. Sharp: 8/1/23
-% Last updated by J.D. Sharp: 8/31/23
+% Last updated by J.D. Sharp: 10/18/24
 
 %% Load gridded mooring observations
-load('Data/socat_gridded_2022_moorings_only','SOCAT_grid');
+load('Data/socat_gridded_2023_moorings_only','SOCAT_grid');
 % define mooring indices by grid cells that include data
 [a,b] = find(~isnan(mean(SOCAT_grid.fco2_ave_wtd,3,'omitnan')));
 
@@ -762,10 +762,7 @@ for m = 1:length(moor_nums)
         mooring.(moor_nums{m}).pCO2,mooring.(moor_nums{m}).time(1),2,[365/2 365]);
     mooring.(moor_nums{m}).trend = x(2)*365;
     scatterm(mooring.(moor_nums{m}).lat,mooring.(moor_nums{m}).lon,...
-        40,mooring.(moor_nums{m}).trend,'MarkerEdgeColor','k')
-%     scatterm(mooring.(moor_nums{m}).lat,mooring.(moor_nums{m}).lon,...
-%         40,mooring.(moor_nums{m}).trend,'filled',...
-%         'MarkerEdgeColor','k')
+        40,mooring.(moor_nums{m}).trend,'filled','MarkerEdgeColor','k');
 end
 % save figure
 if ~isfolder('Figures/full'); mkdir('Figures/full'); end

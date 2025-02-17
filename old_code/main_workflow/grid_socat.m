@@ -5,12 +5,18 @@
 % SOCATv2024 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/22
-% Last updated by J.D. Sharp: 7/5/24
+% Last updated by J.D. Sharp: 10/17/24
 % 
+
+%% include moorings?
+if include_moorings == 0; exts = '_no_moorings'; else; exts = ''; end
+
+%% moorings only?
+if moorings_only == 1; exts2 = '_moorings_only'; else; exts2 = ''; end
 
 %% load SOCAT structure
 if ~exist('SOCAT','var')
-    load('Data/socat_structure_2024','SOCAT');
+    load(['Data/socat_structure_' num2str(rfr_lme_year)],'SOCAT');
 end
 
 %% display status
@@ -24,8 +30,8 @@ SOCAT_grid.lim.lonmax = round(max(SOCAT.longitude),0);
 SOCAT_grid.lim.monthmin = 1;
 SOCAT_grid.lim.monthmax = 312;
 
-%% remove values later than 2023
-idx_23 = SOCAT.month_since_1998 > 312;
+%% remove values later than most recent year of RFR-LME
+idx_23 = SOCAT.month_since_1998 > (rfr_lme_year-1998)*12;
 vars = fieldnames(SOCAT);
 for v = 1:length(vars)
     SOCAT.(vars{v})(idx_23) = [];
@@ -41,8 +47,36 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2023,12)';
-SOCAT_grid.month_of_year = repmat(1:12,1,26)';
+SOCAT_grid.year = repelem(1998:rfr_lme_year-1,12)';
+SOCAT_grid.month_of_year = repmat(1:12,1,rfr_lme_year-1998)';
+
+%% exclude mooring observations
+if include_moorings == 0
+    plat = unique(SOCAT.expocode);
+    moor_idx = ~cellfun(@isempty,regexp(plat,'3164')); % this determines which expocodes are moorings
+    moor_idx = moor_idx | ~cellfun(@isempty,regexp(plat,'187F')); % adds something else...
+    test_plat = plat(moor_idx);
+    idx = ~ismember(SOCAT.expocode,test_plat);
+    vars = fieldnames(SOCAT);
+    for v = 1:length(vars)
+        SOCAT.(vars{v}) = SOCAT.(vars{v})(idx);
+    end
+    clear plat moor_idx test_plat idx vars v
+end
+
+%% include mooring observations only
+if moorings_only == 1
+    plat = unique(SOCAT.expocode);
+    moor_idx = ~cellfun(@isempty,regexp(plat,'3164')); % this determines which expocodes are moorings
+    moor_idx = moor_idx | ~cellfun(@isempty,regexp(plat,'187F')); % adds something else...
+    test_plat = plat(moor_idx);
+    idx = ismember(SOCAT.expocode,test_plat);
+    vars = fieldnames(SOCAT);
+    for v = 1:length(vars)
+        SOCAT.(vars{v}) = SOCAT.(vars{v})(idx);
+    end
+    clear plat moor_idx test_plat idx vars v
+end
 
 %% Determine bin number of each data point
 [~,~,Xnum] = histcounts(SOCAT.longitude,...
@@ -222,7 +256,7 @@ clear area_weights yf yr x m
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_gridded_2023','SOCAT_grid','-v7.3');
+save(['Data/socat_gridded_' num2str(rfr_lme_year-1) exts exts2],'SOCAT_grid','-v7.3');
 
 %% clean up
 clear SOCAT_grid

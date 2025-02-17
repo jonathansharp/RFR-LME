@@ -7,7 +7,7 @@
 % algorithm training.
 % 
 % Written by J.D. Sharp: 7/26/23
-% Last updated by J.D. Sharp: 7/26/23
+% Last updated by J.D. Sharp: 10/17/24
 % 
 
 %% this script defines the bounds of the eighteen LMEs

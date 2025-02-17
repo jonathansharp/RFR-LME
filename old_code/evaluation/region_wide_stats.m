@@ -1,6 +1,6 @@
 %% load US LME data
 % set date
-date = '08-May-2024';
+date = '09-Oct-2024';
 new = 1;
 % load indicators
 if new == 1
@@ -46,7 +46,7 @@ RFR_LME.RF = ncread(['Data/US_RFR_LME_Inds_' date '.nc'],'RF');
 end
 
 %% Load SOCAT grid
-load('Data/socat_gridded_2022','SOCAT_grid');
+load('Data/socat_gridded_2023','SOCAT_grid');
 
 %% define variables
 var_type_1 = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};

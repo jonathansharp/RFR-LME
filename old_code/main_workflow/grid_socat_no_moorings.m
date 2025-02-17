@@ -5,12 +5,12 @@
 % SOCATv2024 defined by latitude and longitude bounds.
 % 
 % Written by J.D. Sharp: 7/26/23
-% Last updated by J.D. Sharp: 7/5/24
+% Last updated by J.D. Sharp: 10/17/24
 % 
 
 %% load SOCAT structure
 if ~exist('SOCAT','var')
-    load('Data/socat_structure_2024','SOCAT');
+    load(['Data/socat_structure_' num2str(rfr_lme_year)],'SOCAT');
 end
 
 %% display status
@@ -25,7 +25,7 @@ SOCAT_grid.lim.monthmin = 1;
 SOCAT_grid.lim.monthmax = 312;
 
 %% remove values later than 2023
-idx_23 = SOCAT.month_since_1998 > 312;
+idx_23 = SOCAT.month_since_1998 > (rfr_lme_year-1998)*12;
 vars = fieldnames(SOCAT);
 for v = 1:length(vars)
     SOCAT.(vars{v})(idx_23) = [];
@@ -41,8 +41,8 @@ SOCAT_grid.month = [SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5]';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 %% Add time variables
-SOCAT_grid.year = repelem(1998:2023,12)';
-SOCAT_grid.month_of_year = repmat(1:12,1,25)';
+SOCAT_grid.year = repelem(1998:rfr_lme_year-1,12)';
+SOCAT_grid.month_of_year = repmat(1:12,1,rfr_lme_year-1998)';
 
 %% exclude mooring observations
 plat = unique(SOCAT.expocode);
@@ -234,7 +234,7 @@ clear area_weights yf yr x m
 
 %% Save gridded pco2 data
 if ~isfolder('Data'); mkdir('Data'); end
-save('Data/socat_gridded_2023_no_moorings','SOCAT_grid','-v7.3');
+save(['Data/socat_gridded_' num2str(rfr_lme_year-1) '_no_moorings'],'SOCAT_grid','-v7.3');
 
 %% clean up
 clear SOCAT_grid

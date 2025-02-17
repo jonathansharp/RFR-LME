@@ -18,7 +18,7 @@ for n = 1:length(region)
 
     %% load error statistics
     for en = 1:size(num_groups,2)
-        load(['Data/' region{n} '/us_lme_model_evals'],'Val');
+        load(['Data/' region{n} '/us_lme_model_evals' exts],'Val');
         Val_tmp.avg_err_rfr(en) = mean(Val.(region{n}).delta_rfr.all(:,end));
         Val_tmp.avg_abs_err_rfr(en) = mean(abs(Val.(region{n}).delta_rfr.all(:,end)));
         Val_tmp.med_err_rfr(en) = median(Val.(region{n}).delta_rfr.all(:,end));
@@ -44,4 +44,4 @@ for n = 1:length(region)
 end
 
 %% save table of error statistics
-writetable(error_stats,['IndsAndStats/ErrorStatistics-' date '.xls']);
+writetable(error_stats,['IndsAndStats/ErrorStatistics' exts '-' date '.xls']);

@@ -15,7 +15,7 @@ define_regions_eiwg
 for n = 1:length(region)
 
     %% load SOCAT grid
-    load('Data/socat_gridded_2023_no_moorings','SOCAT_grid');
+    load(['Data/socat_gridded_' num2str(rfr_lme_year-1) '_no_moorings'],'SOCAT_grid');
 
     %% display status
     disp(['Extracting ' region{n} ' LME from SOCAT grid']);

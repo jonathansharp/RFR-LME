@@ -13,10 +13,13 @@
 %% this script defines the bounds of the eighteen LMEs
 define_regions_eiwg
 
+% include moorings?
+if include_moorings == 0; exts = '_no_moorings'; else; exts = ''; end
+
 for n = 1:length(region)
 
     %% load gridded pCO2 and predictors
-    load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
+    load(['Data/' region{n} '/gridded_pco2' exts],'SOCAT_grid');
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
 
     %% Compute regional average total and seasonal data coverage
@@ -33,7 +36,7 @@ for n = 1:length(region)
         {'Lon.' 'Lat.' 'month' 'sin_month' 'cos_month' 'year' 'SSS' 'SSH' ...
          'SST' 'IceC' 'CHL' 'Wind' 'Bathy.' 'Dist.' 'MLD' 'MSLP' 'pCO2_atm'};
     Vars_array.(region{n}).headers_var = ...
-        {'Lon.' 'Lat.' 'SSS' 'SSH' 'SST' 'IceC' 'CHL' 'Wind' 'MLD' 'MSLP' 'pCO2_atm'};
+        {'SSS' 'SSH' 'SST' 'IceC' 'CHL' 'Wind' 'MLD' 'MSLP' 'pCO2_atm'};
 
     % create temporary versions of grid variables
     lon_tmp = repmat(Preds_grid.(region{n}).lon,1,Preds_grid.(region{n}).dim.y,...
@@ -71,8 +74,6 @@ for n = 1:length(region)
     Preds_grid.(region{n}).MLD_var = std(Preds_grid.(region{n}).MLD,[],3);
     Preds_grid.(region{n}).mslp_var = std(Preds_grid.(region{n}).mslp,[],3);
     Preds_grid.(region{n}).pCO2_atm_var = std(Preds_grid.(region{n}).pCO2_atm,[],3);
-    lon_tmp_2 = mean(lon_tmp,3);
-    lat_tmp_2 = mean(lat_tmp,3);
 
     % create X and Y
     Vars_array.(region{n}).X_clust = [lon_tmp(idx_clust) lat_tmp(idx_clust)...
@@ -85,7 +86,6 @@ for n = 1:length(region)
          Preds_grid.(region{n}).MLD(idx_clust) Preds_grid.(region{n}).mslp(idx_clust) ...
          Preds_grid.(region{n}).pCO2_atm(idx_clust)];
     Vars_array.(region{n}).X_clust_var = [
-         lon_tmp_2(idx_clust_var) lat_tmp_2(idx_clust_var) ...
          Preds_grid.(region{n}).SSS_var(idx_clust_var) Preds_grid.(region{n}).SSH_var(idx_clust_var) ...
          Preds_grid.(region{n}).SST_var(idx_clust_var) Preds_grid.(region{n}).IceC_var(idx_clust_var) ...
          log10(Preds_grid.(region{n}).CHL_var(idx_clust_var)) ...
@@ -108,7 +108,7 @@ for n = 1:length(region)
     Preds_grid.(region{n}).idx_mod = idx_mod;
 
     % Save predictor/target arrays and gridded predictor data with cluster indices
-    save(['Data/' region{n} '/variable_arrays'],'Vars_array','-v7.3');
+    save(['Data/' region{n} '/variable_arrays' exts],'Vars_array','-v7.3');
     save(['Data/' region{n} '/gridded_predictors'],'Preds_grid','-v7.3');
 
     % clean up

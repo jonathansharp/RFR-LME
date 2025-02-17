@@ -12,11 +12,14 @@
 %% this script defines the bounds of the eleven LMEs
 define_regions_eiwg
 
+%% include moorings?
+if include_moorings == 0; exts = '_no_moorings'; else; exts = ''; end
+
 %% extract each LME from large grid
 for n = 1:length(region)
 
     %% load SOCAT grid
-    load('Data/socat_gridded_2023','SOCAT_grid');
+    load(['Data/socat_gridded_' num2str(rfr_lme_year-1) exts],'SOCAT_grid');
 
     %% display status
     disp(['Extracting ' region{n} ' LME from SOCAT grid']);
@@ -141,7 +144,7 @@ for n = 1:length(region)
 
     % Save gridded pco2 data
     if ~isfolder(['Data/' region{n}]); mkdir(['Data/' region{n}]); end
-    save(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid','-v7.3');
+    save(['Data/' region{n} '/gridded_pco2' exts],'SOCAT_grid','-v7.3');
 
     % clean up
     clear SOCAT_grid

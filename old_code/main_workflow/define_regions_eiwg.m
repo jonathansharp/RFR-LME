@@ -43,6 +43,11 @@ lme_idx.CS = 1;
 lme_idx.SE = 11;
 lme_idx.NE = 6;
 
+% remove weird southern points for NE region
+idx = lme_shape(lme_idx.NE).Y < 32;
+lme_shape(lme_idx.NE).Y(idx) = [];
+lme_shape(lme_idx.NE).X(idx) = [];
+
 % %% plot regions for reference
 % figure('visible','on');
 % worldmap([-18 82],[140 302]);

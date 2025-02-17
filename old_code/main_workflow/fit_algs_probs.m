@@ -4,14 +4,17 @@
 % surface fCO2 in various US LMEs.
 % 
 % Written by J.D. Sharp: 8/26/22
-% Last updated by J.D. Sharp: 5/6/23
+% Last updated by J.D. Sharp: 10/17/24
 % 
+
+% include moorings?
+if include_moorings == 0; exts = '_no_moorings'; else; exts = ''; end
 
 for n = 1:length(region)
 
     %% load gridded pCO2, predictors, and clusters
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
-    load(['Data/' region{n} '/variable_arrays'],'Vars_array');
+    load(['Data/' region{n} '/variable_arrays' exts],'Vars_array');
     if gmm_test_idx == 0
         load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');
     elseif gmm_test_idx == 1
@@ -140,15 +143,27 @@ for n = 1:length(region)
     % clean up
     clear x_edges x_mids y_edges y_mids
 
+    %% plot 2D histogram of pco2 vs. pco2 for RFRs
+    x_edges = 0:5:1000;
+    x_mids = 2.5:5:997.5;
+    y_edges = 0:5:1000;
+    y_mids = 0:5:1000;
+    plot_mod_v_meas(x_edges,x_mids,y_edges,y_mids,Vars_array.(region{n}).Y_mod,...
+        Val.(region{n}).Y_fit_rfr.all(:,end), Val.(region{n}).delta_rfr.all(:,end),...
+        region{n},[200 600],[200 600],'RFR');
+
+    % clean up
+    clear x_edges x_mids y_edges y_mids
+
     %% Save models and predictor/target arrays with variable indices
     if rfr_test_idx == 0
-        save(['Data/' region{n} '/us_lme_models'],'Mods','-v7.3');
-        save(['Data/' region{n} '/us_lme_model_evals'],'Val','-v7.3');
+        save(['Data/' region{n} '/us_lme_models' exts],'Mods','-v7.3');
+        save(['Data/' region{n} '/us_lme_model_evals' exts],'Val','-v7.3');
     elseif rfr_test_idx == 1
-        save(['Data/' region{n} '/us_lme_models_test'],'Mods','-v7.3');
-        save(['Data/' region{n} '/us_lme_model_evals_test'],'Val','-v7.3');
+        save(['Data/' region{n} '/us_lme_models_test' exts],'Mods','-v7.3');
+        save(['Data/' region{n} '/us_lme_model_evals_test' exts],'Val','-v7.3');
     end
-    save(['Data/' region{n} '/variable_arrays'],'Vars_array','-v7.3');
+    save(['Data/' region{n} '/variable_arrays' exts],'Vars_array','-v7.3');
 
     %% clean up
     clear Mods Val Vars_array

@@ -5,22 +5,25 @@
 % US large Marine Ecosystems.
 % 
 % Written by J.D. Sharp: 9/15/22
-% Last updated by J.D. Sharp: 2/23/22
+% Last updated by J.D. Sharp: 10/17/24
 % 
 
 % Set GMM parameters
 set_gmm_options
 
-for n = 1:length(region)
+% include moorings?
+if include_moorings == 0; exts = '_no_moorings'; else; exts = ''; end
+
+for n = 7%1:length(region)
 
     %% display status
     disp(['Predicting fCO2 (' region{n} ')']);
 
     %% load gridded fCO2 and predictors
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
-    load(['Data/' region{n} '/variable_arrays'],'Vars_array');
+    load(['Data/' region{n} '/variable_arrays' exts],'Vars_array');
     load(['Data/' region{n} '/gridded_clusters'],'Clusts_grid');
-    load(['Data/' region{n} '/us_lme_models'],'Mods');
+    load(['Data/' region{n} '/us_lme_models' exts],'Mods');
 
     %% pre-allocate results
     fco2_rfr_tmp = nan(length(Vars_array.(region{n}).X_clust),num_groups(n));
@@ -119,7 +122,7 @@ for n = 1:length(region)
     clear TempK Delta b RGasConstant FugFac
 
     %% save estimated fCO2 grid
-    save(['Data/' region{n} '/ML_fCO2'],'OAI_grid','-v7.3');
+    save(['Data/' region{n} '/ML_fCO2' exts],'OAI_grid','-v7.3');
 
     %% clean up
     clear archs fco2_rfr fco2_rfr_tmp fCO23Didx OAI_grid Preds_grid Vars_array
