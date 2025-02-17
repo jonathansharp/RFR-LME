@@ -15,11 +15,11 @@ function load_vars(vrs,dpath)
         dist2coast(repmat(Preds_grid.lat',Preds_grid.dim.x,1),...
         repmat(Preds_grid.lon,1,Preds_grid.dim.y));
 
-    % obtain sea surface salinity
-    Preds_grid.SSS = import_SSS(dpath,vrs,'BASS',Preds_grid.lat,...
+    % obtain sea surface salinity (Options: 'BASS', 'GLORYS')
+    Preds_grid.SSS = import_SSS(dpath,vrs,'GLORYS',Preds_grid.lat,...
         Preds_grid.lon,Preds_grid.time,'plot_option',1);
 
-    % obtain sea surface height
+    % obtain sea surface height (Options: 'CMEMS', 'NASA')
     Preds_grid.SSH = import_SSH(dpath,vrs,'CMEMS',Preds_grid.lat,...
         Preds_grid.lon,Preds_grid.time,'plot_option',1);
 
@@ -31,9 +31,9 @@ function load_vars(vrs,dpath)
     Preds_grid.IceC = import_IceC(dpath,vrs,'OISST',Preds_grid.lat,...
         Preds_grid.lon,Preds_grid.time,'plot_option',1);
 
-%     % Obtain sea surface chlorophyll
-%     Preds_grid.CHL = import_CHL(dpath,vrs,'CMEMS',Preds_grid.lat,...
-%         Preds_grid.lon,Preds_grid.time,'plot_option',0);
+    % Obtain sea surface chlorophyll (Options: 'NASA', 'CMEMS')
+    Preds_grid.CHL = import_CHL(dpath,vrs,'NASA',Preds_grid.lat,...
+        Preds_grid.lon,Preds_grid.time,'plot_option',0);
 %     
 %     %% Obtain wind speed from ERA5 re-analysis
 %     Preds_grid.Wind = import_SST(dpath,vrs,'CMEMS',Preds_grid.lat,...

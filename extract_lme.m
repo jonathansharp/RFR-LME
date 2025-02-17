@@ -7,6 +7,8 @@ function extract_lme(vrs)
 
 % load SOCAT grid
 load(['Data/' vrs '_gridded'],'SOCAT_grid');
+% load predictor variables
+load(['Data/' vrs '_gridded'],'SOCAT_grid');
 
 % extract each LME from large grid
 for n = 1:length(region)

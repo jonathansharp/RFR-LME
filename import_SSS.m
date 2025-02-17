@@ -20,7 +20,7 @@ end
 
 % create sst animation
 if plot_option == 1
-    create_animation('SSS',type,time,lat,lon,data_interp,cmocean('haline'),[33 37],'Salinity','');
+    create_animation('SSS',type,time,lat,lon,data_interp,cmocean('haline'),[32 37],'Salinity','');
     create_animation('SSS_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Salinity Anomaly','');
     if strcmp(type,'BASS')
         % create_animation('uSSS',time,lat,lon,data_uncer_interp,cmocean('haline'),[33 37],'Salinity');
@@ -98,12 +98,12 @@ function data_interp = import_SSS_GLORYS(dpath,lat,lon,time)
     clear data_poslon data_neglon data_poslon_int data_neglon_int
     
     % interpolate onto quarter degree grid
-    data_interp = nan(length(lat),length(lon),length(time));
-    [data_lon_grid,data_lat_grid] = meshgrid(data_lon,data_lat);
-    [lon_grid,lat_grid] = meshgrid(lon,lat);
-    for t = 1:length(time)
+    data_interp = nan(length(lon),length(lat),length(time));
+    [data_lon_grid,data_lat_grid] = ndgrid(data_lon,data_lat);
+    [lon_grid,lat_grid] = ndgrid(lon,lat);
+    for t = 1%1:length(time)
         data_interp(:,:,t) = griddata(double(data_lon_grid),...
-            double(data_lat_grid),double(data(:,:,t))',lon_grid,lat_grid);
+            double(data_lat_grid),double(data(:,:,t)),lon_grid,lat_grid);
     end
 
 end
