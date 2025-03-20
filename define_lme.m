@@ -6,7 +6,7 @@ function [lme_shape,lme_idx,region] = define_LMEs()
 region = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
 
 % import LME bounds
-lme_shape_tmp = m_shaperead('Data/eiwg_boundary_2023/eiwg_boundaries_20230512');
+lme_shape_tmp = m_shaperead('eiwg_boundary_2023/eiwg_boundaries_20230512');
 X = cell(16,1);
 Y = cell(16,1);
 BoundingBox = cell(16,1);

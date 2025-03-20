@@ -7,7 +7,7 @@ function create_animation(var,type,time,lat,lon,z,cmap,colorlims,colorlabel,unit
     % loop through months and plot each one
     for m = 1:length(time)
         m_proj('Robinson','lat',[min(lat) max(lat)],'lon',[min(lon) max(lon)]);
-        m_pcolor(lon,lat,z(:,:,m))
+        m_pcolor(lon,lat,z(:,:,m)');
         title(gca,extractAfter(datestr(time(m)),'-'));
         colormap(cmap);
         m_coast('patch',[0.7 0.7 0.7]);

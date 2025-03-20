@@ -1,20 +1,15 @@
 % Extract LMEs from gridded SOCAT data
 
-function extract_lme(vrs)
-
-% this script defines the bounds of the eleven LMEs
-[lme_shape,lme_idx,region] = define_lme();
+function extract_lme(vrs,pred_vars,source,lme_shape,lme_idx,region)
 
 % load SOCAT grid
-load(['Data/' vrs '_gridded'],'SOCAT_grid');
-% load predictor variables
 load(['Data/' vrs '_gridded'],'SOCAT_grid');
 
 % extract each LME from large grid
 for n = 1:length(region)
 
     % display status
-    disp(['Extracting ' region{n} ' LME from SOCAT grid']);
+    disp(['Extracting ' region{n} ' LME from grid']);
 
     %% remove observations outside general LME limits
     % determine geographic indices
@@ -30,12 +25,19 @@ for n = 1:length(region)
         min(abs(SOCAT_grid.lat - max(tmp_lat))));
     % pre-allocate
     vars = fields(SOCAT_grid);
-    % remove gridded observations outside region
+    % remove gridded SOCAT observations outside region
     for v = 1:length(vars)
        if size(SOCAT_grid.(vars{v}),2) == SOCAT_grid.dim.y && ~strcmp(vars{v},'idxspc')
            LME_grid.(region{n}).(vars{v}) = ...
                SOCAT_grid.(vars{v})(idx_xmin:idx_xmax,idx_ymin:idx_ymax,:);
        end
+    end
+    % remove gridded predictor observations outside region
+    for v = 1:length(pred_vars)
+        gridded_predictor = ncread(['Data/' pred_vars{v} '_' ...
+            source{v} '_' vrs '.nc'],pred_vars{v});
+        LME_grid.(region{n}).(pred_vars{v}) = ...
+            gridded_predictor(idx_xmin:idx_xmax,idx_ymin:idx_ymax,:);
     end
     % copy other variables
     LME_grid.(region{n}).lon = SOCAT_grid.lon(idx_xmin:idx_xmax);
@@ -52,7 +54,6 @@ for n = 1:length(region)
     LME_grid.(region{n}).dim.x = length(LME_grid.(region{n}).lon);
     LME_grid.(region{n}).dim.y = length(LME_grid.(region{n}).lat);
     LME_grid.(region{n}).dim.z = length(LME_grid.(region{n}).month);
-
     % remove observations outside refined LME limits:
     % determine index based on LME
     LME_grid.(region{n}).idxspc = ...
@@ -84,7 +85,7 @@ for n = 1:length(region)
         sum(LME_grid.(region{n}).area_km2(LME_grid.(region{n}).idxspc(:,:,1)).*...
         LME_grid.(region{n}).percent_sea(LME_grid.(region{n}).idxspc(:,:,1)),...
         'omitnan');
-    disp(['Area = ' round(num2str(LME_grid.(region{n}).area_tot_km2),0) 'km^2']);
+    disp(['Area = ' num2str(round(LME_grid.(region{n}).area_tot_km2),0) 'km^2']);
 
     % clean up
     clear tmp_lon vars v
@@ -118,7 +119,7 @@ for n = 1:length(region)
 
 end
 
-% save gridded pco2 data in individual LMEs
+% save gridded pco2 and predictor data in individual LMEs
 if ~isfolder('Data'); mkdir('Data'); end
 save(['Data/' vrs '_gridded_lme'],'LME_grid','-v7.3');
 

@@ -10,7 +10,7 @@
 % Last updated by J.D. Sharp: 5/15/22
 % 
 
-%% this script defines the bounds of the eighteen LMEs
+%% this script defines the bounds of the eleven LMEs
 define_regions_eiwg
 
 % include moorings?

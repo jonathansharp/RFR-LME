@@ -13,7 +13,8 @@ set(h,'color','white');
 box on; hold on;
 % determine mean and limits
 zmean = mean(z,3,'omitnan');
-if strcmp(varname,'fCO2') || strcmp(varname,'pCO2')
+if strcmp(varname,'fCO2') || strcmp(varname,'pCO2') || ...
+        strcmp(varname,'pH') || strcmp(varname,'OmA') || strcmp(varname,'OmC')
     zmax = mean(zmean(:),'omitnan')+8.*std(zmean(:),[],'omitnan');
     zmin = mean(zmean(:),'omitnan')-8.*std(zmean(:),[],'omitnan');
 elseif ~contains(varname,'_var') && ~startsWith(varname,'u')
