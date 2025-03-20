@@ -16,15 +16,16 @@ else
     error('Input variable "type" must be "OISST"');
 end
 
-% create ice coverage animation
-if plot_option == 1
-    create_animation('IceC',type,time,lat,lon,data',cmocean('ice'),[0 100],'Ice Coverage','%');
-end
-
 % save data file as netcdf
 ncsave_3d(['Data/IceC_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},{'time' time-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'IceC' data 'ice coverage' 'percent'});
+
+% create ice coverage animation
+if plot_option == 1
+    create_animation('IceC',type,time,lat,lon,data*100,...
+        flipud(cmocean('ice')),[0 100],'Ice Coverage','%');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -63,6 +64,7 @@ function data = import_IceC_OISST(dpath,lat,lon,time)
     % read in data
     data = ncread([dpath fpath fname],'icec',[idx_minlon idx_minlat idx_mintime],...
         [1+idx_maxlon-idx_minlon 1+idx_maxlat-idx_minlat 1+idx_maxtime-idx_mintime]);
+    data(data<-10^6) = NaN; % define NaNs
 
 end
 

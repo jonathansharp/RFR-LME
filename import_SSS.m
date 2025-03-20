@@ -9,6 +9,8 @@ for i = 1:2:length(varargin)
     end
 end
 
+if ~isfile(['Data/SSS_' type '_' vrs '.nc'])
+
 % Import based on "type"
 if strcmp(type,'GLORYS')
     data_interp = import_SSS_GLORYS(dpath,lat,lon,time);
@@ -16,6 +18,13 @@ elseif strcmp(type,'BASS')
     data_interp = import_SSS_BASS(dpath,lat,lon,time);
 else
     error('Input variable "type" must be "GLORYS" or "BASS"');
+end
+
+% save data file
+ncsave_3d(['Data/SSS_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+    {'lat' lat 'latitude' 'degrees north'},{'time' time 'time' 'days since 1950-1-1'},...
+    {'SSS' data_interp 'sea surface salinity' ''});
+
 end
 
 % create sst animation
@@ -26,11 +35,6 @@ if plot_option == 1
         % create_animation('uSSS',time,lat,lon,data_uncer_interp,cmocean('haline'),[33 37],'Salinity');
     end
 end
-
-% save data file
-ncsave_3d(['Data/SSS_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
-    {'lat' lat 'latitude' 'degrees north'},{'time' time 'time' 'days since 1950-1-1'},...
-    {'SSS' data_interp 'sea surface salinity' ''});
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -101,7 +105,7 @@ function data_interp = import_SSS_GLORYS(dpath,lat,lon,time)
     data_interp = nan(length(lon),length(lat),length(time));
     [data_lon_grid,data_lat_grid] = ndgrid(data_lon,data_lat);
     [lon_grid,lat_grid] = ndgrid(lon,lat);
-    for t = 1%1:length(time)
+    for t = 1:length(time)
         data_interp(:,:,t) = griddata(double(data_lon_grid),...
             double(data_lat_grid),double(data(:,:,t)),lon_grid,lat_grid);
     end

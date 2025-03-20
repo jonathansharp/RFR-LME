@@ -18,15 +18,15 @@ else
     error('Input variable "type" must be "CMEMS" or "ECCO"');
 end
 
-% create ssh animation
-if plot_option == 1
-    create_animation('SSH',type,time,lat,lon,data,cmocean('haline'),[-1 1],'Sea Surface Height Anomaly','cm');
-end
-
 % save data file
 ncsave_3d(['Data/SSH_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},{'time' time-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'SSH' data 'sea surface height anomaly' 'centimeters above something...'});
+
+% create ssh animation
+if plot_option == 1
+    create_animation('SSH',type,time,lat,lon,data,cmocean('haline'),[-1 1],'Sea Surface Height Anomaly','cm');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -93,7 +93,7 @@ function data = import_SSH_CMEMS(dpath,lat,lon,time)
 end
 
 % embedded function to import ECCO SSH
-function data_interp = import_SSH_ECCO(dpath,lat,lon,time)
+function data = import_SSH_ECCO(dpath,lat,lon,time)
 
 
 end

@@ -16,16 +16,16 @@ else
     error('Input variable "type" must be "OISST"');
 end
 
-% create sst animation
-if plot_option == 1
-    create_animation('SST',type,time,lat,lon,data',cmocean('thermal'),[-5 35],'Sea Surface Temperature',char(176));
-    create_animation('SST_anom',type,time,lat,lon,(data-mean(data,3,'omitnan'))',cmocean('balance'),[-5 5],'Sea Surface Temperature Anomaly',char(176));
-end
-
 % save data file
 ncsave_3d(['Data/SST_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},{'time' time-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'SST' data 'sea surface temperature' 'degrees Celcius'});
+
+% create sst animation
+if plot_option == 1
+    create_animation('SST',type,time,lat,lon,data,cmocean('thermal'),[-5 35],'Sea Surface Temperature',char(176));
+    create_animation('SST_anom',type,time,lat,lon,data-mean(data,3,'omitnan'),cmocean('balance'),[-5 5],'Sea Surface Temperature Anomaly',char(176));
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -64,6 +64,7 @@ function data = import_SST_OISST(dpath,lat,lon,time)
     % read in data
     data = ncread([dpath fpath fname],'sst',[idx_minlon idx_minlat idx_mintime],...
         [1+idx_maxlon-idx_minlon 1+idx_maxlat-idx_minlat 1+idx_maxtime-idx_mintime]);
+    data(data<-10^6) = NaN; % define NaNs
 
 end
 
