@@ -1,5 +1,5 @@
 % import IceC
-function data = import_IceC(dpath,vrs,type,lat,lon,time,varargin)
+function data = import_IceC(dpath,vrs,type,lat,lon,time,yr_end,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -9,17 +9,27 @@ for i = 1:2:length(varargin)
     end
 end
 
+% check for existence of file
+if ~isfile(['Data/IceC_' type '_' vrs '.nc'])
+
 % Import based on "type"
 if strcmp(type,'OISST')
-    data = import_IceC_OISST(dpath,lat,lon,time);
+    data = import_IceC_OISST(dpath,lat,lon,time,yr_end);
 else
     error('Input variable "type" must be "OISST"');
 end
 
 % save data file as netcdf
 ncsave_3d(['Data/IceC_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
-    {'lat' lat 'latitude' 'degrees north'},{'time' time-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
+    {'lat' lat 'latitude' 'degrees north'},...
+    {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'IceC' data 'ice coverage' 'percent'});
+
+else
+
+data = ncread(['Data/IceC_' type '_' vrs '.nc'],'IceC');
+
+end
 
 % create ice coverage animation
 if plot_option == 1
@@ -30,7 +40,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % embedded function to import OISST ice coverage
-function data = import_IceC_OISST(dpath,lat,lon,time)
+function data = import_IceC_OISST(dpath,lat,lon,time,yr_end)
 
     % obtain OISST ice coverage file if downloaded file is older than one month
     fpath = 'OISST/IceC/';
@@ -59,7 +69,7 @@ function data = import_IceC_OISST(dpath,lat,lon,time)
     [~,idx_minlon] = min(abs(data_lon-min(lon)));
     [~,idx_maxlon] = min(abs(data_lon-max(lon)));
     [~,idx_mintime] = min(abs(data_time-min(time)));
-    [~,idx_maxtime] = min(abs(data_time-max(time)));
+    [~,idx_maxtime] = min(abs(data_time-datenum(yr_end,12,15))); % last month of last year
     
     % read in data
     data = ncread([dpath fpath fname],'icec',[idx_minlon idx_minlat idx_mintime],...

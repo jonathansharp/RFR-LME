@@ -1,6 +1,6 @@
 % Grid SOCAT data
 
-function grid_socat(vrs)
+function grid_socat(vrs,dpath,yr_end)
 
 % load SOCAT structure
 load(['Data/' vrs '_structure'],'data');
@@ -14,7 +14,7 @@ SOCAT_grid.lim.latmax = round(max(data.latitude),0);
 SOCAT_grid.lim.lonmin = round(min(data.longitude),0);
 SOCAT_grid.lim.lonmax = round(max(data.longitude),0);
 SOCAT_grid.lim.monthmin = 1;
-SOCAT_grid.lim.monthmax = 12*(max(data.yr)-1997);
+SOCAT_grid.lim.monthmax = 12*(yr_end-1997);
 
 % create 0.25 x 0.25 degree monthly grid
 SOCAT_grid.lon = (SOCAT_grid.lim.lonmin+0.125:0.25:SOCAT_grid.lim.lonmax)';
@@ -25,7 +25,7 @@ SOCAT_grid.month = (SOCAT_grid.lim.monthmin-0.5:1:SOCAT_grid.lim.monthmax-0.5)';
 SOCAT_grid.dim.z = length(SOCAT_grid.month);
 
 % add time variables
-SOCAT_grid.year = repelem(1998:max(data.yr),12)';
+SOCAT_grid.year = repelem(1998:yr_end,12)';
 SOCAT_grid.month_of_year = repmat(1:12,1,SOCAT_grid.lim.monthmax/12)';
 SOCAT_grid.time = datenum(SOCAT_grid.year,SOCAT_grid.month_of_year,15);
 
@@ -35,28 +35,29 @@ SOCAT_grid.time = datenum(SOCAT_grid.year,SOCAT_grid.month_of_year,15);
 [~,~,Znum] = histcounts(data.month_since_1998,SOCAT_grid.lim.monthmin-1:SOCAT_grid.lim.monthmax);
 
 % accumulate 3D grid by applying function to SOCAT values with bin numbers that match grid cells
-subs = [Xnum, Ynum, Znum];
+idx = Znum>0;
+subs = [Xnum(idx), Ynum(idx), Znum(idx)];
 sz = [SOCAT_grid.dim.x,SOCAT_grid.dim.y,SOCAT_grid.dim.z];
 % cruises
-SOCAT_grid.count_ncruise = accumarray(subs, data.cruise, sz, @(x) numel(unique(x)), NaN);
+SOCAT_grid.count_ncruise = accumarray(subs, data.cruise(idx), sz, @(x) numel(unique(x)), NaN);
 % fCO2
-SOCAT_grid.fco2_count_nobs = accumarray(subs, data.fCO2rec, sz, @numel, NaN);
-SOCAT_grid.fco2_ave_unwtd = accumarray(subs, data.fCO2rec, sz, @nanmean, NaN);
-SOCAT_grid.fco2_std_unwtd = accumarray(subs, data.fCO2rec, sz, @nanstd, NaN);
-% SOCAT_grid.fco2_max_unwtd = accumarray(subs, data.fCO2rec, sz, @max, NaN);
-% SOCAT_grid.fco2_min_unwtd = accumarray(subs, data.fCO2rec, sz, @min, NaN);
+SOCAT_grid.fco2_count_nobs = accumarray(subs, data.fCO2rec(idx), sz, @numel, NaN);
+SOCAT_grid.fco2_ave_unwtd = accumarray(subs, data.fCO2rec(idx), sz, @nanmean, NaN);
+SOCAT_grid.fco2_std_unwtd = accumarray(subs, data.fCO2rec(idx), sz, @nanstd, NaN);
+% SOCAT_grid.fco2_max_unwtd = accumarray(subs, data.fCO2rec(idx), sz, @max, NaN);
+% SOCAT_grid.fco2_min_unwtd = accumarray(subs, data.fCO2rec(idx), sz, @min, NaN);
 % temperature
-SOCAT_grid.sst_count_nobs = accumarray(subs, data.SST, sz, @numel, NaN);
-SOCAT_grid.sst_ave_unwtd = accumarray(subs, data.SST, sz, @nanmean, NaN);
-SOCAT_grid.sst_std_unwtd = accumarray(subs, data.SST, sz, @nanstd, NaN);
-% SOCAT_grid.sst_max_unwtd = accumarray(subs, data.SST, sz, @max, NaN);
-% SOCAT_grid.sst_min_unwtd = accumarray(subs, data.SST, sz, @min, NaN);
+SOCAT_grid.sst_count_nobs = accumarray(subs, data.SST(idx), sz, @numel, NaN);
+SOCAT_grid.sst_ave_unwtd = accumarray(subs, data.SST(idx), sz, @nanmean, NaN);
+SOCAT_grid.sst_std_unwtd = accumarray(subs, data.SST(idx), sz, @nanstd, NaN);
+% SOCAT_grid.sst_max_unwtd = accumarray(subs, data.SST(idx), sz, @max, NaN);
+% SOCAT_grid.sst_min_unwtd = accumarray(subs, data.SST(idx), sz, @min, NaN);
 % salinity
-SOCAT_grid.sss_count_nobs = accumarray(subs, data.sal, sz, @numel, NaN);
-SOCAT_grid.sss_ave_unwtd = accumarray(subs, data.sal, sz, @nanmean, NaN);
-SOCAT_grid.sss_std_unwtd = accumarray(subs, data.sal, sz, @nanstd, NaN);
-% SOCAT_grid.sss_max_unwtd = accumarray(subs, data.sal, sz, @max, NaN);
-% SOCAT_grid.sss_min_unwtd = accumarray(subs, data.sal, sz, @min, NaN);
+SOCAT_grid.sss_count_nobs = accumarray(subs, data.sal(idx), sz, @numel, NaN);
+SOCAT_grid.sss_ave_unwtd = accumarray(subs, data.sal(idx), sz, @nanmean, NaN);
+SOCAT_grid.sss_std_unwtd = accumarray(subs, data.sal(idx), sz, @nanstd, NaN);
+% SOCAT_grid.sss_max_unwtd = accumarray(subs, data.sal(idx), sz, @max, NaN);
+% SOCAT_grid.sss_min_unwtd = accumarray(subs, data.sal(idx), sz, @min, NaN);
 
 % Determine cruise-weighted means and standard deviations
 % 
@@ -148,9 +149,9 @@ SOCAT_grid.area_km2 = ...
 
 % Determine sea fraction of each grid cell
 % Obtain bathymetry from ETOPOv2022
-ETOPO.lon = ncread('Data/ETOPO_2022_v1_60s_N90W180_bed.nc','lon');
-ETOPO.lat = ncread('Data/ETOPO_2022_v1_60s_N90W180_bed.nc','lat');
-ETOPO.bottomdepth = ncread('Data/ETOPO_2022_v1_60s_N90W180_bed.nc','z');
+ETOPO.lon = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lon');
+ETOPO.lat = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lat');
+ETOPO.bottomdepth = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'z');
 % Convert longitude
 ETOPO.lon = convert_lon(ETOPO.lon);
 % define points as land (0) or sea (1)

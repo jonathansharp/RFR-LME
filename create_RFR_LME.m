@@ -1,26 +1,40 @@
-try
-
-% Script to create LME-RFR indicators
-vrs = 'SOCATv2024';
-dpath = '/raid/Data/';
-pred_dims = {'lon' 'lat' 'sin_month_of_year' 'cos_month_of_year' ...
-    'year' 'dist' 'bathy'};
-pred_vars = {'SSS' 'SSH' 'SST' 'IceC' 'CHL'};
-source = {'GLORYS' 'CMEMS' 'OISST' 'OISST' 'CMEMS'};
+%% set parameters
+% SOCAT version and data path
+vrs = 'SOCATv2025'; dpath = '/raid/Data/';
+yr_end = str2num(extractAfter(vrs,'v')) - 1;
+% Coordinates and variables to be used for models
+pred_dims = {'lon' 'lat' 'sin_month_of_year' 'cos_month_of_year' 'year' 'dist'};
+pred_vars = {'SSS' 'SSH' 'SST' 'IceC' 'CHL' 'Wind' 'MLD' 'MSLP' 'apCO2' 'Bathy'};
+pred_vars_arc = {'SSS' 'SST' 'IceC' 'Wind' 'MLD' 'MSLP' 'apCO2' 'Bathy'};
+% Coordinates and variables to be used for clustering
 clust_dims = {};
-clust_vars = {'SST' 'SSH'};
+clust_vars = {'SST' 'MSLP' 'CHL'};
+clust_vars_arc = {'SST' 'MSLP' 'Wind'};
+% number of rfr groups
 num_groups = [3;5;4;4;5;6;4;3;5;3;4];
+% probability threshold for model training
+thresh = 0.10;
 
-% this script defines the bounds of the eleven LMEs
+%% set predictor variable sources
+source.SSS = 'CMEMS'; source.SSH = 'CMEMS';
+source.SST = 'OISST'; source.IceC = 'OISST';
+source.CHL = 'CMEMS'; source.Wind = 'ERA5';
+source.MLD = 'CMEMS'; source.MSLP = 'NCEP';
+source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
+
+%% define the bounds of the eleven LMEs
 [lme_shape,lme_idx,region] = define_lme();
+
+%% run scripts to create RFR-LME
 % load_socat(vrs);
-% grid_socat(vrs);
-import_vars(vrs,dpath,pred_vars,source);
+% grid_socat(vrs,dpath,yr_end);
+% download_vars(vrs,dpath,source);
+% import_vars(vrs,dpath,source,yr_end);
 extract_lme(vrs,pred_vars,source,lme_shape,lme_idx,region);
-define_x_y(vrs,clust_vars,pred_vars,clust_dims,pred_dims,region);
-cluster_lme(vrs,num_groups,region);
-
-
-catch
-    exit
-end
+define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
+cluster_lme(vrs,num_groups,region,'plot_option',0);
+train_rfr(vrs,num_groups,pred_dims,pred_vars_arc,pred_vars,region,thresh,100,2,ceil((2/3)*length(pred_vars)));
+predict_fco2(vrs,num_groups,region,'plot_option',0);
+calculate_oa(vrs,region,num_groups,'plot_option',0);
+matlab_to_netcdf(vrs,lme_shape,lme_idx,region);
+create_figures(vrs,lme_shape,lme_idx,region);

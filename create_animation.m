@@ -11,7 +11,7 @@ function create_animation(var,type,time,lat,lon,z,cmap,colorlims,colorlabel,unit
         title(gca,extractAfter(datestr(time(m)),'-'));
         colormap(cmap);
         m_coast('patch',[0.7 0.7 0.7]);
-        m_grid('linestyle','-','xticklabels',[],'yticklabels',[],'ytick',-90:30:90);
+        m_grid('linestyle','-','xticklabels',[],'yticklabels',[]);
         clim(colorlims);
         c=colorbar;
         c.Limits = colorlims;

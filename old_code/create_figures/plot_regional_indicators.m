@@ -3,7 +3,7 @@ addpath(genpath(pwd));
 % this script defines the bounds of the eleven LMEs
 define_regions_eiwg
 
-for n = 1:length(region)
+for n = 7%1:length(region)
 
     % load gridded fCO2, predictors, and models
     load(['Data/' region{n} '/ML_fCO2'],'OAI_grid');

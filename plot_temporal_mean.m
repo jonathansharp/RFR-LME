@@ -43,6 +43,6 @@ cbarrow;
 % save figure
 if ~isfolder('Figures'); mkdir('Figures'); end
 % exportgraphics(gcf,['Figures/' region '_' varname '.png']);
-export_fig(gcf,['Figures/' region '_' varname '.png'],'-transparent');
-% export_fig(gcf,['Figures/' region '_' varname '.png']);
+% export_fig(gcf,['Figures/' region '_' varname '.png'],'-transparent');
+export_fig(gcf,['Figures/' region '_' varname '.png']);
 close

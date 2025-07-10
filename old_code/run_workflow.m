@@ -59,7 +59,7 @@ predict_fCO2_probs
 % this script applies the ESPER algorithm to produce TA estimates within
 % each LME, then uses fCO2 and TA to calculate OA indicators within each
 % LME
-% predict_OA
+predict_OA
 
 % time series and climatology
 % OA_summary_stats

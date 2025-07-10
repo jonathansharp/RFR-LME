@@ -18,7 +18,7 @@ xlim(xlimit); ylim(ylimit);
 xlabel('{\itp}CO_{2} (\muatm)');
 ylabel('\Delta{\itp}CO_{2} (\muatm)');
 text(max(xlimit)-200,min(ylimit)+50,['RMSE = ' ...
-    num2str(round(sqrt(mean(delta.^2)),2))],'fontsize',16);
+    num2str(round(sqrt(mean(delta.^2,'omitnan')),2))],'fontsize',16);
 myColorMap = parula(20);
 myColorMap(1,:) = 1;
 colormap(gca,myColorMap);

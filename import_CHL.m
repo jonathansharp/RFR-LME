@@ -1,5 +1,5 @@
 % import SSH
-function data = import_CHL(dpath,vrs,type,lat,lon,time,varargin)
+function import_CHL(dpath,vrs,type,lat,lon,time,yr_end,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -9,29 +9,39 @@ for i = 1:2:length(varargin)
     end
 end
 
+% check for existence of file
+if ~isfile(['Data/CHL_' type '_' vrs '.nc'])
+
 % Import based on "type"
 if strcmp(type,'NASA')
-    data = import_CHL_NASA(dpath,lat,lon,time);
+    data_interp = import_CHL_NASA(dpath,lat,lon,time,yr_end);
 elseif strcmp(type,'CMEMS')
-    data = import_CHL_CMEMS(dpath,lat,lon,time);
+    data_interp = import_CHL_CMEMS(dpath,lat,lon,time,yr_end);
 else
     error('Input variable "type" must be "CMEMS" or "ECCO"');
 end
 
 % save data file
 ncsave_3d(['Data/CHL_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
-    {'lat' lat 'latitude' 'degrees north'},{'time' time-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
-    {'CHL' data 'sea surface chlorophyll' 'milligrams per meter squared'});
+    {'lat' lat 'latitude' 'degrees north'},...
+    {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
+    {'CHL' data_interp 'sea surface chlorophyll' 'milligrams per meter squared'});
+
+else
+
+data_interp = ncread(['Data/CHL_' type '_' vrs '.nc'],'CHL');
+
+end
 
 % create chl animation
 if plot_option == 1
-    create_animation('CHL',type,time,lat,lon,log10(data),cmocean('algae'),[0.001 10],'Sea Surface Chlorophyll','mg/m2');
+    create_animation('CHL',type,time,lat,lon,log10(data_interp),cmocean('algae'),[0.001 10],'Sea Surface Chlorophyll','mg/m2');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % embedded function to import NASA CHL
-function data = import_CHL_NASA(dpath,lat,lon,time)
+function data_interp = import_CHL_NASA(dpath,lat,lon,time)
 
     % Define normal and leap year days of year to start month
     year = 1998:2002;
@@ -55,7 +65,7 @@ function data = import_CHL_NASA(dpath,lat,lon,time)
             if ~isfile([dpath fpath fname])
                 websave([dpath fpath fname],[url fname]);
             end
-            data(:,:,(y-1)*12+m) = ...
+            data_interp(:,:,(y-1)*12+m) = ...
                 ncread([dpath fpath fname],'chlor_a');
         end
     end
@@ -82,7 +92,7 @@ function data = import_CHL_NASA(dpath,lat,lon,time)
             if ~isfile([dpath fpath fname])
                 websave([dpath fpath fname],[url fname]);
             end
-            data(:,:,60+(y-1)*12+m) = ...
+            data_interp(:,:,60+(y-1)*12+m) = ...
                 ncread([dpath fpath fname],'chlor_a');
         end
     end
@@ -120,7 +130,7 @@ function data = import_CHL_NASA(dpath,lat,lon,time)
 end
 
 % embedded function to import CMEMS CHL
-function data = import_CHL_CMEMS(dpath,lat,lon,time)
+function data_interp = import_CHL_CMEMS(dpath,lat,lon,time,yr_end)
     % files obtained with the copernicusmarine python toolbox:
     %     > cd dpath/CMEMS
     %     > conda activate copernicusmarine
@@ -158,7 +168,7 @@ function data = import_CHL_CMEMS(dpath,lat,lon,time)
     dayleap = [31 29 31 30 31 30 31 31 30 31 30 31];
 
     % create grid for interpolation
-    data_interp = nan(length(lon),length(lat),length(time));
+    data_interp = nan(length(lon),length(lat),(yr_end-1997)*12);
     [data_lon_grid,data_lat_grid] = ndgrid(data_lon,data_lat);
     [lon_grid,lat_grid] = ndgrid(lon,lat);
 
@@ -166,7 +176,7 @@ function data = import_CHL_CMEMS(dpath,lat,lon,time)
     date = datevec(time);
     year = date(:,1);
     month = date(:,2);
-    for t = 1:length(time)
+    for t = 1:(yr_end-1997)*12
 
         if  year(t) == 2000 || year(t) == 2004 || year(t) == 2008 || ...
             year(t) == 2012 || year(t) == 2016 || year(t) == 2020 || ...
@@ -222,7 +232,8 @@ function data = import_CHL_CMEMS(dpath,lat,lon,time)
         end
         % interpolate onto quarter degree grid
         data_interp(:,:,t) = griddata(double(data_lon_grid),...
-            double(data_lat_grid),double([data_poslon;data_neglon]),lon_grid,lat_grid);
+            double(data_lat_grid),double([data_poslon;data_neglon]),...
+            lon_grid,lat_grid);
     end
 
 end

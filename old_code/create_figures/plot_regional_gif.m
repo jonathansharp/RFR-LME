@@ -15,8 +15,8 @@ box on; hold on;
 zmean = mean(z,3,'omitnan');
 if strcmp(varname,'fCO2') || strcmp(varname,'pCO2') || ...
         strcmp(varname,'pH') || strcmp(varname,'OmA') || strcmp(varname,'OmC')
-    zmax = mean(zmean(:),'omitnan')+8.*std(zmean(:),[],'omitnan');
-    zmin = mean(zmean(:),'omitnan')-8.*std(zmean(:),[],'omitnan');
+    zmax = mean(zmean(:),'omitnan')+6.*std(zmean(:),[],'omitnan');
+    zmin = mean(zmean(:),'omitnan')-6.*std(zmean(:),[],'omitnan');
 elseif ~contains(varname,'_var') && ~startsWith(varname,'u')
     zmax = mean(zmean(:),'omitnan')+2.*std(zmean(:),[],'omitnan');
     zmin = mean(zmean(:),'omitnan')-2.*std(zmean(:),[],'omitnan');

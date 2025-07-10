@@ -1,5 +1,5 @@
 % import SSS
-function data_interp = import_SSS(dpath,vrs,type,lat,lon,time,varargin)
+function data_interp = import_SSS(dpath,vrs,type,lat,lon,time,yr_end,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -9,21 +9,27 @@ for i = 1:2:length(varargin)
     end
 end
 
+% check for existence of file
 if ~isfile(['Data/SSS_' type '_' vrs '.nc'])
 
 % Import based on "type"
-if strcmp(type,'GLORYS')
-    data_interp = import_SSS_GLORYS(dpath,lat,lon,time);
+if strcmp(type,'CMEMS')
+    data_interp = import_SSS_CMEMS(dpath,lat,lon,time,yr_end);
 elseif strcmp(type,'BASS')
-    data_interp = import_SSS_BASS(dpath,lat,lon,time);
+    data_interp = import_SSS_BASS(dpath,lat,lon,time,yr_end);
 else
-    error('Input variable "type" must be "GLORYS" or "BASS"');
+    error('Input variable "type" must be "CMEMS" or "BASS"');
 end
 
 % save data file
 ncsave_3d(['Data/SSS_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
-    {'lat' lat 'latitude' 'degrees north'},{'time' time 'time' 'days since 1950-1-1'},...
+    {'lat' lat 'latitude' 'degrees north'},...
+    {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'SSS' data_interp 'sea surface salinity' ''});
+
+else
+
+data_interp = ncread(['Data/SSS_' type '_' vrs '.nc'],'SSS');
 
 end
 
@@ -38,20 +44,20 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% embedded function to import GLORYS SSS
-function data_interp = import_SSS_GLORYS(dpath,lat,lon,time)
+% embedded function to import CMEMS SSS
+function data_interp = import_SSS_CMEMS(dpath,lat,lon,time,yr_end)
     % files obtained with the copernicusmarine python toolbox:
     %     > cd dpath/CMEMS
     %     > conda activate copernicusmarine
-    %     > copernicusmarine subset --dataset-id cmems_mod_glo_phy_my_0.083deg_P1M-m --minimum-depth 0 --maximum-depth 0
-    %     > copernicusmarine subset --dataset-id cmems_mod_glo_phy_myint_0.083deg_P1M-m --minimum-depth 0 --maximum-depth 0
+    %     > copernicusmarine subset --dataset-id cmems_mod_glo_phy_my_0.083deg_P1M-m --minimum-depth 0 --maximum-depth 0 --start-datetime 1998-01-01 --end-datetime 2024-12-31
+    %     > copernicusmarine subset --dataset-id cmems_mod_glo_phy_myint_0.083deg_P1M-m --minimum-depth 0 --maximum-depth 0 --start-datetime 1998-01-01 --end-datetime 2024-12-31
     %     > conda deactivate
 
     % file name
     fname = ['cmems_mod_glo_phy_my_0.083deg_P1M-m_multi-vars_180.00W-' ...
-        '179.92E_80.00S-90.00N_0.49m_1993-01-01-2021-06-01.nc'];
+        '179.92E_80.00S-90.00N_0.49m_1998-01-01-2021-06-01.nc'];
     fname_int = ['cmems_mod_glo_phy_myint_0.083deg_P1M-m_multi-vars_180.00W-' ...
-        '179.92E_80.00S-90.00N_0.49m_2021-07-01-2024-04-01.nc'];
+        '179.92E_80.00S-90.00N_0.49m_2021-07-01-2024-12-01.nc'];
     
     % load dimensions
     inf = ncinfo([dpath 'CMEMS/' fname]);
@@ -74,9 +80,9 @@ function data_interp = import_SSS_GLORYS(dpath,lat,lon,time)
     [~,idx_minlon2] = min(abs(data_lon_pos-floor(min(lon))));
     [~,idx_maxlon2] = min(abs(data_lon_pos-ceil(max(lon))));
     [~,idx_mintime] = min(abs(data_time-floor(min(time))));
-    [~,idx_maxtime] = min(abs(data_time-ceil(max(time))));
+    [~,idx_maxtime] = min(abs(data_time-datenum(yr_end,12,15))); % last month of last year
     [~,idx_mintime_int] = min(abs(data_time_int-floor(min(time))));
-    [~,idx_maxtime_int] = min(abs(data_time_int-ceil(max(time))));
+    [~,idx_maxtime_int] = min(abs(data_time_int-datenum(yr_end,12,15))); % last month of last year
     
     % cut down dimensions
     data_lat = data_lat(idx_minlat:idx_maxlat);
@@ -102,10 +108,10 @@ function data_interp = import_SSS_GLORYS(dpath,lat,lon,time)
     clear data_poslon data_neglon data_poslon_int data_neglon_int
     
     % interpolate onto quarter degree grid
-    data_interp = nan(length(lon),length(lat),length(time));
+    data_interp = nan(length(lon),length(lat),(yr_end-1997)*12);
     [data_lon_grid,data_lat_grid] = ndgrid(data_lon,data_lat);
     [lon_grid,lat_grid] = ndgrid(lon,lat);
-    for t = 1:length(time)
+    for t = 1:(yr_end-1997)*12
         data_interp(:,:,t) = griddata(double(data_lon_grid),...
             double(data_lat_grid),double(data(:,:,t)),lon_grid,lat_grid);
     end
@@ -114,7 +120,7 @@ end
 
 
 % embedded function to import BASS SSS
-function data_interp = import_SSS_BASS(dpath,lat,lon,time)
+function data_interp = import_SSS_BASS(dpath,lat,lon,time,yr_end)
 
     % obtain BASS file and NODC climatology file
     url = 'https://ftp.cpc.ncep.noaa.gov/precip/BASS/';
@@ -176,10 +182,10 @@ function data_interp = import_SSS_BASS(dpath,lat,lon,time)
     data = squeeze(data(:,:,1,:));
 
     % interpolate data onto quarter degree grid
-    data_interp = nan(length(lat),length(lon),length(time));
+    data_interp = nan(length(lat),length(lon),(yr_end-1997)*12);
     [data_lon_grid,data_lat_grid] = meshgrid(data_lon,data_lat);
     [lon_grid,lat_grid] = meshgrid(lon,lat);
-    for t = 1:length(time)
+    for t = 1:(yr_end-1997)*12
         data_interp(:,:,t) = griddata(data_lon_grid,...
             data_lat_grid,data(:,:,t)',lon_grid,lat_grid);
     end
