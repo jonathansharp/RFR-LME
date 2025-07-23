@@ -44,7 +44,7 @@ clear a b m cnt temp WHOTSm % clean up
 define_regions_eiwg
 
 %% loop through each region
-for n = 1:length(region)
+for n = 7%1:length(region)
 
     % load datasets
     load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
@@ -53,7 +53,7 @@ for n = 1:length(region)
 
     % calculates differences and their variability
     diffs = w_moor.OAI_grid.(region{n}).pCO2 - no_moor.OAI_grid.(region{n}).pCO2;
-    diffs_var = std(diffs,[],3,'omitnan');
+    diffs_rmsd = sqrt(mean(diffs.^2,3,'omitnan'));
     diffs_abs_avg = mean(abs(diffs),3,'omitnan');
 
     % plot average absolute differences
@@ -101,7 +101,7 @@ for n = 1:length(region)
         [w_moor.OAI_grid.(region{n}).lim.lonmin ...
         w_moor.OAI_grid.(region{n}).lim.lonmax]);
     contourfm(w_moor.OAI_grid.(region{n}).lat,w_moor.OAI_grid.(region{n}).lon,...
-        diffs_var',0:0.5:20,'LineStyle','none');
+        diffs_rmsd',0:0.5:20,'LineStyle','none');
     % plot borders around regions
     plot_lme_borders(region,lme_shape,lme_idx);
     % plot land
@@ -110,7 +110,7 @@ for n = 1:length(region)
     colormap(cmocean('amp'));
     caxis([0 20]);
     c.TickLength = 0;
-    c.Label.String = '\Delta{\itp}CO_{2} Var. (\muatm)';
+    c.Label.String = '\Delta{\itp}CO_{2} RMSD (\muatm)';
     cbarrow('up');
     mlabel off;
     plabel off;
@@ -153,12 +153,12 @@ for n = 1:length(region)
     % plot borders around regions
     plot_lme_borders(region,lme_shape,lme_idx);
     % plot land
-    caxis([-20 20]);
+    caxis([-10 10]);
     plot_land('map');
     c=colorbar;
     colormap(cmocean('balance','pivot',0));
     c.TickLength = 0;
-    c.Label.String = '\Delta{\itp}CO_{2} Amp.';
+    c.Label.String = '\Delta{\itp}CO_{2} Amp. (\muatm)';
     cbarrow;
     mlabel off;
     plabel off;
@@ -181,56 +181,111 @@ for n = 1:length(region)
 end
 
 
-%% zoomed in figure for GoM
+%% zoomed in figure
+
+% NE region
+n=7;
 
 % load datasets
-load(['Data/NE/gridded_pco2'],'SOCAT_grid');
-w_moor = load(['Data/NE/ML_fCO2'],'OAI_grid');
-no_moor = load(['Data/NE/ML_fCO2_no_moorings'],'OAI_grid');
+load(['Data/' (region{n}) '/gridded_pco2'],'SOCAT_grid');
+w_moor = load(['Data/' (region{n}) '/ML_fCO2'],'OAI_grid');
+no_moor = load(['Data/' (region{n}) '/ML_fCO2_no_moorings'],'OAI_grid');
 
 % calculates differences and their variability
-diffs = w_moor.OAI_grid.NE.pCO2 - no_moor.OAI_grid.NE.pCO2;
-diffs_var = std(diffs,[],3,'omitnan');
+diffs = w_moor.OAI_grid.(region{n}).pCO2 - no_moor.OAI_grid.(region{n}).pCO2;
+diffs_rmsd = sqrt(mean(diffs.^2,3,'omitnan'));
 diffs_abs_avg = mean(abs(diffs),3,'omitnan');
-n=10; highest = maxk(diffs_abs_avg(:),n);
-lon_idx = nan(n,1); lat_idx = nan(n,1);
-for nn = 1:n
-    [lon_idx(nn),lat_idx(nn)] = find(diffs_abs_avg==highest(nn));
+num=10; highest = maxk(diffs_rmsd(:),num);
+lon_idx = nan(num,1); lat_idx = nan(num,1);
+for nn = 1:num
+    [lon_idx(nn),lat_idx(nn)] = find(diffs_rmsd==highest(nn));
 end
 
 % plot variability of differences
 figure('visible','on');
 set(gca,'fontsize',14);
 worldmap([41 44],[288 291]);
-% contourfm(w_moor.OAI_grid.NE.lat,w_moor.OAI_grid.NE.lon,...
-%     diffs_var',0:0.5:20,'LineStyle','none');
-pcolorm(repmat(w_moor.OAI_grid.NE.lat-.125,1,length(w_moor.OAI_grid.NE.lon)),...
-    repmat(w_moor.OAI_grid.NE.lon'-.125,length(w_moor.OAI_grid.NE.lat),1),...
-    diffs_abs_avg');
-scatterm(w_moor.OAI_grid.NE.lat(lat_idx),w_moor.OAI_grid.NE.lon(lon_idx),...
+% contourfm(w_moor.OAI_grid.(region{n}).lat,w_moor.OAI_grid.(region{n}).lon,...
+%     diffs_rmsd',0:0.5:20,'LineStyle','none');
+pcolorm(repmat(w_moor.OAI_grid.(region{n}).lat-.125,1,length(w_moor.OAI_grid.(region{n}).lon)),...
+    repmat(w_moor.OAI_grid.(region{n}).lon'-.125,length(w_moor.OAI_grid.(region{n}).lat),1),...
+    diffs_rmsd');
+scatterm(w_moor.OAI_grid.(region{n}).lat(lat_idx),w_moor.OAI_grid.(region{n}).lon(lon_idx),...
     300,'k.');
 % plot land
 plot_land('map');
 c=colorbar;
+clim([0 20]);
 colormap(cmocean('amp'));
-caxis([0 20]);
 c.TickLength = 0;
-c.Label.String = 'Mean |\Delta{\itp}CO_{2}| (\muatm)';
+c.Label.String = '\Delta{\itp}CO_{2} RMSD (\muatm)';
 cbarrow('up');
 mlabel off;
 plabel off;
 % save figure (without labels)
 if ~isfolder('Figures'); mkdir('Figures'); end
-export_fig(gcf,['Figures/NE_pCO2_moor_diffs_abs_avg_zoomed.png'],'-transparent');
+export_fig(gcf,['Figures/' (region{n}) '_pCO2_moor_diffs_zoomed.png'],'-transparent');
 % plot pCO2 from moorings
 for m = 1:length(moor_nums)
     if inpolygon(mooring.(moor_nums{m}).lon,mooring.(moor_nums{m}).lat,...
-            convert_lon(lme_shape(lme_idx.NE).X),lme_shape(lme_idx.NE).Y)
+            convert_lon(lme_shape(lme_idx.(region{n})).X),lme_shape(lme_idx.(region{n})).Y)
         scatterm(mooring.(moor_nums{m}).lat,mooring.(moor_nums{m}).lon,...
             100,'pentagram','MarkerEdgeColor','k','MarkerFaceColor','y');
     end
 end
 % save figure (with labels)
 if ~isfolder('Figures'); mkdir('Figures'); end
-export_fig(gcf,['Figures/NE_pCO2_moor_diffs_abs_avg_w_stars_zoomed.png'],'-transparent');
+export_fig(gcf,['Figures/' (region{n}) '_pCO2_moor_diffs_w_stars_zoomed.png'],'-transparent');
+close
+
+% calculate amplitude and differences
+w_moor_pco2_clim = nan(w_moor.OAI_grid.(region{n}).dim.x,w_moor.OAI_grid.(region{n}).dim.y,12);
+no_moor_pco2_clim = nan(no_moor.OAI_grid.(region{n}).dim.x,no_moor.OAI_grid.(region{n}).dim.y,12);
+for m=1:12
+    w_moor_pco2_clim(:,:,m) = mean(w_moor.OAI_grid.(region{n}).pCO2(:,:,m:12:end),3,'omitnan');
+    no_moor_pco2_clim(:,:,m) = mean(no_moor.OAI_grid.(region{n}).pCO2(:,:,m:12:end),3,'omitnan');
+end
+w_moor_amp = max(w_moor_pco2_clim,[],3) - min(w_moor_pco2_clim,[],3);
+no_moor_amp = max(no_moor_pco2_clim,[],3) - min(no_moor_pco2_clim,[],3);
+amp_diff = w_moor_amp - no_moor_amp;
+num=10; highest = maxk(abs(amp_diff(:)),num);
+lon_idx = nan(num,1); lat_idx = nan(num,1);
+for nn = 1:num
+    [lon_idx(nn),lat_idx(nn)] = find(abs(amp_diff)==highest(nn));
+end
+
+% plot amplitude differences
+figure('visible','on');
+set(gca,'fontsize',14);
+worldmap([41 44],[288 291]);
+% contourfm(w_moor.OAI_grid.(region{n}).lat,w_moor.OAI_grid.(region{n}).lon,...
+%     diffs_rmsd',0:0.5:20,'LineStyle','none');
+pcolorm(repmat(w_moor.OAI_grid.(region{n}).lat-.125,1,length(w_moor.OAI_grid.(region{n}).lon)),...
+    repmat(w_moor.OAI_grid.(region{n}).lon'-.125,length(w_moor.OAI_grid.(region{n}).lat),1),...
+    amp_diff');
+scatterm(w_moor.OAI_grid.(region{n}).lat(lat_idx),w_moor.OAI_grid.(region{n}).lon(lon_idx),...
+    300,'k.');
+% plot land
+plot_land('map');
+c=colorbar;
+clim([-10 10]);
+colormap(cmocean('balance','pivot',0));
+c.TickLength = 0;
+c.Label.String = '\Delta{\itp}CO_{2} Amp. (\muatm)';
+mlabel off;
+plabel off;
+% save figure (without labels)
+if ~isfolder('Figures'); mkdir('Figures'); end
+export_fig(gcf,['Figures/' (region{n}) '_pCO2_moor_diffs_amp_zoomed.png'],'-transparent');
+% plot pCO2 from moorings
+for m = 1:length(moor_nums)
+    if inpolygon(mooring.(moor_nums{m}).lon,mooring.(moor_nums{m}).lat,...
+            convert_lon(lme_shape(lme_idx.(region{n})).X),lme_shape(lme_idx.(region{n})).Y)
+        scatterm(mooring.(moor_nums{m}).lat,mooring.(moor_nums{m}).lon,...
+            100,'pentagram','MarkerEdgeColor','k','MarkerFaceColor','y');
+    end
+end
+% save figure (with labels)
+if ~isfolder('Figures'); mkdir('Figures'); end
+export_fig(gcf,['Figures/' (region{n}) '_pCO2_moor_diffs_amp_w_stars_zoomed.png'],'-transparent');
 close

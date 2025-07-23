@@ -18,10 +18,10 @@ else
     zmin = 0;
 end
 if ~isnan(zmin) && ~isnan(zmax)
-    pcolorm(repmat(lat',dim.x,1)-.125,repmat(lon,1,dim.y)-.125,...
-            mean(z,3,'omitnan'),20);
-%     contourfm(repmat(lat',dim.x,1),repmat(lon,1,dim.y),...
-%             mean(z,3,'omitnan'),zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
+%     pcolorm(repmat(lat',dim.x,1)-.125,repmat(lon,1,dim.y)-.125,...
+%             mean(z,3,'omitnan'),20);
+    contourfm(repmat(lat',dim.x,1),repmat(lon,1,dim.y),...
+            mean(z,3,'omitnan'),zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
 end
 % plot borders around regions
 plot_lme_borders(cellstr(region),lme_shape,lme_idx);

@@ -1,7 +1,7 @@
 % this script defines the bounds of the eleven LMEs
 define_regions_eiwg
 
-for n = 1:length(region)
+for n = 7%1:length(region)
     % load data
     load(['Data/' region{n} '/gridded_pco2'],'SOCAT_grid');
     % for each LME, plot an amimation of available fCO2 observations

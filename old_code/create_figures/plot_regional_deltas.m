@@ -3,11 +3,12 @@
 % define regions
 define_regions_eiwg
 
-for n = 1:length(region)
+for n = 7%1:length(region)
     % load data
     load(['Data/' region{n} '/gridded_predictors'],'Preds_grid');
     load(['Data/' region{n} '/us_lme_model_evals'],'Val');
-    % create plot
+
+    % create absolute value plot
     figure('visible','off');
     worldmap([Preds_grid.(region{n}).lim.latmin ...
         Preds_grid.(region{n}).lim.latmax],...
@@ -21,6 +22,29 @@ for n = 1:length(region)
     c=colorbar;
     colormap(cmocean('tempo',16));
     caxis([-1 31]);
+    c.TickLength = 0;
+    c.Label.String = '\Delta{\itf}CO_{2} (\muatm)';
+    cbarrow('up');
+    clear c
+    % save figure
+    if ~isfolder('Figures'); mkdir('Figures'); end
+    exportgraphics(gcf,['Figures/' region{n} '_abs_delta_fCO2_RFR_gridded.png']);
+    close
+
+    % create average difference plot
+    figure('visible','off');
+    worldmap([Preds_grid.(region{n}).lim.latmin ...
+        Preds_grid.(region{n}).lim.latmax],...
+       [Preds_grid.(region{n}).lim.lonmin ...
+        Preds_grid.(region{n}).lim.lonmax]);
+    set(gca,'fontsize',16);
+    pcolorm(repmat(Preds_grid.(region{n}).lat',Preds_grid.(region{n}).dim.x,1),...
+            repmat(Preds_grid.(region{n}).lon,1,Preds_grid.(region{n}).dim.y),...
+            mean(Val.(region{n}).delta_rfr_grid,3,'omitnan'));
+    plot_land('map');
+    c=colorbar;
+    caxis([-20 20]);
+    colormap(cmocean('balance',21,'pivot',0));
     c.TickLength = 0;
     c.Label.String = '\Delta{\itf}CO_{2} (\muatm)';
     cbarrow('up');

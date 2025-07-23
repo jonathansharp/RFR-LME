@@ -29,7 +29,7 @@ c=colorbar('location','eastoutside');
 c.TickLength = 0;
 c.Label.String = lab;
 colormap(clrmp);
-caxis([zmin,zmax]);
+caxis([250 500]);
 cbarrow;
 % define filename
 filename = ['Figures/' reg '_' varname '_monthly.gif'];
@@ -39,8 +39,8 @@ for m = 1:length(month_of_year)
     % initialize axis
     worldmap([lim.latmin lim.latmax],[lim.lonmin lim.lonmax]);
     % plot
-    %pcolorm(lat,lon,z(:,:,m)');
-    contourfm(lat,lon,z(:,:,m)',zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
+    pcolorm(lat,lon,z(:,:,m)');
+    %contourfm(lat,lon,z(:,:,m)',zmin:(zmax-zmin)/200:zmax,'LineStyle','none');
     % plot land
     plot_land('map');
     % plot border
