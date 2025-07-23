@@ -28,7 +28,7 @@ for n = 1:length(region)
 
     %% remove observations outside general LME limits
     % determine geographic indices
-    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X)';
+    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X,'format','0-360')';
     tmp_lat = lme_shape(lme_idx.(region{n})).Y';
     idx_xmin = find(abs(SOCAT_grid.lon - min(tmp_lon))==...
         min(abs(SOCAT_grid.lon - min(tmp_lon))));

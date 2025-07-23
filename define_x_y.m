@@ -79,11 +79,15 @@ for n = 1:length(region)
     LME_clustering.variability = nan(sum(LME_clustering.idx_var(:)),length(clust_all));
     for v = 1:length(clust_all)
         if v <= length(clust_dims)
-            LME_clustering.monthly(:,v) = LME.([clust_vars{v} '_grid'])(LME_clustering.idx);
+            LME_clustering.monthly(:,v) = LME.([clust_all{v} '_grid'])(LME_clustering.idx);
         else
-            LME_clustering.monthly(:,v) = LME.(clust_vars{v})(LME_clustering.idx);
+            LME_clustering.monthly(:,v) = LME.(clust_all{v})(LME_clustering.idx);
         end
-        LME_clustering.variability(:,v) = LME.([clust_vars{v} '_var'])(LME_clustering.idx_var);
+        if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+            LME_clustering.variability(:,v) = LME.([clust_vars_arc{v} '_var'])(LME_clustering.idx_var);
+        else
+            LME_clustering.variability(:,v) = LME.([clust_vars{v} '_var'])(LME_clustering.idx_var);
+        end
     end
 
     % create X and Y for algorithm training

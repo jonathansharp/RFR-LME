@@ -18,7 +18,7 @@ thresh = 0.10;
 %% set predictor variable sources
 source.SSS = 'CMEMS'; source.SSH = 'CMEMS';
 source.SST = 'OISST'; source.IceC = 'OISST';
-source.CHL = 'CMEMS'; source.Wind = 'ERA5';
+source.CHL = 'NASA'; source.Wind = 'ERA5';
 source.MLD = 'CMEMS'; source.MSLP = 'NCEP';
 source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
 
@@ -32,8 +32,8 @@ source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
 % import_vars(vrs,dpath,source,yr_end);
 extract_lme(vrs,pred_vars,source,lme_shape,lme_idx,region);
 define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
-cluster_lme(vrs,num_groups,region,'plot_option',0);
-train_rfr(vrs,num_groups,pred_dims,pred_vars_arc,pred_vars,region,thresh,100,2,ceil((2/3)*length(pred_vars)));
+cluster_lme(vrs,num_groups,region,'plot_option',1);
+train_rfr(vrs,num_groups,pred_dims,pred_vars,pred_vars_arc,region,thresh,100,2,ceil((2/3)*length(pred_vars)));
 predict_fco2(vrs,num_groups,region,'plot_option',0);
 calculate_oa(vrs,region,num_groups,'plot_option',0);
 matlab_to_netcdf(vrs,lme_shape,lme_idx,region);
