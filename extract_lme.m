@@ -72,7 +72,7 @@ for n = 1:length(region)
     % remove observations outside refined LME limits:
     % determine index based on LME
     LME.idxspc = nan(LME.dim.x,LME.dim.y);
-    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X);
+    tmp_lon = convert_lon(lme_shape(lme_idx.(region{n})).X,'format','0-360');
     tmp_lat = lme_shape(lme_idx.(region{n})).Y';
     LME.idxspc = inpolygon(repmat(LME.lon,1,LME.dim.y),...
         repmat(LME.lat',LME.dim.x,1),tmp_lon,tmp_lat);
@@ -80,10 +80,11 @@ for n = 1:length(region)
     % eliminate gridded data outside LME
     vars = fields(LME);
     for v = 1:length(vars)
-       if size(LME.(vars{v}),2) == LME.dim.y && ...
-               ~strcmp(vars{v},'idxspc')
+       if size(LME.(vars{v}),2) == LME.dim.y && ~strcmp(vars{v},'idxspc')
            if size(LME.(vars{v}),3) == LME.dim.z
                LME.(vars{v})(~LME.idxspc) = NaN;
+           elseif size(LME.(vars{v}),3) == 12
+               LME.(vars{v})(~LME.idxspc(:,:,1:12)) = NaN;
            else
                LME.(vars{v})(~LME.idxspc(:,:,1)) = NaN;
            end

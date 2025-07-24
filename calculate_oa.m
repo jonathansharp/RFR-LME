@@ -9,7 +9,7 @@ for i = 1:2:length(varargin)
     end
 end
 
-for n = 1:length(region)
+for n = 4%1:length(region)
 
     % display status
     disp(['Calculating CO2 System (' region{n} ')']);
@@ -17,6 +17,7 @@ for n = 1:length(region)
     % load gridded fCO2, predictors, and models
     load(['Data/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
     load(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME');
+    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
     load(['Models/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))],'rfr');
 
     %% predict TA (and nutrients) using ESPER
@@ -29,7 +30,9 @@ for n = 1:length(region)
     sal = RFR_LME.SSS(LME_prediction.idx);
     tmp = RFR_LME.SST(LME_prediction.idx);
     % predict TA using ESPER-Mixed
-    [data,u_data] = ESPER_Mixed([1 4 6],[lon lat depth],[sal tmp],[1 2],'Equations',8);
+    %idx = ~isnan(sal) & ~isnan(tmp);
+    [data,u_data] = ESPER_Mixed([1 4 6],[lon lat depth],...
+        [sal tmp],[1 2],'Equations',8);
     % pre-allocate TA and nutrients
     RFR_LME.TA = nan(size(LME_prediction.idx));
     RFR_LME.uTA = nan(size(LME_prediction.idx));
