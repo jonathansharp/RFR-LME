@@ -26,15 +26,25 @@ source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
 [lme_shape,lme_idx,region] = define_lme();
 
 %% run scripts to create RFR-LME
-% load_socat(vrs);
-% grid_socat(vrs,dpath,yr_end);
-% download_vars(vrs,dpath,source);
-% import_vars(vrs,dpath,source,yr_end);
-extract_lme(vrs,pred_vars,source,lme_shape,lme_idx,region);
+load_socat(vrs);
+grid_socat(vrs,dpath,yr_end);
+download_vars(vrs,dpath,source);
+import_vars(vrs,dpath,source,yr_end,pred_vars_arc);
+extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region);
 define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
 cluster_lme(vrs,num_groups,region,'plot_option',1);
 train_rfr(vrs,num_groups,pred_dims,pred_vars,pred_vars_arc,region,thresh,100,2,ceil((2/3)*length(pred_vars)));
-predict_fco2(vrs,num_groups,region,'plot_option',0);
-calculate_oa(vrs,region,num_groups,'plot_option',0);
+predict_fco2(vrs,num_groups,region,'plot_option',1);
+calculate_oa(vrs,region,num_groups,'plot_option',1);
 matlab_to_netcdf(vrs,lme_shape,lme_idx,region);
+regional_stats(vrs,lme_shape,lme_idx,region,yr_end);
 create_figures(vrs,lme_shape,lme_idx,region);
+log_errs(vrs,num_groups,region);
+region_wide_stats(vrs,date);
+
+%% test numbers of clusters
+num_groups = repelem((1:10)',11,1);
+for ng = 1:size(num_groups,1)
+    train_rfr(vrs,num_groups(:,ng),pred_dims,pred_vars,pred_vars_arc,region,...
+        thresh,100,2,ceil((2/3)*length(pred_vars)));
+end

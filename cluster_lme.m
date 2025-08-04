@@ -71,7 +71,7 @@ for n = 1:length(region)
     if plot_option == 1
         create_animation([region{n} '_groups'],['GMM_' num2str(num_groups(n))],...
             datenum(LME.year,LME.month,15),LME.lat,LME.lon,...
-            LME_GMM.group3D,jet,[1 8],'GMM Groups','');
+            LME_GMM.group3D,jet,[1 num_groups(n)],'GMM Groups','');
     end
 
 %     % fit GMM from predictor variable variability

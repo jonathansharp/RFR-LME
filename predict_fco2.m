@@ -58,6 +58,7 @@ for n = 1:length(region)
     RFR_LME.year = LME.year;
     RFR_LME.month_of_year = LME.month_of_year;
     RFR_LME.idxspc = LME.idxspc;
+    RFR_LME.idxspc(LME.IceC>0.5) = false; % remove cells where ice is >50%
     RFR_LME.SSS = LME.SSS;
     RFR_LME.SST = LME.SST;
 

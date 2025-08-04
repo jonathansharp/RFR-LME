@@ -1,11 +1,4 @@
-% Log error statistics
-% 
-% This script loads error statics determined during fCO2 algorithm fits for
-% eighteen US large Marine Ecosystems and saves them in a table
-% 
-% Written by J.D. Sharp: 1/10/23
-% Last updated by J.D. Sharp: 1/10/23
-% 
+function log_errs(vrs,num_groups,region)
 
 %% pre-allocate table
 error_stats = table('Size',[length(region) 7],...
@@ -16,32 +9,22 @@ error_stats = table('Size',[length(region) 7],...
 %% loop through regions
 for n = 1:length(region)
 
-    %% load error statistics
-    for en = 1:size(num_groups,2)
-        load(['Data/' region{n} '/us_lme_model_evals' exts],'Val');
-        Val_tmp.avg_err_rfr(en) = mean(Val.(region{n}).delta_rfr.all(:,end));
-        Val_tmp.avg_abs_err_rfr(en) = mean(abs(Val.(region{n}).delta_rfr.all(:,end)));
-        Val_tmp.med_err_rfr(en) = median(Val.(region{n}).delta_rfr.all(:,end));
-        Val_tmp.med_abs_err_rfr(en) = median(abs(Val.(region{n}).delta_rfr.all(:,end)));
-        Val_tmp.iqr_rfr(en) = iqr(Val.(region{n}).delta_rfr.all(:,end));
-        Val_tmp.rmse_rfr(en) = sqrt(mean(Val.(region{n}).delta_rfr.all(:,end).^2));
-        Val_tmp.r2_rfr(en) = Val.(region{n}).r2_rfr(end);
-        clear Val
-    end
+    %% load error statistics and calculate some extra ones
+    load(['Models/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))]);
+    rfr.avg_abs_err = mean(abs(rfr.delta.all(:,end)),'omitnan');
+    rfr.med_abs_err = median(abs(rfr.delta.all(:,end)),'omitnan');
+    rfr.iqr = iqr(rfr.delta.all(:,end));
 
     %% log in table
-    error_stats(n,1) = {mean(Val_tmp.avg_err_rfr,'omitnan')};
-    error_stats(n,2) = {mean(Val_tmp.avg_abs_err_rfr,'omitnan')};
-    error_stats(n,3) = {mean(Val_tmp.med_err_rfr,'omitnan')};
-    error_stats(n,4) = {mean(Val_tmp.med_abs_err_rfr,'omitnan')};
-    error_stats(n,5) = {mean(Val_tmp.iqr_rfr,'omitnan')};
-    error_stats(n,6) = {mean(Val_tmp.rmse_rfr,'omitnan')};
-    error_stats(n,7) = {mean(Val_tmp.r2_rfr,'omitnan')};
-
-    %% clean up
-    clear Mods
+    error_stats(n,1) = {rfr.avg_err(end)};
+    error_stats(n,2) = {mean(rfr.avg_abs_err,'omitnan')};
+    error_stats(n,3) = {rfr.med_err(end)};
+    error_stats(n,4) = {mean(rfr.med_abs_err,'omitnan')};
+    error_stats(n,5) = {mean(rfr.iqr,'omitnan')};
+    error_stats(n,6) = {rfr.rmse(end)};
+    error_stats(n,7) = {rfr.r2(end)};
 
 end
 
 %% save table of error statistics
-writetable(error_stats,['IndsAndStats/ErrorStatistics' exts '-' date '.xls']);
+writetable(error_stats,['IndsAndStats/ErrorStatistics-' date '.xls']);

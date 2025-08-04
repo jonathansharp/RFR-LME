@@ -117,7 +117,7 @@ for n = 1:length(region)
             set(gca,'fontsize',16);
             xlabel('Predictors');
             ylabel('Out-of-Bag Feature Importance');
-            if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+            if strcmp(region{n},'BS') || strcmp(region{n},'NBCS') || strcmp(region{n},'EBS') 
                 xticks(1:length([pred_dims pred_vars_arc]));
                 xticklabels([pred_dims pred_vars_arc]);
             else
@@ -145,8 +145,11 @@ for n = 1:length(region)
     end
 
 % average error statistics across clusters
-rfr.Y_fit.all(:,c+1) = sum(rfr.Y_fit.all.*LME_probabilities,2,'omitnan')./sum(LME_probabilities,2,'omitnan');
-rfr.delta.all(:,c+1) = sum(rfr.delta.all.*LME_probabilities,2,'omitnan')./sum(LME_probabilities,2,'omitnan');
+LME_probabilities(~LME_training_idx) = NaN;
+rfr.Y_fit.all(:,c+1) = sum(rfr.Y_fit.all.*LME_probabilities,2,'omitnan')./...
+    sum(LME_probabilities,2,'omitnan');
+rfr.delta.all(:,c+1) = sum(rfr.delta.all.*LME_probabilities,2,'omitnan')./...
+    sum(LME_probabilities,2,'omitnan');
 
 % rfr error statistics across all clusters
 idx = ~isnan(rfr.Y_fit.all(:,c+1));

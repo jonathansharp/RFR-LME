@@ -1,6 +1,6 @@
 % Extract LMEs from gridded SOCAT data
 
-function extract_lme(vrs,pred_vars,source,lme_shape,lme_idx,region)
+function extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region)
 
 % load SOCAT grid
 load(['Data/' vrs '_gridded'],'SOCAT_grid');
@@ -19,6 +19,25 @@ for p = 1:length(pred_vars)
     SOCAT_grid.(pred_vars{p}) = ...
         ncread(['Data/' pred_vars{p} '_' source.(pred_vars{p}) '_' vrs '.nc'],pred_vars{p});
 end
+
+% apply mask to each predictor variable according to bathymetry
+% per_sea = repmat(SOCAT_grid.percent_sea,1,1,SOCAT_grid.dim.z);
+% ocean_mask = true(SOCAT_grid.dim.x,SOCAT_grid.dim.y,SOCAT_grid.dim.z);
+% ocean_mask(per_sea==0) = false;
+% for p = 1:length(pred_vars_arc)
+%     if ndims(SOCAT_grid.(pred_vars_arc{p})) == 3
+%         ocean_mask(isnan(SOCAT_grid.(pred_vars_arc{p}))) = false;
+%     end
+% end
+% for p = 1:length(pred_vars)
+%     if ndims(SOCAT_grid.(pred_vars{p})) == 2
+%         SOCAT_grid.(pred_vars{p})(~ocean_mask(:,:,1)) = NaN;
+%     else
+%         SOCAT_grid.(pred_vars{p})(~ocean_mask) = NaN;
+%     end
+%     sum(sum(isnan(SOCAT_grid.(pred_vars{p})(:,:,1))))
+%     % figure; pcolor(SOCAT_grid.lon,SOCAT_grid.lat,SOCAT_grid.SSH(:,:,1)'); shading flat; colorbar;
+% end
 
 % extract each LME from large grid
 for n = 1:length(region)
@@ -77,10 +96,13 @@ for n = 1:length(region)
     LME.idxspc = inpolygon(repmat(LME.lon,1,LME.dim.y),...
         repmat(LME.lat',LME.dim.x,1),tmp_lon,tmp_lat);
     LME.idxspc = repmat(LME.idxspc,1,1,LME.dim.z);
+    LME.idxspc(~LME.ocean_mask) = false;
     % eliminate gridded data outside LME
     vars = fields(LME);
     for v = 1:length(vars)
-       if size(LME.(vars{v}),2) == LME.dim.y && ~strcmp(vars{v},'idxspc')
+       if size(LME.(vars{v}),2) == LME.dim.y && ...
+               ~strcmp(vars{v},'idxspc') && ...
+               ~strcmp(vars{v},'ocean_mask')
            if size(LME.(vars{v}),3) == LME.dim.z
                LME.(vars{v})(~LME.idxspc) = NaN;
            elseif size(LME.(vars{v}),3) == 12

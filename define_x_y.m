@@ -58,7 +58,7 @@ for n = 1:length(region)
     LME_prediction.idx = ~isnan(LME.SSS) & LME.idxspc; % within LME with valid SSS 
 
     % calculate variability
-    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS') || strcmp(region{n},'EBS')
         all_vars = unique([clust_vars_arc pred_vars_arc]);
     else
         all_vars = unique([clust_vars pred_vars]);
@@ -69,7 +69,7 @@ for n = 1:length(region)
     end
 
     % create X and Y for clustering
-    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS') || strcmp(region{n},'EBS')
         clust_all = [clust_dims clust_vars_arc];
     else
         clust_all = [clust_dims clust_vars];
@@ -83,7 +83,7 @@ for n = 1:length(region)
         else
             LME_clustering.monthly(:,v) = LME.(clust_all{v})(LME_clustering.idx);
         end
-        if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+        if strcmp(region{n},'BS') || strcmp(region{n},'NBCS') || strcmp(region{n},'EBS') 
             LME_clustering.variability(:,v) = LME.([clust_vars_arc{v} '_var'])(LME_clustering.idx_var);
         else
             LME_clustering.variability(:,v) = LME.([clust_vars{v} '_var'])(LME_clustering.idx_var);
@@ -91,7 +91,7 @@ for n = 1:length(region)
     end
 
     % create X and Y for algorithm training
-    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS') || strcmp(region{n},'EBS') 
         pred_all = [pred_dims pred_vars_arc];
     else
         pred_all = [pred_dims pred_vars];
@@ -109,7 +109,7 @@ for n = 1:length(region)
     LME_training.y = LME.fco2_ave_wtd(LME_training.idx);
 
     % create X and Y for prediction
-    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS')
+    if strcmp(region{n},'BS') || strcmp(region{n},'NBCS') || strcmp(region{n},'EBS')
         pred_all = [pred_dims pred_vars_arc];
     else
         pred_all = [pred_dims pred_vars];
