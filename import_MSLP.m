@@ -33,8 +33,8 @@ end
 
 % create sst animation
 if plot_option == 1
-    create_animation('MSLP',type,time,lat,lon,data_interp,cmocean('rain'),[0 200],'Mean Sea Level Pressure','');
-    % create_animation('MSLP_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Mean Sea Level Pressure Anomaly','');
+    create_animation('MSLP',type,time,lat,lon,data_interp,cmocean('rain'),[.9 1.1],'Mean Sea Level Pressure','');
+    % create_animation('MSLP_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-1 1],'Mean Sea Level Pressure Anomaly','');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

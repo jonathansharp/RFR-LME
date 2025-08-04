@@ -9,7 +9,7 @@ for i = 1:2:length(varargin)
     end
 end
 
-for n = 4%1:length(region)
+for n = 1:length(region)
 
     % display status
     disp(['Calculating CO2 System (' region{n} ')']);

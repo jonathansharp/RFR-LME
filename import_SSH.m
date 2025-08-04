@@ -61,17 +61,28 @@ function data = import_SSH_CMEMS(dpath,lat,lon,time,yr_end)
     inf = ncinfo([dpath fpath temp_file]);
     data_lat = ncread([dpath fpath temp_file],'latitude'); % degrees north
     data_lon = ncread([dpath fpath temp_file],'longitude'); % degrees east
-    
+    data_lon_neg = data_lon; data_lon_pos = data_lon;
+    data_lon_neg(data_lon_neg >= 0) = NaN;
+    data_lon_pos(data_lon_pos < 0) = NaN;
+    data_lon_neg = convert_lon(data_lon_neg);
+    data_time = ncread([dpath fpath temp_file],'time'); % hours since 1950-01-01
+    data_time = datenum(1950,1,1,double(data_time),0,0) + 14; % add 14 days for mid-month
+
     % index based on dimensions
     [~,idx_minlat] = min(abs(data_lat-min(lat)));
     [~,idx_maxlat] = min(abs(data_lat-max(lat)));
-    [~,idx_minlon] = min(abs(data_lon-min(lon)));
-    [~,idx_maxlon] = min(abs(data_lon-max(lon)));
+    [~,idx_minlon1] = min(abs(data_lon_neg-min(lon)));
+    [~,idx_maxlon1] = min(abs(data_lon_neg-max(lon)));
+    [~,idx_minlon2] = min(abs(data_lon_pos-min(lon)));
+    [~,idx_maxlon2] = min(abs(data_lon_pos-max(lon)));
+    [~,idx_mintime] = min(abs(data_time-floor(min(time))));
+    [~,idx_maxtime] = min(abs(data_time-datenum(yr_end,12,15))); % last month of last year
 
     % cut down dimensions
     data_lat = data_lat(idx_minlat:idx_maxlat);
-    data_lon = data_lon(idx_minlon:idx_maxlon);
-
+    data_lon = [data_lon_pos(idx_minlon2:idx_maxlon2);data_lon_neg(idx_minlon1:idx_maxlon1)];
+    data_time = data_time(idx_mintime:idx_maxtime);
+   
     % read in data
     date = datevec(time);
     year = date(:,1);
@@ -79,11 +90,17 @@ function data = import_SSH_CMEMS(dpath,lat,lon,time,yr_end)
     for t = 1:(yr_end-1997)*12
         try
             % science-quality data
-            data(:,:,t) = ncread([dpath fpath num2str(year(t)) ...
+            data_neglon = ncread([dpath fpath num2str(year(t)) ...
                 '/dt_global_twosat_phy_l4_' num2str(year(t)) ...
                 sprintf('%02d',month(t)) '_vDT2024-M01.nc'],'sla',...
-                [idx_minlon idx_minlat 1],...
-                [1+idx_maxlon-idx_minlon 1+idx_maxlat-idx_minlat 1]);
+                [idx_minlon1 idx_minlat 1],...
+                [1+idx_maxlon1-idx_minlon1 1+idx_maxlat-idx_minlat 1]);
+            data_poslon = ncread([dpath fpath num2str(year(t)) ...
+                '/dt_global_twosat_phy_l4_' num2str(year(t)) ...
+                sprintf('%02d',month(t)) '_vDT2024-M01.nc'],'sla',...
+                [idx_minlon2 idx_minlat 1],...
+                [1+idx_maxlon2-idx_minlon2 1+idx_maxlat-idx_minlat 1]);
+            data(:,:,t) = cat(1,data_poslon,data_neglon);
             data_time(t) = ncread([dpath fpath num2str(year(t)) ...
                 '/dt_global_twosat_phy_l4_' num2str(year(t)) ...
                 sprintf('%02d',month(t)) '_vDT2024-M01.nc'],'time');
@@ -99,20 +116,44 @@ function data = import_SSH_CMEMS(dpath,lat,lon,time,yr_end)
         catch
             try
                 % near-real-time data
-                data(:,:,t) = ncread([dpath fpath_int num2str(year(t)) ...
+                data_neg_lon = ncread([dpath fpath_int num2str(year(t)) ...
                     '/dt_global_allsat_msla_h_y' num2str(year(t)) ...
                     '_m' sprintf('%02d',month(t)) '.nc'],'sla',...
-                    [idx_minlon idx_minlat 1],...
-                    [1+idx_maxlon-idx_minlon 1+idx_maxlat-idx_minlat 1]);
+                    [idx_minlon1 idx_minlat 1],...
+                    [1+idx_maxlon1-idx_minlon1 1+idx_maxlat-idx_minlat 1]);
+                data_pos_lon = ncread([dpath fpath_int num2str(year(t)) ...
+                    '/dt_global_allsat_msla_h_y' num2str(year(t)) ...
+                    '_m' sprintf('%02d',month(t)) '.nc'],'sla',...
+                    [idx_minlon2 idx_minlat 1],...
+                    [1+idx_maxlon2-idx_minlon2 1+idx_maxlat-idx_minlat 1]);
+                data(:,:,t) = cat(1,data_poslon,data_neglon);
                 data_time(t) = ncread([dpath fpath_int num2str(year(t)) ...
                     '/dt_global_allsat_msla_h_y' num2str(year(t)) ...
                     '_m' sprintf('%02d',month(t)) '.nc'],'time');
             catch
+                data(:,:,t) = nan(size(data(:,:,t-1)));
+                data_time(t) = data_time(t-1) + 30;
             end
         end
     end
 
-    % 
+    % Interpolate over some gaps in SSH dataset (linear, 1-D, time), then
+    % remaining gaps at either end (nearest, 1-D, time)
+    for g = 1:length(data_lon)
+        for h = 1:length(data_lat)
+            if sum(~isnan(squeeze(data(g,h,:)))) >= 200 % check for "too many" NaNs
+                % linear interpolation
+                idx = ~isnan(squeeze(data(g,h,:)));
+                ssh_tmp = interp1(time(idx),squeeze(data(g,h,idx)),time,'linear');
+                % then, nearest neighbor interpolation
+                idx = ~isnan(ssh_tmp);
+                ssh_fit = interp1(time(idx),ssh_tmp(idx),time,'nearest','extrap');
+                data(g,h,:) = ssh_fit;
+            else
+                data(g,h,:) = NaN;
+            end
+        end
+    end
 
 end
 

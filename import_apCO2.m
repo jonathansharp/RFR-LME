@@ -1,5 +1,6 @@
 % import atmospheric pCO2
-function data_interp = import_apCO2(dpath,vrs,type,lat,lon,time,yr_end,mslp_type,sss_type,sst_type,varargin)
+function data_interp = import_apCO2(dpath,vrs,type,lat,lon,time,...
+    yr_end,mslp_type,sss_type,sst_type,varargin)
 
 % process optional inputs
 plot_option = 0;

@@ -1,5 +1,5 @@
 % import Bathymetry
-function data_interp = import_Bathy(dpath,vrs,type,lat,lon,time,varargin)
+function data_interp = import_Bathy(dpath,vrs,type,lat,lon,varargin)
 
 if ~isfile(['Data/Bathy_' type '_' vrs '.nc'])
 

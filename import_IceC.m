@@ -1,5 +1,5 @@
 % import IceC
-function data = import_IceC(dpath,vrs,type,lat,lon,time,yr_end,varargin)
+function data = import_IceC(dpath,vrs,type,lat,lon,time,yr_end,ocean_mask,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -14,7 +14,7 @@ if ~isfile(['Data/IceC_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'OISST')
-    data = import_IceC_OISST(dpath,lat,lon,time,yr_end);
+    data = import_IceC_OISST(dpath,lat,lon,time,yr_end,ocean_mask);
 else
     error('Input variable "type" must be "OISST"');
 end
@@ -40,7 +40,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % embedded function to import OISST ice coverage
-function data = import_IceC_OISST(dpath,lat,lon,time,yr_end)
+function data = import_IceC_OISST(dpath,lat,lon,time,yr_end,ocean_mask)
 
     % obtain OISST ice coverage file if downloaded file is older than one month
     fpath = 'OISST/IceC/';
@@ -74,7 +74,9 @@ function data = import_IceC_OISST(dpath,lat,lon,time,yr_end)
     % read in data
     data = ncread([dpath fpath fname],'icec',[idx_minlon idx_minlat idx_mintime],...
         [1+idx_maxlon-idx_minlon 1+idx_maxlat-idx_minlat 1+idx_maxtime-idx_mintime]);
-    data(data<-10^6) = NaN; % define NaNs
+    data(data<-10^6) = 0; % define NaN
+    ocean_mask = repmat(ocean_mask,1,1,size(data,3));
+    data(~ocean_mask) = NaN;
 
 end
 

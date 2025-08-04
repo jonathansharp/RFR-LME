@@ -150,8 +150,8 @@ end
 
     % Interpolate over some gaps in CHL dataset (linear, 1-D, time), then
     % remaining gaps at either end (nearest, 1-D, time)
-    for g = 1:size(data_lon)
-        for h = 1:size(data_lat)
+    for g = 1:length(data_lon)
+        for h = 1:length(data_lat)
             if sum(~isnan(chl_ts(g,h,:))) >= 200 % check for "too many" NaNs
                 % linear interpolation
                 idx = ~isnan(chl_ts(g,h,:));
@@ -167,9 +167,9 @@ end
     end
 
     % adjust ocean mask
-    for g = 1:size(lon)
+    for g = 1:length(lon)
         idx_lon = data_lon >= lon(g)-0.125 & data_lon <= lon(g)+0.125;
-        for h = 1:size(lat)
+        for h = 1:length(lat)
             idx_lat = data_lat >= lat(h)-0.125 & data_lat <= lat(h)+0.125;
             chl_test = chl_ts(idx_lon,idx_lat,1);
             if any(~isnan((chl_test(:))))
