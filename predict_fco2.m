@@ -26,7 +26,7 @@ for n = 1:length(region)
 
     % pre-allocate results
     fco2_rfr_tmp = nan(length(LME_prediction.x),num_groups(n));
-    fco2_gmm_probs = nan(length(LME_prediction.x),num_groups(n));
+    fco2_gmm_probs = repmat(LME_GMM.probs,LME.dim.z,1);
 
     %% predict fCO2 using RFR for each cluster
     for c = 1:num_groups(n)
@@ -46,7 +46,7 @@ for n = 1:length(region)
     end
 
     % average RFR result across clusters
-    fco2_rfr = sum(fco2_rfr_tmp.*LME_GMM.probs,2,'omitnan');
+    fco2_rfr = sum(fco2_rfr_tmp.*fco2_gmm_probs,2,'omitnan');
 
     %% re-grid
     % grid information

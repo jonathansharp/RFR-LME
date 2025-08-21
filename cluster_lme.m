@@ -9,6 +9,8 @@ plot_option = 0;
 for i = 1:2:length(varargin)
     if strcmp(varargin{i},'plot_option')
         plot_option = varargin{i+1};
+    elseif strcmp(varargin{i},'cluster_option')
+        cluster_option = varargin{i+1};
     end
 end
 
@@ -19,8 +21,13 @@ for n = 1:length(region)
     load(['Data/LME_Data/' vrs '_clustering_arrays_' region{n}],'LME_clustering');
 
     % normalize X to have mean of zero and st. dev. of 1
-    X_norm = normalize(LME_clustering.monthly);
-    
+    if strcmp(cluster_option,'var')
+        X_norm = normalize(LME_clustering.variability);
+    elseif strcmp(cluster_option,'monthly')
+         X_norm = normalize(LME_clustering.monthly);
+    else
+        X_norm = normalize(LME_clustering.monthly);
+    end
 %     % determine covariance among cluster variables
 %     idx = sum(~isnan(LME_clustering.(region{n})),2) == 2;
 %     [R,P] = corrcoef(LME_clustering.(region{n})(idx,:));
@@ -56,15 +63,26 @@ for n = 1:length(region)
 %     export_fig(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'],'-transparent')
 %     close
     
-    % fill group grid
-    idx_clust = ~isnan(LME.SSS) & LME.idxspc;
-    LME_GMM.group3D = nan(LME.dim.x,LME.dim.y,LME.dim.z);
-    LME_GMM.group3D(idx_clust) = LME_GMM.clusters;
-
-    % fill probability grids
-    for g = 1:num_groups(n)
-        LME_GMM.prob3D.(['c' num2str(g)]) = nan(LME.dim.x,LME.dim.y,LME.dim.z);
-        LME_GMM.prob3D.(['c' num2str(g)])(idx_clust) = LME_GMM.probs(:,g);
+    % fill group grid and probability grids
+    if strcmp(cluster_option,'var')
+        idx_clust = ~isnan(mean(LME.SSS,3,'omitnan')) & any(LME.idxspc,3);
+        LME_GMM.group3D = nan(LME.dim.x,LME.dim.y,1);
+        LME_GMM.group3D(idx_clust) = LME_GMM.clusters;
+        LME_GMM.group3D = repmat(LME_GMM.group3D,1,1,LME.dim.z);
+        for g = 1:num_groups(n)
+            LME_GMM.prob3D.(['c' num2str(g)]) = nan(LME.dim.x,LME.dim.y,1);
+            LME_GMM.prob3D.(['c' num2str(g)])(idx_clust) = LME_GMM.probs(:,g);
+            LME_GMM.prob3D.(['c' num2str(g)]) = ...
+                repmat(LME_GMM.prob3D.(['c' num2str(g)]),1,1,LME.dim.z);
+        end
+    else
+        idx_clust = ~isnan(LME.SSS) & LME.idxspc;
+        LME_GMM.group3D = nan(LME.dim.x,LME.dim.y,LME.dim.z);
+        LME_GMM.group3D(idx_clust) = LME_GMM.clusters;
+        for g = 1:num_groups(n)
+            LME_GMM.prob3D.(['c' num2str(g)]) = nan(LME.dim.x,LME.dim.y,LME.dim.z);
+            LME_GMM.prob3D.(['c' num2str(g)])(idx_clust) = LME_GMM.probs(:,g);
+        end
     end
 
     % create animation
