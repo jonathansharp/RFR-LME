@@ -1,8 +1,8 @@
 %% set parameters
 % SOCAT version and data path
-vrs = 'SOCATv2025'; dpath = '/raid/Data/RFR-LME-Data/';
-cmems.path = '/home/sharp/.conda/envs/copernicusmarine/bin/';
-cmems.usr = 'jsharp'; cmems.pwd = 'jvqsEZL9';
+vrs = 'SOCATv2025'; dpath = '';
+cmems.path = '';
+cmems.usr = ''; cmems.pwd = '';
 yr_end = str2num(extractAfter(vrs,'v')) - 1;
 % Coordinates and variables to be used for models
 pred_dims = {'lon' 'lat' 'sin_month_of_year' 'cos_month_of_year' 'year' 'dist'};
