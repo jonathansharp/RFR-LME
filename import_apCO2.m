@@ -52,11 +52,11 @@ function data_interp_temp = import_axCO2_MBL(dpath,lat,lon,time,yr_end)
     % 
 
     % file name
-    fnames = dir([dpath 'NOAA-MBL']);
+    fnames = dir(dpath);
     for n = 1:length(fnames)
         if contains(fnames(n).name,'.txt'); idx = n; end
     end
-    fname = [dpath 'NOAA-MBL/' fnames(idx).name];
+    fname = [dpath fnames(idx).name];
     
     % Open and scan file
     file = fopen(fname);

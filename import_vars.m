@@ -1,6 +1,6 @@
 % Import predictor variables
 
-function import_vars(vrs,dpath,source,yr_end,pred_vars_arc)
+function import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems)
 
     % load SOCAT grid
     load(['Data/' vrs '_gridded'],'SOCAT_grid');
@@ -11,10 +11,10 @@ function import_vars(vrs,dpath,source,yr_end,pred_vars_arc)
     clear SOCAT_grid
 
     % 1. obtain sea surface salinity (Options: 'BASS', 'CMEMS')
-    import_SSS(dpath,vrs,source.SSS,lat,lon,time,yr_end,'plot_option',0);
+    import_SSS(dpath,vrs,source.SSS,lat,lon,time,yr_end,cmems,'plot_option',0);
 
     % 2. obtain sea surface height (Options: 'CMEMS', 'NASA')
-    import_SSH(dpath,vrs,source.SSH,lat,lon,time,yr_end,'plot_option',0);
+    import_SSH(dpath,vrs,source.SSH,lat,lon,time,yr_end,cmems,'plot_option',0);
 
     % 3. obtain sea surface temperature
     import_SST(dpath,vrs,source.SST,lat,lon,time,yr_end,'plot_option',0);
@@ -29,7 +29,7 @@ function import_vars(vrs,dpath,source,yr_end,pred_vars_arc)
     import_Wind(dpath,vrs,source.Wind,lat,lon,time,yr_end,'plot_option',0);
 
     % 7. Obtain mixed layer depth from CMEMS
-    import_MLD(dpath,vrs,source.MLD,lat,lon,time,yr_end,'plot_option',0);
+    import_MLD(dpath,vrs,source.MLD,lat,lon,time,yr_end,cmems,'plot_option',1);
 
     % 8. Obtain atmospheric pressure from NCEP
     import_MSLP(dpath,vrs,source.MSLP,lat,lon,time,yr_end,'plot_option',0);

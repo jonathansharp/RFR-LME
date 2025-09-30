@@ -48,10 +48,10 @@ function data_interp = import_MSLP_NCEP(dpath,lat,lon,time,yr_end)
     fname = ['mslp.mon.mean.nc'];
     
     % load dimensions
-    inf = ncinfo([dpath 'NCEP-DOE/' fname]);
-    data_lat = ncread([dpath 'NCEP-DOE/' fname],'lat'); % degrees north
-    data_lon = ncread([dpath 'NCEP-DOE/' fname],'lon'); % degrees east
-    data_time = ncread([dpath 'NCEP-DOE/' fname],'time'); % hours since 1950-01-01
+    inf = ncinfo([dpath fname]);
+    data_lat = ncread([dpath fname],'lat'); % degrees north
+    data_lon = ncread([dpath fname],'lon'); % degrees east
+    data_time = ncread([dpath fname],'time'); % hours since 1950-01-01
     data_time = datenum(1800,1,1,data_time,0,0) + 14; % add 14 days for mid-month
     
     % index based on dimensions
@@ -68,7 +68,7 @@ function data_interp = import_MSLP_NCEP(dpath,lat,lon,time,yr_end)
     % data_time = data_time(idx_mintime:idx_maxtime);
     
     % read in data
-    data = ncread([dpath 'NCEP-DOE/' fname],'mslp',[idx_minlon idx_maxlat idx_mintime],...
+    data = ncread([dpath fname],'mslp',[idx_minlon idx_maxlat idx_mintime],...
         [1+idx_maxlon-idx_minlon 1+idx_minlat-idx_maxlat 1+idx_maxtime-idx_mintime]);
 
     % interpolate onto quarter degree grid

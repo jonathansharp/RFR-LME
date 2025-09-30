@@ -149,9 +149,9 @@ SOCAT_grid.area_km2 = ...
 
 % Determine sea fraction of each grid cell
 % Obtain bathymetry from ETOPOv2022
-ETOPO.lon = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lon');
-ETOPO.lat = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lat');
-ETOPO.bottomdepth = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'z');
+ETOPO.lon = ncread([dpath 'ETOPO_2022_v1_60s_N90W180_bed.nc'],'lon');
+ETOPO.lat = ncread([dpath 'ETOPO_2022_v1_60s_N90W180_bed.nc'],'lat');
+ETOPO.bottomdepth = ncread([dpath 'ETOPO_2022_v1_60s_N90W180_bed.nc'],'z');
 % Convert longitude
 ETOPO.lon = convert_lon(ETOPO.lon);
 % define points as land (0) or sea (1)

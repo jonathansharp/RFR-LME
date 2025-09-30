@@ -71,6 +71,9 @@ for n = 1:length(region)
     LME_prediction.idx(LME.IceC > 0.5) = 0;
     RFR_LME.fCO2(~LME_prediction.idx) = NaN;
 
+    %% get rid of zeros (had an issue in GA)
+    RFR_LME.fCO2(RFR_LME.fCO2==0) = NaN;
+
     %% convert fCO2 to pCO2
     % calculate fugacity factor
     TempK = LME.SST + 273.15;

@@ -43,24 +43,22 @@ end
 function data = import_SST_OISST(dpath,lat,lon,time,yr_end)
 
     % obtain OISST file if downloaded file is older than one month
-    fpath = 'OISST/SST/';
     fname = 'sst.mon.mean.nc';
-    if ~isfolder([dpath fpath]); mkdir([dpath fpath]); end
     url = 'https://psl.noaa.gov/thredds/fileServer/Datasets/noaa.oisst.v2.highres/';
-    if isfile([dpath fpath fname])
-        inf = dir([dpath fpath fname]);
+    if isfile([dpath fname])
+        inf = dir([dpath fname]);
         if datenum(inf.date) - datenum(date) > 30
-            websave([dpath fpath fname],[url fname]);
+            websave([dpath fname],[url fname]);
         end
     else
-        websave([dpath fpath fname],[url fname]);
+        websave([dpath fname],[url fname]);
     end
 
     % load dimensions
-    inf = ncinfo([dpath fpath fname]);
-    data_lat = ncread([dpath fpath fname],'lat'); % degrees north
-    data_lon = ncread([dpath fpath fname],'lon'); % degrees east
-    data_time = ncread([dpath fpath fname],'time'); % days since 1800-01-00
+    inf = ncinfo([dpath fname]);
+    data_lat = ncread([dpath fname],'lat'); % degrees north
+    data_lon = ncread([dpath fname],'lon'); % degrees east
+    data_time = ncread([dpath fname],'time'); % days since 1800-01-00
     data_time = datenum(1800,1,data_time,0,0,0) + 15; % add 15 days for mid-month
 
     % index based on dimensions
@@ -72,7 +70,7 @@ function data = import_SST_OISST(dpath,lat,lon,time,yr_end)
     [~,idx_maxtime] = min(abs(data_time-datenum(yr_end,12,15))); % last month of last year
     
     % read in data
-    data = ncread([dpath fpath fname],'sst',[idx_minlon idx_minlat idx_mintime],...
+    data = ncread([dpath fname],'sst',[idx_minlon idx_minlat idx_mintime],...
         [1+idx_maxlon-idx_minlon 1+idx_maxlat-idx_minlat 1+idx_maxtime-idx_mintime]);
     data(data<-10^6) = NaN; % define NaNs
 

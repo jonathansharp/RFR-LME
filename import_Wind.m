@@ -43,9 +43,9 @@ end
 function data = import_Wind_ERA5(dpath,lat,lon,time,yr_end)
 
     % obtain wind data
-    data_lat = ncread([dpath '/ERA5_2024/ERA5_Wind.nc'],'latitude');
-    data_lon = ncread([dpath '/ERA5_2024/ERA5_Wind.nc'],'longitude');
-    data_time = ncread([dpath '/ERA5_2024/ERA5_Wind.nc'],'valid_time');
+    data_lat = ncread([dpath 'ERA5_Wind.nc'],'latitude');
+    data_lon = ncread([dpath 'ERA5_Wind.nc'],'longitude');
+    data_time = ncread([dpath 'ERA5_Wind.nc'],'valid_time');
     data_time = datenum(1970,1,15,0,0,double(data_time));
 
     % index based on dimensions
@@ -57,7 +57,7 @@ function data = import_Wind_ERA5(dpath,lat,lon,time,yr_end)
     [~,idx_maxtime] = min(abs(data_time-datenum(yr_end,12,15)));
     
     % read in data
-    data = ncread([dpath '/ERA5_2024/ERA5_Wind.nc'],'si10',[idx_minlon idx_maxlat idx_mintime],...
+    data = ncread([dpath 'ERA5_Wind.nc'],'si10',[idx_minlon idx_maxlat idx_mintime],...
         [1+idx_maxlon-idx_minlon 1+idx_minlat-idx_maxlat 1+idx_maxtime-idx_mintime]);
     data = fliplr(data);
     data(data<-10^6) = NaN; % define NaNs

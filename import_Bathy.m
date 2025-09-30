@@ -30,9 +30,9 @@ create_map('Bathy',type,lat,lon,data_interp,cmocean('deep'),[0 6000],'Bottom Dep
     % file obtained from:
     % https://www.ngdc.noaa.gov/thredds/catalog/global/ETOPO2022/60s/60s_bed_elev_netcdf/catalog.html?dataset=globalDatasetScan/ETOPO2022/60s/60s_bed_elev_netcdf/ETOPO_2022_v1_60s_N90W180_bed.nc
 
-    data_lon = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lon');
-    data_lat = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'lat');
-    data = ncread([dpath '/ETOPO/ETOPO_2022_v1_60s_N90W180_bed.nc'],'z');
+    data_lon = ncread([dpath 'ETOPO_2022_v1_60s_N90W180_bed.nc'],'lon');
+    data_lat = ncread([dpath 'ETOPO_2022_v1_60s_N90W180_bed.nc'],'lat');
+    data = ncread([dpath 'ETOPO_2022_v1_60s_N90W180_bed.nc'],'z');
     
     % Convert longitude
     data_lon = convert_lon(data_lon,'0-360');
