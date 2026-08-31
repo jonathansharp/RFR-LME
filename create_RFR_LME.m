@@ -1,8 +1,8 @@
 %% set parameters
 % SOCAT version and data path
-vrs = 'SOCATv2025'; dpath = '';
-cmems.path = '';
-cmems.usr = ''; cmems.pwd = '';
+vrs = 'SOCATv2026'; dpath = '/home/sockeye/sharp/RFR-LME-Data/';
+cmems.path = '/home/sockeye/sharp/RFR-LME/';
+cmems.usr = 'jsharp'; cmems.pwd = 'jvqsEZL9';
 yr_end = str2num(extractAfter(vrs,'v')) - 1;
 % Coordinates and variables to be used for models
 pred_dims = {'lon' 'lat' 'sin_month_of_year' 'cos_month_of_year' 'year' 'dist'};
@@ -30,9 +30,9 @@ source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
 %% run scripts to create RFR-LME
 % load_socat(vrs);
 % grid_socat(vrs,dpath,yr_end);
-% import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems);
-% extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region);
-% define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
+import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems);
+extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region);
+define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
 cluster_lme(vrs,num_groups,region,'plot_option',0,'cluster_option','var');
 train_rfr(vrs,num_groups,pred_dims,pred_vars,pred_vars_arc,region,...
     thresh,100,2,ceil((2/3)*length(pred_vars)));

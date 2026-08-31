@@ -76,8 +76,12 @@ function data_interp = import_MSLP_NCEP(dpath,lat,lon,time,yr_end)
     [data_lon_grid,data_lat_grid] = ndgrid(data_lon,data_lat);
     [lon_grid,lat_grid] = ndgrid(lon,lat);
     for t = 1:(yr_end-1997)*12
-        data_interp(:,:,t) = griddata(double(data_lon_grid),...
-            double(data_lat_grid),double(data(:,:,t)),lon_grid,lat_grid);
+        if t <= size(data,3)
+            data_interp(:,:,t) = griddata(double(data_lon_grid),...
+                double(data_lat_grid),double(data(:,:,t)),lon_grid,lat_grid);
+        else
+            data_interp(:,:,t) = mean(data_interp(:,:,(334/12-floor(334/12))*12:12:end),3,'omitnan');
+        end
     end
     
     % convert Pascals to Atmospheres

@@ -29,7 +29,7 @@ function import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems)
     import_Wind(dpath,vrs,source.Wind,lat,lon,time,yr_end,'plot_option',0);
 
     % 7. Obtain mixed layer depth from CMEMS
-    import_MLD(dpath,vrs,source.MLD,lat,lon,time,yr_end,cmems,'plot_option',1);
+    import_MLD(dpath,vrs,source.MLD,lat,lon,time,yr_end,cmems,'plot_option',0);
 
     % 8. Obtain atmospheric pressure from NCEP
     import_MSLP(dpath,vrs,source.MSLP,lat,lon,time,yr_end,'plot_option',0);
