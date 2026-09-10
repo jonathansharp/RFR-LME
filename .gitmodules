@@ -7,3 +7,6 @@
 [submodule "export_fig"]
 	path = export_fig
 	url = https://github.com/altmany/export_fig.git
+[submodule "CO2-System-Extd"]
+	path = CO2-System-Extd
+	url = https://github.com/jonathansharp/CO2-System-Extd.git

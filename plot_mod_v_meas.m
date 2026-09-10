@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 11/29/22
 % 
 
-function plot_mod_v_meas(x_edges,x_mids,y_edges,y_mids,meas,mod,delta,reg,xlimit,ylimit,type)
+function plot_mod_v_meas(x_edges,x_mids,y_edges,y_mids,meas,mod,delta,reg,xlimit,ylimit,type,num_c)
 
 % assemble histogram counts
 counts = histcounts2(meas,mod,x_edges,y_edges);
@@ -33,5 +33,5 @@ c.Label.FontSize = 14;
 
 % save figure
 if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,['Figures/' reg '_mod_v_meas_fCO2_' type '.png']);
+exportgraphics(gcf,['Figures/' reg '_c' num2str(num_c) '_mod_v_meas_fCO2_' type '.png']);
 close

@@ -65,7 +65,7 @@ for n = 1:length(region)
     end
     for v = 1:length(all_vars)
         LME.([pred_vars{v} '_var']) = ...
-            std(LME.(pred_vars{v}),[],3);
+            std(LME.(pred_vars{v}),[],3,'omitnan');
     end
 
     % create X and Y for clustering

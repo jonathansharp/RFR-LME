@@ -27,4 +27,5 @@ for n = 1:length(region)
 end
 
 %% save table of error statistics
+if ~isdir('IndsAndStats'); mkdir('IndsAndStats'); end
 writetable(error_stats,['IndsAndStats/ErrorStatistics-' date '.xls']);

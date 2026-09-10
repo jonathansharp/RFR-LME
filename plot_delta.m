@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 11/29/22
 % 
 
-function plot_delta(x_edges,x_mids,y_edges,y_mids,Y_fit,delta,reg,xlimit,ylimit,type)
+function plot_delta(x_edges,x_mids,y_edges,y_mids,Y_fit,delta,reg,xlimit,ylimit,type,num_c)
 
 % assemble histogram counts
 counts = histcounts2(Y_fit,delta,x_edges,y_edges);
@@ -32,5 +32,5 @@ c.Label.FontSize = 14;
 
 % save figure
 if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,['Figures/' reg '_del_fCO2_' type '.png']);
+exportgraphics(gcf,['Figures/' reg '_c' num2str(num_c) '_del_fCO2_' type '.png']);
 close

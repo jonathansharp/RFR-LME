@@ -39,8 +39,10 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% embedded function to import OISST
+% embedded function to import Winds
 function data = import_Wind_ERA5(dpath,lat,lon,time,yr_end)
+
+    % data obtained from https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
 
     % obtain wind data
     data_lat = ncread([dpath 'ERA5_Wind.nc'],'latitude');

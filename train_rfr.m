@@ -175,7 +175,7 @@ x_mids = 2.5:5:997.5;
 y_edges = -1000:10:1000;
 y_mids = -995:10:995;
 plot_delta(x_edges,x_mids,y_edges,y_mids,rfr.Y_fit.all(:,end),...
-    rfr.delta.all(:,end),region{n},[200 800],[-300 300],'RFR');
+    rfr.delta.all(:,end),region{n},[200 800],[-300 300],'RFR',c);
 
 %% plot 2D histogram of pco2 vs. pco2 for RFRs
 x_edges = 0:5:1000;
@@ -184,7 +184,7 @@ y_edges = 0:5:1000;
 y_mids = 0:5:1000;
 plot_mod_v_meas(x_edges,x_mids,y_edges,y_mids,LME_training.y,...
     rfr.Y_fit.all(:,end), rfr.delta.all(:,end),...
-    region{n},[200 600],[200 600],'RFR');
+    region{n},[200 600],[200 600],'RFR',c);
 
 % save rfr model and error statistics
 if ~isfolder(['Models/' region{n}]); mkdir(['Models/' region{n}]); end
