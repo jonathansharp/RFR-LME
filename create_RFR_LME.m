@@ -1,10 +1,10 @@
 %% set user-defined parameters
 % SOCAT version, data paths, and passwords
 vrs = 'SOCATv2026';
-dpath = '/home/sockeye/sharp/RFR-LME-Data/'; % add path to where proxy datasets will be downloaded
-cmems.path = '/home/sockeye/sharp/RFR-LME/'; % add path to where copernicusmarine toolbox is located
-cmems.usr = 'jsharp'; % add usename for copernicus marine data system
-cmems.pwd = 'jvqsEZL9'; % add password for copernicus marine data system
+dpath = ''; % add path to where proxy datasets will be downloaded
+cmems.path = ''; % add path to where copernicusmarine toolbox is located
+cmems.usr = ''; % add usename for copernicus marine data system
+cmems.pwd = ''; % add password for copernicus marine data system
 
 %% YOU SHOULDN'T NEED TO EDIT ANYTHING BELOW HERE TO RUN CODE %%
 

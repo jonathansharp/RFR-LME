@@ -342,7 +342,7 @@ for var_num = 1:length(var_type)
         date = datestr(datenum(data.Year,data.Month,repmat(15,length(data.Month),1)),'mmm-yyyy');
         data_table = table(repmat(region{n},length(data.Month),1),...
             date,data.Value,data.Uncertainty,'VariableNames',{'LME' ...
-            'Time (MMM-YY)' 'Value' 'Uncertainty'});
+            'Time (MMM-YYYY)' 'Value' 'Uncertainty'});
         writetable(data_table,['IndsAndStats/' var_type{var_num} '.csv'],'WriteMode','append');
     end
 end
