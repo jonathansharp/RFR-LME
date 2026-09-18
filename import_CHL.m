@@ -1,5 +1,5 @@
 % import SSH
-function import_CHL(dpath,vrs,type,lat,lon,time,yr_end,ocean_mask,varargin)
+function import_CHL(dpath,vrs,type,lat,lon,time,yr_end,nasa,ocean_mask,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -14,7 +14,8 @@ if ~isfile(['Data/CHL_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'NASA')
-    options = weboptions('Username','***','Password','***');
+    options = weboptions('HeaderFields', {'Authorization', ['Bearer ' nasa.token]}, ...
+        'CertificateFilename', '', 'Timeout', 60);
     data_interp = import_CHL_NASA(dpath,lat,lon,time,yr_end,options,ocean_mask);
 elseif strcmp(type,'CMEMS')
     data_interp = import_CHL_CMEMS(dpath,lat,lon,time,yr_end,ocean_mask);
@@ -44,12 +45,16 @@ end
 % embedded function to import NASA CHL
     function data_interp = import_CHL_NASA(dpath,lat,lon,time,yr_end,options,ocean_mask)
 
-    % Download netcdf files (SeaWiFS)
+    % Download first netcdf files (SeaWiFS)
     fpath = 'Sat/SeaWiFS/Mapped/Monthly/9km/chlor_a/';
     if ~isfolder([dpath fpath]); mkdir([dpath fpath]); end
-    url = 'https://oceandata.sci.gsfc.nasa.gov/directdataaccess/Level-3 Mapped/';
-    data_lon = ncread([dpath fpath 'S19980011998031.L3m_MO_CHL_chlor_a_9km.nc'],'lon');
-    data_lat = ncread([dpath fpath 'S19980011998031.L3m_MO_CHL_chlor_a_9km.nc'],'lat');
+    url = 'https://oceandata.sci.gsfc.nasa.gov/getfile/';
+    if ~isfile([dpath fpath 'SEASTAR_SEAWIFS_GAC.19980101_19980131.L3m.MO.CHL.chlor_a.9km.nc'])
+        websave([dpath fpath 'SEASTAR_SEAWIFS_GAC.19980101_19980131.L3m.MO.CHL.chlor_a.9km.nc'],...
+            [url 'SEASTAR_SEAWIFS_GAC.19980101_19980131.L3m.MO.CHL.chlor_a.9km.nc'],options);
+    end
+    data_lon = ncread([dpath fpath 'SEASTAR_SEAWIFS_GAC.19980101_19980131.L3m.MO.CHL.chlor_a.9km.nc'],'lon');
+    data_lat = ncread([dpath fpath 'SEASTAR_SEAWIFS_GAC.19980101_19980131.L3m.MO.CHL.chlor_a.9km.nc'],'lat');
     
     % separate longitudes into positive and negative 
     data_lon_neg = data_lon; data_lon_pos = data_lon;
@@ -81,21 +86,25 @@ end
     
     % Define normal and leap year days of year to start month
     year = 1998:2002;
-    monthdaynorm = [1 32 60 91 121 152 182 213 244 274 305 335 366];
-    monthdayleap = [1 32 61 92 122 153 183 214 245 275 306 336 367];
+    daynorm = [31 28 31 30 31 30 31 31 30 31 30 31];
+    dayleap = [31 29 31 30 31 30 31 31 30 31 30 31];
+    % Download netcdf files (SeaWIFs)
+    fpath = 'Sat/SeaWiFS/Mapped/Monthly/9km/chlor_a/';
+    if ~isfolder([dpath fpath]); mkdir([dpath fpath]); end
+    url = 'https://oceandata.sci.gsfc.nasa.gov/getfile/';
     for y = 1:length(year)
         if  year(y) == 2000 || year(y) == 2004 || year(y) == 2008 || ...
             year(y) == 2012 || year(y) == 2016 || year(y) == 2020
-            day = monthdayleap;
+            day = dayleap;
         else
-            day = monthdaynorm;
+            day = daynorm;
         end
         for m = 1:12
-            fname = ['S' num2str(year(y)) sprintf('%03d',day(m)) ...
-                num2str(year(y)) sprintf('%03d',day(m+1)-1) ...
-                '.L3m_MO_CHL_chlor_a_9km.nc'];
+            % Example: SEASTAR_SEAWIFS_GAC.19980101_19980131.L3m.MO.CHL.chlor_a.9km.nc
+            fname = ['SEASTAR_SEAWIFS_GAC.' num2str(year(y)) sprintf('%02d',m) '01_' ...
+                num2str(year(y)) sprintf('%02d',m) sprintf('%02d',day(m)) ...
+                '.L3m.MO.CHL.chlor_a.9km.nc'];
             if ~isfile([dpath fpath fname])
-                % this does not work!
                 websave([dpath fpath fname],[url fname],options);
             end
             data_temp_neglon = ncread([dpath fpath fname],'chlor_a',...
@@ -130,7 +139,6 @@ end
                 num2str(year(y)) sprintf('%02d',m) sprintf('%02d',day(m)) ...
                 '.L3m.MO.CHL.chlor_a.9km.nc'];
             if ~isfile([dpath fpath fname])
-                % this does not work!
                 websave([dpath fpath fname],[url fname],options);
             end
             data_temp_neglon = ncread([dpath fpath fname],'chlor_a',...
