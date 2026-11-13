@@ -1,5 +1,5 @@
 % import Winds
-function data = import_Wind(dpath,vrs,type,lat,lon,time,yr_end,varargin)
+function data = import_Wind(dpath,vrs,type,lat,lon,time,cds,yr_end,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -14,7 +14,7 @@ if ~isfile(['Data/Wind_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'ERA5')
-    data = import_Wind_ERA5(dpath,lat,lon,time,yr_end);
+    data = import_Wind_ERA5(dpath,lat,lon,time,cds,yr_end);
 else
     error('Input variable "type" must be "ERA5"');
 end
@@ -40,11 +40,55 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % embedded function to import Winds
-function data = import_Wind_ERA5(dpath,lat,lon,time,yr_end)
+function data = import_Wind_ERA5(dpath,lat,lon,time,cds,yr_end)
 
-    % data obtained from https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
+    % Data manually downloaed from:
+    % https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
 
-    % obtain wind data
+    % Automated data download not yet working...
+    % % set up authentication headers
+    % options = weboptions(...
+    %     'HeaderFields', {'Authorization', ['Bearer ' cds.token]; 'Content-Type', 'application/json'}, ...
+    %     'MediaType', 'application/json', ...
+    %     'Timeout', 60);            
+    % dataset = 'reanalysis-era5-single-levels';
+    % apiUrl = ['https://cds.climate.copernicus.eu/api/v2/resources/' dataset];
+
+    % % define body request structure matching the web API UI
+    % years_to_download = arrayfun(@num2str, 1998:yr_end, 'UniformOutput', 0);
+    % requestBody = struct('product_type',{{'monthly_averaged_reanalysis'}},...
+    %     'variable',{{'10m_wind_speed'}},...
+    %     'year',{years_to_download},...
+    %     'month',{{'01' '02' '03' '04' '05' '06' '07' '08' '09' '10' '11' '12'}},...
+    %     'time',{{'00:00'}},...
+    %     'data_format',{{'netcdf'}},...
+    %     'download_format',{{'unarchived'}});
+
+    % % submit job request
+    % response = webwrite(apiUrl, jsonencode(requestBody), options);
+    % statusUrl = response.location; % Get task status URL
+
+    % % poll for completion
+    % disp('Processing query on CDS servers...');
+    % isComplete = false;
+    % while ~isComplete
+    %     pause(5); % Wait 5 seconds between checks
+    %     status = webread(statusUrl, options);
+    %     if strcmp(status.state, 'completed')
+    %         downloadUrl = status.location;
+    %         isComplete = true;
+    %     elseif strcmp(status.state, 'failed')
+    %         error('Data request failed on Copernicus server.');
+    %     end
+    % end
+
+    % % save file locally using websave
+    % disp('Downloading Wind data file...');
+    % outputFile = 'ERA5_Wind.nc';
+    % websave(outputFile, downloadUrl, options);
+    % disp('Download finished successfully.');
+
+    % obtain wind data from downloaded file
     data_lat = ncread([dpath 'ERA5_Wind.nc'],'latitude');
     data_lon = ncread([dpath 'ERA5_Wind.nc'],'longitude');
     data_time = ncread([dpath 'ERA5_Wind.nc'],'valid_time');

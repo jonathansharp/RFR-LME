@@ -1,10 +1,12 @@
 %% set user-defined parameters
 % SOCAT version, data paths, and passwords
-vrs = 'SOCATv2026';
-dpath = ''; % add path to where proxy datasets will be downloaded
+vrs = 'SOCATv2026'; % change annually
+dpath = '/home/sockeye/sharp/RFR-LME-Data/'; % add path to where proxy datasets will be downloaded
 cmems.path = ''; % add path to where copernicusmarine toolbox is located
-cmems.usr = ''; % add usename for copernicus marine data system
+cmems.usr = ''; % add username for copernicus marine data system
 cmems.pwd = ''; % add password for copernicus marine data system
+nasa.token = ''; % add personal token for NASA Earthdata
+cds.token =''; % add personal token for Climate Data Store
 
 %% YOU SHOULDN'T NEED TO EDIT ANYTHING BELOW HERE TO RUN CODE %%
 
@@ -21,7 +23,8 @@ clust_vars_arc = {'SST' 'MSLP' 'Wind'};
 num_groups = [3;5;4;4;5;6;4;3;5;3;4];
 yr_end = str2double(extractAfter(vrs,'v')) - 1;
 % probability threshold for model training
-thresh = 0.10;
+thresh = 0.10; % probability threshold used to determine whether a data point belongs in a given cluster
+clust_opt = 'var'; % set to 'var' to cluster based on variability over time (static clusters) and 'abs' to cluster based on absolute values (time-varying clusters)
 
 %% set predictor variable sources
 source.SSS = 'CMEMS'; source.SSH = 'CMEMS';
@@ -36,16 +39,16 @@ source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
 %% run scripts to create RFR-LME
 load_socat(vrs);
 grid_socat(vrs,dpath,yr_end);
-import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems);
+import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems,nasa,cds);
 extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region);
 define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
-cluster_lme(vrs,num_groups,region,'plot_option',0,'cluster_option','var');
+cluster_lme(vrs,num_groups,region,'plot_option',0,'cluster_option',clust_opt);
 train_rfr(vrs,num_groups,pred_dims,pred_vars,pred_vars_arc,region,...
     thresh,100,2,ceil((2/3)*length(pred_vars)));
 log_errs(vrs,num_groups,region);
 predict_fco2(vrs,num_groups,region,'plot_option',1);
 calculate_oa(vrs,region,num_groups,'plot_option',1);
-matlab_to_netcdf(vrs,lme_shape,lme_idx,region);
+matlab_to_netcdf_new(vrs,region);
 regional_stats(vrs,lme_shape,lme_idx,region,yr_end);
 create_figures(vrs,lme_shape,lme_idx,region);
 region_wide_stats(vrs,date);

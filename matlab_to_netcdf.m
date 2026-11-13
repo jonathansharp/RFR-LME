@@ -1,7 +1,6 @@
 % Convert MATLAB RFR-LME files to NetCDFs
-% 
 
-function matlab_to_netcdf(vrs,lme_shape,lme_idx,region)
+function matlab_to_netcdf(vrs,region)
 
 % load SOCAT grid
 load(['Data/' vrs '_gridded'],'SOCAT_grid');
@@ -132,7 +131,7 @@ for v = 1:length(Vars_pred)
     if isfile(filename); delete(filename); end
     % longitude
     nccreate(filename,'lon','Dimensions',{'lon',US_RFR_LME.dim.x},...
-        'DataType','single','FillValue',NaN);
+        'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'lon',US_RFR_LME.lon);
     %ncwriteatt(filename,'lon','bounds','lon_bounds');
     ncwriteatt(filename,'lon','units','degrees_east');
@@ -141,7 +140,7 @@ for v = 1:length(Vars_pred)
     ncwriteatt(filename,'lon','_CoordinateAxisType','Lon');
     % latitude
     nccreate(filename,'lat','Dimensions',{'lat',US_RFR_LME.dim.y},...
-        'DataType','single','FillValue',NaN);
+        'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'lat',US_RFR_LME.lat);
     %ncwriteatt(filename,'lat','bounds','lat_bounds');
     ncwriteatt(filename,'lat','units','degrees_north');
@@ -150,7 +149,7 @@ for v = 1:length(Vars_pred)
     ncwriteatt(filename,'lat','_CoordinateAxisType','Lat');
     % time
     nccreate(filename,'time','Dimensions',{'time',US_RFR_LME.dim.z},...
-        'DataType','single','FillValue',NaN);
+        'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'time',time);
     %ncwriteatt(filename,'time','bounds','time_bounds');
     ncwriteatt(filename,'time','units','days since 1-Jan-0000');
@@ -161,11 +160,14 @@ for v = 1:length(Vars_pred)
     if ~strcmp(Vars_pred{v},'Bathy') && ~strcmp(Vars_pred{v},'Dist')
         nccreate(filename,varnames_pred{v},'Dimensions',...
             {'lon',US_RFR_LME.dim.x,'lat',US_RFR_LME.dim.y,...
-            'time',US_RFR_LME.dim.z},'DataType','single','FillValue',NaN);
+                'time',US_RFR_LME.dim.z},'DataType','single','FillValue',-9999.0,...
+                    'DeflateLevel',5,'Shuffle',true,...
+                        'ChunkSize',[US_RFR_LME.dim.x,US_RFR_LME.dim.y,1]);
     else
         nccreate(filename,varnames_pred{v},'Dimensions',...
             {'lon',US_RFR_LME.dim.x,'lat',US_RFR_LME.dim.y},...
-            'DataType','single','FillValue',NaN);
+                'DataType','single','FillValue',-9999.0,...
+                    'DeflateLevel',5,'Shuffle',true);
     end
     ncwrite(filename,varnames_pred{v},US_RFR_LME.(Vars_pred{v}));
     ncwriteatt(filename,varnames_pred{v},'units',units_pred{v});
@@ -173,7 +175,7 @@ for v = 1:length(Vars_pred)
     % LME number
     nccreate(filename,'lme_num','Dimensions',...
             {'lon',US_RFR_LME.dim.x,'lat',US_RFR_LME.dim.y},...
-            'DataType','single','FillValue',NaN);
+            'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'lme_num',US_RFR_LME.LME);
     ncwriteatt(filename,'lme_num','reference_table','lme_ref');
     ncwriteatt(filename,'lme_num','long_name','Large Marine Ecosystem Number');
@@ -198,7 +200,7 @@ for v = 1:length(Vars_OA)
     if isfile(filename); delete(filename); end
     % longitude
     nccreate(filename,'lon','Dimensions',{'lon',US_RFR_LME.dim.x},...
-        'DataType','single','FillValue',NaN);
+        'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'lon',US_RFR_LME.lon);
     %ncwriteatt(filename,'lon','bounds','lon_bounds');
     ncwriteatt(filename,'lon','units','degrees_east');
@@ -207,7 +209,7 @@ for v = 1:length(Vars_OA)
     ncwriteatt(filename,'lon','_CoordinateAxisType','Lon');
     % latitude
     nccreate(filename,'lat','Dimensions',{'lat',US_RFR_LME.dim.y},...
-        'DataType','single','FillValue',NaN);
+        'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'lat',US_RFR_LME.lat);
     %ncwriteatt(filename,'lat','bounds','lat_bounds');
     ncwriteatt(filename,'lat','units','degrees_north');
@@ -216,7 +218,7 @@ for v = 1:length(Vars_OA)
     ncwriteatt(filename,'lat','_CoordinateAxisType','Lat');
     % time
     nccreate(filename,'time','Dimensions',{'time',US_RFR_LME.dim.z},...
-        'DataType','single','FillValue',NaN);
+        'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'time',time);
     %ncwriteatt(filename,'time','bounds','time_bounds');
     ncwriteatt(filename,'time','units','days since 1-Jan-0000');
@@ -226,21 +228,25 @@ for v = 1:length(Vars_OA)
     % variable
     nccreate(filename,varnames_OA{v},'Dimensions',...
         {'lon',US_RFR_LME.dim.x,'lat',US_RFR_LME.dim.y,...
-        'time',US_RFR_LME.dim.z},'DataType','single','FillValue',NaN);
+            'time',US_RFR_LME.dim.z},'DataType','single','FillValue',-9999.0,...
+                'DeflateLevel',5,'Shuffle',true,...
+                    'ChunkSize',[US_RFR_LME.dim.x,US_RFR_LME.dim.y,1]);
     ncwrite(filename,varnames_OA{v},US_RFR_LME.(Vars_OA{v}));
     ncwriteatt(filename,varnames_OA{v},'units',units_OA{v});
     ncwriteatt(filename,varnames_OA{v},'long_name',names_OA{v});
     % variable uncertainty
     nccreate(filename,varnames_uOA{v},'Dimensions',...
         {'lon',US_RFR_LME.dim.x,'lat',US_RFR_LME.dim.y,...
-        'time',US_RFR_LME.dim.z},'DataType','single','FillValue',NaN);
+            'time',US_RFR_LME.dim.z},'DataType','single','FillValue',-9999.0,...
+            'DeflateLevel',5,'Shuffle',true,...
+            'ChunkSize',[US_RFR_LME.dim.x,US_RFR_LME.dim.y,1]);
     ncwrite(filename,varnames_uOA{v},US_RFR_LME.(uVars_OA{v}));
     ncwriteatt(filename,varnames_uOA{v},'units',units_OA{v});
     ncwriteatt(filename,varnames_uOA{v},'long_name',['Uncertainty in ' names_OA{v}]);
     % LME number
     nccreate(filename,'lme_num','Dimensions',...
             {'lon',US_RFR_LME.dim.x,'lat',US_RFR_LME.dim.y},...
-            'DataType','single','FillValue',NaN);
+                'DataType','single','FillValue',-9999.0);
     ncwrite(filename,'lme_num',US_RFR_LME.LME);
     ncwriteatt(filename,'lme_num','reference_table','lme_ref');
     ncwriteatt(filename,'lme_num','long_name','Large Marine Ecosystem Number');
@@ -248,8 +254,8 @@ for v = 1:length(Vars_OA)
     % LME reference
     nccreate(filename,'lme_ref','Dimensions',{'a',11,'b',4},'DataType','char');
     ncwrite(filename,'lme_ref',char(region));
-    ncwriteatt(filename,'lme_num','long_name','Large Marine Ecosystem Reference Table');
-    ncwriteatt(filename,'lme_num','information','This variable provides the order of LME abbreviations associated with each LME number.');
+    ncwriteatt(filename,'lme_ref','long_name','Large Marine Ecosystem Reference Table');
+    ncwriteatt(filename,'lme_ref','information','This variable provides the order of LME abbreviations associated with each LME number.');
 end
 
 % %% save predictors as NetCDFs

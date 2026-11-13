@@ -48,7 +48,9 @@ end
 
 % embedded function to import NOAA MBL xCO2
 function data_interp_temp = import_axCO2_MBL(dpath,lat,lon,time,yr_end)
-    % have to change this file name yearly
+
+    % still have to generate and change this file name yearly
+    % (generate by selecting applicable options at https://gml.noaa.gov/ccgg/mbl/data.php)
     fname = 'co2_GHGreference.1880098685_surface.txt';
     websave([dpath fname],['https://gml.noaa.gov/ccgg/mbl/tmp/' fname]);
 

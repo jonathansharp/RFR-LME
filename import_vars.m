@@ -1,6 +1,6 @@
 % Import predictor variables
 
-function import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems)
+function import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems,nasa,cds)
 
     % load SOCAT grid
     load(['Data/' vrs '_gridded'],'SOCAT_grid');
@@ -23,10 +23,10 @@ function import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems)
     import_IceC(dpath,vrs,source.IceC,lat,lon,time,yr_end,ocean_mask,'plot_option',1);
 
     % 5. obtain sea surface chlorophyll (Options: 'NASA', 'CMEMS')
-    import_CHL(dpath,vrs,source.CHL,lat,lon,time,yr_end,ocean_mask,'plot_option',1);
+    import_CHL(dpath,vrs,source.CHL,lat,lon,time,yr_end,nasa,ocean_mask,'plot_option',1);
     
     % 6. Obtain wind speed from ERA5 re-analysis
-    import_Wind(dpath,vrs,source.Wind,lat,lon,time,yr_end,'plot_option',1);
+    import_Wind(dpath,vrs,source.Wind,lat,lon,time,cds,yr_end,'plot_option',1);
 
     % 7. Obtain mixed layer depth from CMEMS
     import_MLD(dpath,vrs,source.MLD,lat,lon,time,yr_end,cmems,'plot_option',1);

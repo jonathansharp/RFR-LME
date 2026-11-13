@@ -44,8 +44,9 @@ function data = import_IceC_OISST(dpath,lat,lon,time,yr_end,ocean_mask)
 
     % obtain OISST ice coverage file if downloaded file is older than one month
     fname = 'icec.mon.mean.nc';
-    % url = 'https://psl.noaa.gov/thredds/fileServer/Datasets/noaa.oisst.v2.highres/';
+    % url = 'https://psl.noaa.gov/thredds/fileServer/Datasets/noaa.oisst.v2.highres/'; % old url
     url = 'https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/';
+    
     if isfile([dpath fname])
         inf = dir([dpath fname]);
         if datenum(date) - datenum(inf.date) > 30
