@@ -4,7 +4,7 @@
 % Last updated by J.D. Sharp: 9/15/22
 % 
 
-function plot_temporal_mean(lim,dim,lat,lon,z,clrmp,varname,lab,region,lme_shape,lme_idx)
+function plot_temporal_mean(lim,dim,lat,lon,z,clrmp,varname,lab,region,lme_shape,lme_idx,paths)
 
 zmean = mean(z,3,'omitnan');
 figure('visible','off'); set(gcf,'position',[100 100 800 800]);
@@ -41,8 +41,8 @@ c.Label.String = lab;
 cbarrow;
 
 % save figure
-if ~isfolder('Figures'); mkdir('Figures'); end
-% exportgraphics(gcf,['Figures/' region '_' varname '.png']);
-% export_fig(gcf,['Figures/' region '_' varname '.png'],'-transparent');
-export_fig(gcf,['Figures/' region '_' varname '.png']);
+if ~isfolder(paths.figures); mkdir(paths.figures); end
+% exportgraphics(gcf,[paths.figures '/' region '_' varname '.png']);
+% export_fig(gcf,[paths.figures '/' region '_' varname '.png'],'-transparent');
+export_fig(gcf,[paths.figures '/' region '_' varname '.png']);
 close

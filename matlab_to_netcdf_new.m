@@ -1,9 +1,9 @@
 % Convert MATLAB RFR-LME files to NetCDFs
 
-function matlab_to_netcdf(vrs,region)
+function matlab_to_netcdf(vrs,region,paths)
 
 % load SOCAT grid
-load(['Data/' vrs '_gridded'],'SOCAT_grid');
+load([paths.data '/' vrs '_gridded'],'SOCAT_grid');
 
 % copy variables to US LME file
 US_RFR_LME.lim = SOCAT_grid.lim;
@@ -70,8 +70,8 @@ end
 for n = 1:length(region)
 
     %% load gridded fCO2 and predictors
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
-    load(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/RFR-LME/' vrs '_' region{n}],'RFR_LME');
 
     %% define LME mask
     idx_lon = US_RFR_LME.lon >= min(LME.lon) & US_RFR_LME.lon <= max(LME.lon);
@@ -123,9 +123,9 @@ end
 time = datenum([repmat(1998,US_RFR_LME.dim.z,1),...
     double(US_RFR_LME.month+0.5),repmat(15,US_RFR_LME.dim.z,1)]);
 % create folder
-if ~isfolder([pwd '/Data/NetCDFs_' date]); mkdir(['Data/NetCDFs_' date]); end
+if ~isfolder([paths.data '/NetCDFs_' date]); mkdir([paths.data '/NetCDFs_' date]); end
 % define file name
-filename = ['Data/NetCDFs_' date '/US_RFR_LME.nc'];
+filename = [paths.data '/NetCDFs_' date '/US_RFR_LME.nc'];
 % delete old file if it exists
 if isfile(filename); delete(filename); end
 % longitude

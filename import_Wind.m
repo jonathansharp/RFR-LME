@@ -1,5 +1,5 @@
 % import Winds
-function data = import_Wind(dpath,vrs,type,lat,lon,time,cds,yr_end,varargin)
+function data = import_Wind(dpath,vrs,type,lat,lon,time,cds,yr_end,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/Wind_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/Wind_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'ERA5')
@@ -20,21 +20,21 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/Wind_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/Wind_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'Wind' data 'wind speed' 'meters per second'});
 
 else
 
-data = ncread(['Data/Wind_' type '_' vrs '.nc'],'Wind');
+data = ncread([paths.data '/Wind_' type '_' vrs '.nc'],'Wind');
 
 end
 
 % create sst animation
 if plot_option == 1
-    create_animation('Wind',type,time,lat,lon,data,cmocean('speed'),[-5 35],'Wind Speed','m/s');
-    create_animation('Wind_anom',type,time,lat,lon,data-mean(data,3,'omitnan'),cmocean('balance'),[-5 5],'Wind Speed Anomaly','m/s');
+    create_animation('Wind',type,time,lat,lon,data,cmocean('speed'),[-5 35],'Wind Speed','m/s',paths);
+    create_animation('Wind_anom',type,time,lat,lon,data-mean(data,3,'omitnan'),cmocean('balance'),[-5 5],'Wind Speed Anomaly','m/s',paths);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

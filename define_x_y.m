@@ -3,12 +3,12 @@
 % via self-organizing maps and algorithm training.
 
 function define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,...
-    pred_vars_arc,clust_dims,pred_dims,region)
+    pred_vars_arc,clust_dims,pred_dims,region,paths)
 
 for n = 1:length(region)
 
     % load gridded pco2 and predictor data in individual LMEs
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
 
     %% Compute regional average total and seasonal data coverage
     disp(['Processing data for clustering and algorithm training (' region{n} ')']);
@@ -125,9 +125,9 @@ for n = 1:length(region)
     end
 
     % save variables for clustering and training in each LME
-    save(['Data/LME_Data/' vrs '_clustering_arrays_' region{n}],'LME_clustering');
-    save(['Data/LME_Data/' vrs '_training_arrays_' region{n}],'LME_training');
-    save(['Data/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
+    save([paths.data '/LME_Data/' vrs '_clustering_arrays_' region{n}],'LME_clustering');
+    save([paths.data '/LME_Data/' vrs '_training_arrays_' region{n}],'LME_training');
+    save([paths.data '/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
 
 end
 

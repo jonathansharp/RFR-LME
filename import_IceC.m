@@ -1,5 +1,5 @@
 % import IceC
-function data = import_IceC(dpath,vrs,type,lat,lon,time,yr_end,ocean_mask,varargin)
+function data = import_IceC(dpath,vrs,type,lat,lon,time,yr_end,ocean_mask,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/IceC_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/IceC_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'OISST')
@@ -20,21 +20,21 @@ else
 end
 
 % save data file as netcdf
-ncsave_3d(['Data/IceC_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/IceC_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'IceC' data 'ice coverage' 'percent'});
 
 else
 
-data = ncread(['Data/IceC_' type '_' vrs '.nc'],'IceC');
+data = ncread([paths.data '/IceC_' type '_' vrs '.nc'],'IceC');
 
 end
 
 % create ice coverage animation
 if plot_option == 1
     create_animation('IceC',type,time,lat,lon,data*100,...
-        flipud(cmocean('ice')),[0 100],'Ice Coverage','%');
+        flipud(cmocean('ice')),[0 100],'Ice Coverage','%',paths);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

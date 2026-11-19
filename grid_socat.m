@@ -1,9 +1,9 @@
 % Grid SOCAT data
 
-function grid_socat(vrs,dpath,yr_end)
+function grid_socat(vrs,dpath,yr_end,paths)
 
 % load SOCAT structure
-load(['Data/' vrs '_structure'],'data');
+load([paths.data '/' vrs '_structure'],'data');
 
 % display status
 disp('Gridding SOCAT observations');
@@ -199,7 +199,7 @@ SOCAT_grid.fco2_dom_mean_detrend = ...
 SOCAT_grid.fco2_dom_mean_detrend(SOCAT_grid.fco2_dom_mean_detrend == 0) = NaN;
 
 % Save gridded pco2 data
-if ~isfolder('Data'); mkdir('Data'); end
-save(['Data/' vrs '_gridded'],'SOCAT_grid','-v7.3');
+if ~isfolder(paths.data); mkdir(paths.data); end
+save([paths.data '/' vrs '_gridded'],'SOCAT_grid','-v7.3');
 
 end

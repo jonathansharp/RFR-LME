@@ -1,5 +1,5 @@
 % import SSH
-function import_CHL(dpath,vrs,type,lat,lon,time,yr_end,nasa,ocean_mask,varargin)
+function import_CHL(dpath,vrs,type,lat,lon,time,yr_end,nasa,ocean_mask,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/CHL_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/CHL_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'NASA')
@@ -24,20 +24,20 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/CHL_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/CHL_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'CHL' data_interp 'sea surface chlorophyll' 'milligrams per meter squared'});
 
 else
 
-data_interp = ncread(['Data/CHL_' type '_' vrs '.nc'],'CHL');
+data_interp = ncread([paths.data '/CHL_' type '_' vrs '.nc'],'CHL');
 
 end
 
 % create chl animation
 if plot_option == 1
-    create_animation('CHL',type,time,lat,lon,data_interp,cmocean('algae'),[0 3],'Sea Surface Chlorophyll','mg/m2');
+    create_animation('CHL',type,time,lat,lon,data_interp,cmocean('algae'),[0 3],'Sea Surface Chlorophyll','mg/m2',paths);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,13 +75,13 @@ end
     data_lon = [data_lon_pos(idx_minlon2:idx_maxlon2);data_lon_neg(idx_minlon1:idx_maxlon1)];
 
     % create temporary netcdf
-    if isfile('Data/CHL_temp.nc'); delete('Data/CHL_temp.nc'); end
-    nccreate('Data/CHL_temp.nc','lon','Dimensions',{'lon',length(data_lon)});
-    ncwrite('Data/CHL_temp.nc','lon',data_lon);
-    nccreate('Data/CHL_temp.nc','lat','Dimensions',{'lat',length(data_lat)});
-    ncwrite('Data/CHL_temp.nc','lat',data_lat);
-    nccreate('Data/CHL_temp.nc','time','Dimensions',{'time',Inf});
-    nccreate('Data/CHL_temp.nc','chl','Dimensions',{'lon',length(data_lon),...
+    if isfile(fullfile(paths.data,'CHL_temp.nc')); delete(fullfile(paths.data,'CHL_temp.nc')); end
+    nccreate(fullfile(paths.data,'CHL_temp.nc'),'lon','Dimensions',{'lon',length(data_lon)});
+    ncwrite(fullfile(paths.data,'CHL_temp.nc'),'lon',data_lon);
+    nccreate(fullfile(paths.data,'CHL_temp.nc'),'lat','Dimensions',{'lat',length(data_lat)});
+    ncwrite(fullfile(paths.data,'CHL_temp.nc'),'lat',data_lat);
+    nccreate(fullfile(paths.data,'CHL_temp.nc'),'time','Dimensions',{'time',Inf});
+    nccreate(fullfile(paths.data,'CHL_temp.nc'),'chl','Dimensions',{'lon',length(data_lon),...
         'lat',length(data_lat),'time',Inf});
     
     % Define normal and leap year days of year to start month
@@ -114,7 +114,7 @@ end
                 [idx_minlon2 idx_maxlat],...
                 [1+idx_maxlon2-idx_minlon2 1+idx_minlat-idx_maxlat]);
             % append to temporary netcdf
-            ncwrite('Data/CHL_temp.nc','chl',[data_temp_poslon;...
+            ncwrite(fullfile(paths.data,'CHL_temp.nc'),'chl',[data_temp_poslon;...
                 data_temp_neglon],[1 1 (y-1)*12+m]);
         end
     end
@@ -148,13 +148,13 @@ end
                 [idx_minlon2 idx_maxlat],...
                 [1+idx_maxlon2-idx_minlon2 1+idx_minlat-idx_maxlat]);
             % append to temporary netcdf
-            ncwrite('Data/CHL_temp.nc','chl',[data_temp_poslon;...
+            ncwrite(fullfile(paths.data,'CHL_temp.nc'),'chl',[data_temp_poslon;...
                 data_temp_neglon],[1 1 60+(y-1)*12+m]);
         end
     end
 
     % Pre-allocate
-    chl_ts = squeeze(ncread('Data/CHL_temp.nc','chl'));   
+    chl_ts = squeeze(ncread(fullfile(paths.data,'CHL_temp.nc'),'chl'));
 
     % Interpolate over some gaps in CHL dataset (linear, 1-D, time), then
     % remaining gaps at either end (nearest, 1-D, time)
@@ -210,7 +210,7 @@ end
     end
 
     % delete temporary file
-    delete('Data/CHL_temp.nc');
+    delete(fullfile(paths.data,'CHL_temp.nc'));
         
 end
 

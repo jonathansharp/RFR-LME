@@ -1,9 +1,9 @@
 % Extract LMEs from gridded SOCAT data
 
-function extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region)
+function extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region,paths)
 
 % load SOCAT grid
-load(['Data/' vrs '_gridded'],'SOCAT_grid');
+load([paths.data '/' vrs '_gridded'],'SOCAT_grid');
 % SOCAT_vars = fieldnames(SOCAT_grid);
 % keep_vars = {'fco2_ave_wtd' 'lat' 'lon' 'dim' 'lim' 'month' ...
 %     'year' 'month_of_year' 'area_km2' 'percent_sea'};
@@ -17,7 +17,7 @@ load(['Data/' vrs '_gridded'],'SOCAT_grid');
 % load predictor variables
 for p = 1:length(pred_vars)
     SOCAT_grid.(pred_vars{p}) = ...
-        ncread(['Data/' pred_vars{p} '_' source.(pred_vars{p}) '_' vrs '.nc'],pred_vars{p});
+        ncread([paths.data '/' pred_vars{p} '_' source.(pred_vars{p}) '_' vrs '.nc'],pred_vars{p});
 end
 
 % apply mask to each predictor variable according to bathymetry
@@ -68,7 +68,7 @@ for n = 1:length(region)
     end
     % remove gridded predictor observations outside region
     for v = 1:length(pred_vars)
-        gridded_predictor = ncread(['Data/' pred_vars{v} '_' ...
+        gridded_predictor = ncread([paths.data '/' pred_vars{v} '_' ...
             source.(pred_vars{v}) '_' vrs '.nc'],pred_vars{v});
         LME.(pred_vars{v}) = ...
             gridded_predictor(idx_xmin:idx_xmax,idx_ymin:idx_ymax,:);
@@ -151,8 +151,8 @@ for n = 1:length(region)
     LME.fco2_dom_mean_detrend(LME.fco2_dom_mean_detrend == 0) = NaN;
 
     % save gridded pco2 and predictor data in individual LMEs
-    if ~isfolder('Data/LME_Data'); mkdir('Data/LME_Data'); end
-    save(['Data/LME_Data/' vrs '_' region{n}],'LME','-v7.3');
+    if ~isfolder(fullfile(paths.data,'LME_Data')); mkdir(fullfile(paths.data,'LME_Data')); end
+    save([paths.data '/LME_Data/' vrs '_' region{n}],'LME','-v7.3');
     clear LME
 
 end

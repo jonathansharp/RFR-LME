@@ -1,4 +1,4 @@
-function regional_stats(vrs,lme_shape,lme_idx,region,yr_end)
+function regional_stats(vrs,lme_shape,lme_idx,region,yr_end,paths)
 
 % region labels
 reg_lab = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
@@ -27,8 +27,8 @@ amp_table = nan(length(region),length(var_type));
 for n = 1:length(region)
 
     % load regional properties
-    load(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME');
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/RFR-LME/' vrs '_' region{n}],'RFR_LME');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
 
     for var_num = 1:length(var_type)
 
@@ -269,7 +269,7 @@ for n = 1:length(region)
 %             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
 %         end
         % save figure
-        exportgraphics(gcf,['Figures/' region{n} '_time_series_' var_type{var_num} '.png']);
+        exportgraphics(gcf,[paths.figures '/' region{n} '_time_series_' var_type{var_num} '.png']);
         close
 
         %% plot climatology
@@ -307,7 +307,7 @@ for n = 1:length(region)
 %             text(xL(2),yL(1),'o','HorizontalAlignment','right','VerticalAlignment','bottom');
 %         end
         % save figure
-        exportgraphics(gcf,['Figures/' region{n} '_climatology_' var_type{var_num} '.png']);
+        exportgraphics(gcf,[paths.figures '/' region{n} '_climatology_' var_type{var_num} '.png']);
         close
 
         %% save LME-specific indicator time series

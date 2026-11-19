@@ -1,5 +1,5 @@
 % function to create animations
-function create_animation(var,type,time,lat,lon,z,cmap,colorlims,colorlabel,units)
+function create_animation(var,type,time,lat,lon,z,cmap,colorlims,colorlabel,units,paths)
 
     % establish figure
     f = figure; set(f,'color','w','visible','off');
@@ -18,19 +18,19 @@ function create_animation(var,type,time,lat,lon,z,cmap,colorlims,colorlabel,unit
         c.Label.String = [colorlabel ' (' units ')'];
         c.TickLength = 0;
         % save frame
-        if ~isfolder(['Figures/' var '/' type '/Monthly']); mkdir(['Figures/' var '/' type '/Monthly']); end
-        exportgraphics(f,['Figures/' var '/' type '/Monthly/m' num2str(m) '_' strrep(colorlabel,' ','_') '.png']);
+        if ~isfolder([paths.figures '/' var '/' type '/Monthly']); mkdir([paths.figures '/' var '/' type '/Monthly']); end
+        exportgraphics(f,[paths.figures '/' var '/' type '/Monthly/m' num2str(m) '_' strrep(colorlabel,' ','_') '.png']);
         % capture frame
         frame = getframe(f);
         im = frame2im(frame);
         [imind,cm] = rgb2ind(im,256);
         % write to file
         if m == 1
-            imwrite(imind,cm,['Figures/' var '/' type '/' ...
+            imwrite(imind,cm,[paths.figures '/' var '/' type '/' ...
                 strrep(colorlabel,' ','_') '_Animation.gif'],...
                 'gif','Loopcount',inf,'DelayTime',0.1);
         else
-            imwrite(imind,cm,['Figures/' var '/' type '/' ...
+            imwrite(imind,cm,[paths.figures '/' var '/' type '/' ...
                 strrep(colorlabel,' ','_') '_Animation.gif'],...
                 'gif','WriteMode','append','DelayTime',0.1);
         end

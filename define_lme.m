@@ -1,6 +1,6 @@
 % Define LMEs
 
-function [lme_shape,lme_idx,region] = define_LMEs()
+function [lme_shape,lme_idx,region] = define_LMEs(paths)
 
 %% define regions of interest
 region = {'CCS' 'GA' 'AI' 'EBS' 'BS' 'NBCS' 'NE' 'SE' 'GM' 'CS' 'PI'};
@@ -49,8 +49,8 @@ land = shaperead('usastatehi.shp', 'UseGeoCoords',true);
 geoshow(land,'FaceColor',rgb('grey'));
 
 % save figure
-if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,'Figures/lme_test.png');
+if ~isfolder(paths.figures); mkdir(paths.figures); end
+exportgraphics(gcf,fullfile(paths.figures,'lme_test.png'));
 close
 
 end

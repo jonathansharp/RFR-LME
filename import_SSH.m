@@ -1,5 +1,5 @@
 % import SSH
-function data = import_SSH(dpath,vrs,type,lat,lon,time,yr_end,cmems,varargin)
+function data = import_SSH(dpath,vrs,type,lat,lon,time,yr_end,cmems,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/SSH_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/SSH_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'CMEMS')
@@ -22,20 +22,20 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/SSH_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/SSH_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'SSH' data 'sea surface height anomaly' 'centimeters above something...'});
 
 else
 
-data = ncread(['Data/SSH_' type '_' vrs '.nc'],'SSH');
+data = ncread([paths.data '/SSH_' type '_' vrs '.nc'],'SSH');
 
 end
 
 % create ssh animation
 if plot_option == 1
-    create_animation('SSH',type,time,lat,lon,data,cmocean('haline'),[-1 1],'Sea Surface Height Anomaly','cm');
+    create_animation('SSH',type,time,lat,lon,data,cmocean('haline'),[-1 1],'Sea Surface Height Anomaly','cm',paths);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

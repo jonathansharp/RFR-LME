@@ -1,32 +1,32 @@
-function region_wide_stats(vrs,date)
+function region_wide_stats(vrs,date,paths)
 
 % load indicators
-RFR_LME.lat = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'lat');
-RFR_LME.lon = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'lon');
-RFR_LME.time = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'time');
-RFR_LME.pco2 = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'pco2');
-RFR_LME.fco2 = ncread(['Data/NetCDFs_' date '/US_RFR_LME_fCO2.nc'],'fco2');
-RFR_LME.TA = ncread(['Data/NetCDFs_' date '/US_RFR_LME_TA.nc'],'ta');
-RFR_LME.DIC = ncread(['Data/NetCDFs_' date '/US_RFR_LME_DIC.nc'],'dic');
-RFR_LME.pH = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pH.nc'],'ph');
-RFR_LME.OmA = ncread(['Data/NetCDFs_' date '/US_RFR_LME_OmA.nc'],'om_a');
-RFR_LME.OmC = ncread(['Data/NetCDFs_' date '/US_RFR_LME_OmC.nc'],'om_c');
-RFR_LME.H = ncread(['Data/NetCDFs_' date '/US_RFR_LME_H.nc'],'h');
-RFR_LME.CO3 = ncread(['Data/NetCDFs_' date '/US_RFR_LME_CO3.nc'],'co3');
-RFR_LME.RF = ncread(['Data/NetCDFs_' date '/US_RFR_LME_RF.nc'],'rf');
-RFR_LME.pco2_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'u_pco2');
-RFR_LME.fco2_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_fCO2.nc'],'u_fco2');
-RFR_LME.TA_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_TA.nc'],'u_ta');
-RFR_LME.DIC_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_DIC.nc'],'u_dic');
-RFR_LME.pH_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_pH.nc'],'u_ph');
-RFR_LME.OmA_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_OmA.nc'],'u_om_a');
-RFR_LME.OmC_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_OmC.nc'],'u_om_c');
-RFR_LME.H_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_H.nc'],'u_h');
-RFR_LME.CO3_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_CO3.nc'],'u_co3');
-RFR_LME.RF_e = ncread(['Data/NetCDFs_' date '/US_RFR_LME_RF.nc'],'u_rf');
+RFR_LME.lat = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'lat');
+RFR_LME.lon = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'lon');
+RFR_LME.time = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'time');
+RFR_LME.pco2 = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'pco2');
+RFR_LME.fco2 = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_fCO2.nc'],'fco2');
+RFR_LME.TA = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_TA.nc'],'ta');
+RFR_LME.DIC = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_DIC.nc'],'dic');
+RFR_LME.pH = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pH.nc'],'ph');
+RFR_LME.OmA = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_OmA.nc'],'om_a');
+RFR_LME.OmC = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_OmC.nc'],'om_c');
+RFR_LME.H = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_H.nc'],'h');
+RFR_LME.CO3 = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_CO3.nc'],'co3');
+RFR_LME.RF = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_RF.nc'],'rf');
+RFR_LME.pco2_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pCO2.nc'],'u_pco2');
+RFR_LME.fco2_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_fCO2.nc'],'u_fco2');
+RFR_LME.TA_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_TA.nc'],'u_ta');
+RFR_LME.DIC_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_DIC.nc'],'u_dic');
+RFR_LME.pH_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_pH.nc'],'u_ph');
+RFR_LME.OmA_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_OmA.nc'],'u_om_a');
+RFR_LME.OmC_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_OmC.nc'],'u_om_c');
+RFR_LME.H_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_H.nc'],'u_h');
+RFR_LME.CO3_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_CO3.nc'],'u_co3');
+RFR_LME.RF_e = ncread([paths.data '/NetCDFs_' date '/US_RFR_LME_RF.nc'],'u_rf');
 
 %% Load SOCAT grid
-load(['Data/' vrs '_gridded'],'SOCAT_grid');
+load([paths.data '/' vrs '_gridded'],'SOCAT_grid');
 
 %% define variables
 var_type_1 = {'DIC' 'pCO2' 'fCO2' 'TA' 'pH' 'OmA' 'OmC' 'H' 'CO3' 'RF'};

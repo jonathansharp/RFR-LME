@@ -1,5 +1,5 @@
 % import MSLP
-function data_interp = import_MSLP(dpath,vrs,type,lat,lon,time,yr_end,varargin)
+function data_interp = import_MSLP(dpath,vrs,type,lat,lon,time,yr_end,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/MSLP_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/MSLP_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'NCEP')
@@ -20,20 +20,20 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/MSLP_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/MSLP_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'MSLP' data_interp 'mean sea level pressure' 'atmospheres'});
 
 else
 
-data_interp = ncread(['Data/MSLP_' type '_' vrs '.nc'],'MSLP');
+data_interp = ncread([paths.data '/MSLP_' type '_' vrs '.nc'],'MSLP');
 
 end
 
 % create sst animation
 if plot_option == 1
-    create_animation('MSLP',type,time,lat,lon,data_interp,cmocean('rain'),[.9 1.1],'Mean Sea Level Pressure','');
+    create_animation('MSLP',type,time,lat,lon,data_interp,cmocean('rain'),[.9 1.1],'Mean Sea Level Pressure','',paths);
     % create_animation('MSLP_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-1 1],'Mean Sea Level Pressure Anomaly','');
 end
 

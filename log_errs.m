@@ -1,4 +1,4 @@
-function log_errs(vrs,num_groups,region)
+function log_errs(vrs,num_groups,region,paths)
 
 %% pre-allocate table
 error_stats = table('Size',[length(region) 7],...
@@ -10,7 +10,7 @@ error_stats = table('Size',[length(region) 7],...
 for n = 1:length(region)
 
     %% load error statistics and calculate some extra ones
-    load(['Models/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))]);
+    load([paths.models '/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))]);
     rfr.avg_abs_err = mean(abs(rfr.delta.all(:,end)),'omitnan');
     rfr.med_abs_err = median(abs(rfr.delta.all(:,end)),'omitnan');
     rfr.iqr = iqr(rfr.delta.all(:,end));

@@ -2,7 +2,7 @@
 % define time-varying clusters within which to train machine learning
 % algorithms via a Gaussian mixture model method.
 
-function cluster_lme(vrs,num_groups,region,varargin)
+function cluster_lme(vrs,num_groups,region,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -17,8 +17,8 @@ end
 for n = 1:length(region)
 
     % load variables for clustering
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
-    load(['Data/LME_Data/' vrs '_clustering_arrays_' region{n}],'LME_clustering');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/LME_Data/' vrs '_clustering_arrays_' region{n}],'LME_clustering');
 
     % normalize X to have mean of zero and st. dev. of 1
     if strcmp(cluster_option,'var')
@@ -60,7 +60,7 @@ for n = 1:length(region)
 %     yL = ylim;
 %     plot([mean(sil,'omitnan') mean(sil,'omitnan')],[yL(1) yL(2)],'k--','linewidth',2);
 %     title([reg ', Clusters = ' num2str(num_groups)]);
-%     export_fig(gcf,['Figures/gmm_validate_' reg '_' num2str(num_groups) '.png'],'-transparent')
+%     export_fig(gcf,[paths.figures '/gmm_validate_' reg '_' num2str(num_groups) '.png'],'-transparent')
 %     close
     
     % fill group grid and probability grids
@@ -89,7 +89,7 @@ for n = 1:length(region)
     if plot_option == 1
         create_animation([region{n} '_groups'],['GMM_' num2str(num_groups(n))],...
             datenum(LME.year,LME.month,15),LME.lat,LME.lon,...
-            LME_GMM.group3D,jet,[1 num_groups(n)],'GMM Groups','');
+            LME_GMM.group3D,jet,[1 num_groups(n)],'GMM Groups','',paths);
     end
 
 %     % fit GMM from predictor variable variability
@@ -102,8 +102,8 @@ for n = 1:length(region)
 %     [LME_GMM.clusters,~,LME_GMM.probs] = cluster(gmm,X_norm);
 
     % save variables for clustering and training in each LME
-    save(['Data/LME_Data/' vrs '_GMM_' region{n}],'LME_GMM');
-%    save(['Data/LME_Data/' vrs '_GMM_var_' region{n}],'LME_GMM_var');
+    save([paths.data '/LME_Data/' vrs '_GMM_' region{n}],'LME_GMM');
+%    save([paths.data '/LME_Data/' vrs '_GMM_var_' region{n}],'LME_GMM_var');
 
 end
 

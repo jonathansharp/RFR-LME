@@ -1,6 +1,6 @@
 % Load SOCAT data
 
-function load_socat(vrs)
+function load_socat(vrs,paths)
 
 % display status
 disp('Loading SOCAT data');
@@ -10,7 +10,7 @@ fmt_data = ['%s %*s %*s %s %s %s %s %*s %*s %*s %s %s %*s %s %s %*s %*s %*s ' ..
     '%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %s %*s %s \n'];
 
 % process header lines to find where data starts
-ff = fopen([vrs '/' vrs '.tsv'],'r'); % open .tsv file
+ff = fopen(fullfile(paths.socat,[vrs '.tsv']),'r'); % open .tsv file
 header_lines = textscan(ff,'%s',10000,'delimiter','\n'); % scan first 10,000 lines
 hdr_in1 = strfind(header_lines{1}, 'Expocode'); hdr_in1=~cellfun('isempty', hdr_in1);
 hdr_in2 = strfind(header_lines{1}, 'SST'); hdr_in2=~cellfun('isempty', hdr_in2);
@@ -19,7 +19,7 @@ clear header_lines
 fclose(ff);
 
 % import data
-ff = fopen([vrs '/' vrs '.tsv'],'r'); % open .tsv file
+ff = fopen(fullfile(paths.socat,[vrs '.tsv']),'r'); % open .tsv file
 junk = textscan(ff,'%s',hdrline-1,'delimiter','\n'); clear junk;
 headers = textscan(ff,fmt_data,1,'delimiter','\t');
 headers = cellfun(@eraseBetween,headers,repmat({' ['},1,length(headers)),...
@@ -93,12 +93,12 @@ xlabel('Year');
 clear time
 
 % save figure
-if ~isfolder('Figures'); mkdir('Figures'); end
-exportgraphics(gcf,'Figures/fCO2_hist_NA.png');
+if ~isfolder(paths.figures); mkdir(paths.figures); end
+exportgraphics(gcf,fullfile(paths.figures,'fCO2_hist_NA.png'));
 close
 
 % save SOCAT structure
-if ~isfolder('Data'); mkdir('Data'); end
-save(['Data/' vrs '_structure'],'data','-v7.3');
+if ~isfolder(paths.data); mkdir(paths.data); end
+save(fullfile(paths.data,[vrs '_structure']),'data','-v7.3');
 
 end

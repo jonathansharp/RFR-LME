@@ -1,6 +1,6 @@
 % import atmospheric pCO2
 function data_interp = import_apCO2(dpath,vrs,type,lat,lon,time,...
-    yr_end,mslp_type,sss_type,sst_type,varargin)
+    yr_end,mslp_type,sss_type,sst_type,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,16 +10,16 @@ for i = 1:2:length(varargin)
     end
 end
 
-if ~isfile(['Data/apCO2_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/apCO2_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'MBL')
     % import xCO2
     data_interp_temp = import_axCO2_MBL(dpath,lat,lon,time,yr_end);
     % calculate pCO2 from xCO2 (with vapor pressure correction)
-    MSLP = ncread(['Data/MSLP_' mslp_type '_' vrs '.nc'],'MSLP');
-    SSS = ncread(['Data/SSS_' sss_type '_' vrs '.nc'],'SSS');
-    SST = ncread(['Data/SST_' sst_type '_' vrs '.nc'],'SST');
+    MSLP = ncread([paths.data '/MSLP_' mslp_type '_' vrs '.nc'],'MSLP');
+    SSS = ncread([paths.data '/SSS_' sss_type '_' vrs '.nc'],'SSS');
+    SST = ncread([paths.data '/SST_' sst_type '_' vrs '.nc'],'SST');
     vapor_pressure = vpress(SSS,SST);
     data_interp = data_interp_temp.*(MSLP-vapor_pressure);
 else
@@ -27,20 +27,20 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/apCO2_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/apCO2_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'apCO2' data_interp 'atmospheric pCO2' 'uatm'});
 
 else
 
-data_interp = ncread(['Data/apCO2_' type '_' vrs '.nc'],'apCO2');
+data_interp = ncread([paths.data '/apCO2_' type '_' vrs '.nc'],'apCO2');
 
 end
 
 % create sst animation
 if plot_option == 1
-    create_animation('apCO2',type,time,lat,lon,data_interp,cmocean('matter'),[340 420],'Atmospheric pCO2','');
+    create_animation('apCO2',type,time,lat,lon,data_interp,cmocean('matter'),[340 420],'Atmospheric pCO2','',paths);
     % create_animation('MSLP_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Atmospheric pCO2 Anomaly','');
 end
 

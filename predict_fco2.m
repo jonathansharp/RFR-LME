@@ -1,7 +1,7 @@
 % This function uses random forest regression models to predict fco2 in US
 % LMEs and then calculates pCO2 from fCO2.
 
-function predict_fco2(vrs,num_groups,region,varargin)
+function predict_fco2(vrs,num_groups,region,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -17,12 +17,12 @@ for n = 1:length(region)
     disp(['Predicting fCO2 (' region{n} ')']);
     
     % load variables for prediction    
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
-    load(['Data/LME_Data/' vrs '_GMM_' region{n}],'LME_GMM');
-    load(['Data/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/LME_Data/' vrs '_GMM_' region{n}],'LME_GMM');
+    load([paths.data '/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
 
     % load model for prediction
-    load(['Models/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))],'rfr');
+    load([paths.models '/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))],'rfr');
 
     % pre-allocate results
     fco2_rfr_tmp = nan(length(LME_prediction.x),num_groups(n));
@@ -88,11 +88,11 @@ for n = 1:length(region)
     if plot_option == 1
         create_animation([region{n} '_pCO2'],['RFR-LME_' num2str(num_groups(n))],...
             datenum(RFR_LME.year,RFR_LME.month,15),RFR_LME.lat,RFR_LME.lon,...
-            RFR_LME.pCO2,parula,[200 500],'pCO2','(\mumol kg^{-1})');
+            RFR_LME.pCO2,parula,[200 500],'pCO2','(\mumol kg^{-1})',paths);
     end
     
     %% save estimated fCO2 grid
-    if ~isfolder('Data/RFR-LME/'); mkdir('Data/RFR-LME/'); end
-    save(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME','-v7.3');
+    if ~isfolder(fullfile(paths.data,'RFR-LME')); mkdir(fullfile(paths.data,'RFR-LME')); end
+    save([paths.data '/RFR-LME/' vrs '_' region{n}],'RFR_LME','-v7.3');
 
 end

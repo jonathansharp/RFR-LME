@@ -1,5 +1,5 @@
 % import SST
-function data = import_SST(dpath,vrs,type,lat,lon,time,yr_end,varargin)
+function data = import_SST(dpath,vrs,type,lat,lon,time,yr_end,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/SST_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/SST_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'OISST')
@@ -20,21 +20,21 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/SST_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/SST_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'SST' data 'sea surface temperature' 'degrees Celcius'});
 
 else
 
-data = ncread(['Data/SST_' type '_' vrs '.nc'],'SST');
+data = ncread([paths.data '/SST_' type '_' vrs '.nc'],'SST');
 
 end
 
 % create sst animation
 if plot_option == 1
-    create_animation('SST',type,time,lat,lon,data,cmocean('thermal'),[-5 35],'Sea Surface Temperature',char(176));
-    create_animation('SST_anom',type,time,lat,lon,data-mean(data,3,'omitnan'),cmocean('balance'),[-5 5],'Sea Surface Temperature Anomaly',char(176));
+    create_animation('SST',type,time,lat,lon,data,cmocean('thermal'),[-5 35],'Sea Surface Temperature',char(176),paths);
+    create_animation('SST_anom',type,time,lat,lon,data-mean(data,3,'omitnan'),cmocean('balance'),[-5 5],'Sea Surface Temperature Anomaly',char(176),paths);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

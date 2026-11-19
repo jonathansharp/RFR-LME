@@ -1,7 +1,7 @@
 % import Bathymetry
-function data_interp = import_Bathy(dpath,vrs,type,lat,lon,varargin)
+function data_interp = import_Bathy(dpath,vrs,type,lat,lon,paths,varargin)
 
-if ~isfile(['Data/Bathy_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/Bathy_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'ETOPO')
@@ -11,17 +11,17 @@ else
 end
 
 % save data file
-ncsave_2d(['Data/Bathy_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_2d([paths.data '/Bathy_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},{'Bathy' data_interp 'seafloor depth' 'meters'});
 
 else
 
-data_interp = ncread(['Data/Bathy_' type '_' vrs '.nc'],'Bathy');
+data_interp = ncread([paths.data '/Bathy_' type '_' vrs '.nc'],'Bathy');
 
 end
 
 % plot bathymetry
-create_map('Bathy',type,lat,lon,data_interp,cmocean('deep'),[0 6000],'Bottom Depth','m');
+create_map('Bathy',type,lat,lon,data_interp,cmocean('deep'),[0 6000],'Bottom Depth','m',paths);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

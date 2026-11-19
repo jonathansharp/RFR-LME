@@ -1,5 +1,5 @@
 % import MLD
-function data_interp = import_MLD(dpath,vrs,type,lat,lon,time,yr_end,cmems,varargin)
+function data_interp = import_MLD(dpath,vrs,type,lat,lon,time,yr_end,cmems,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/MLD_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/MLD_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'CMEMS')
@@ -20,20 +20,20 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/MLD_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/MLD_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'MLD' data_interp 'mixed layer thickness' 'meters'});
 
 else
 
-data_interp = ncread(['Data/MLD_' type '_' vrs '.nc'],'MLD');
+data_interp = ncread([paths.data '/MLD_' type '_' vrs '.nc'],'MLD');
 
 end
 
 % create sst animation
 if plot_option == 1
-    create_animation('MLD',type,time,lat,lon,data_interp,cmocean('tempo'),[0 200],'Mixed Layer Depth','');
+    create_animation('MLD',type,time,lat,lon,data_interp,cmocean('tempo'),[0 200],'Mixed Layer Depth','',paths);
     % create_animation('MLD_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Mixed Layer Depth Anomaly','');
 end
 

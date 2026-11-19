@@ -1,7 +1,7 @@
 %% set user-defined parameters
 % SOCAT version, data paths, and passwords
-vrs = 'SOCATv2026'; % change annually
-dpath = '/home/sockeye/sharp/RFR-LME-Data/'; % add path to where proxy datasets will be downloaded
+paths = rfr_lme_paths(); % this helper set paths to data and figures, edit the helper function to change paths
+vrs = 'SOCATv2026'; % change this version tag annually
 cmems.path = ''; % add path to where copernicusmarine toolbox is located
 cmems.usr = ''; % add username for copernicus marine data system
 cmems.pwd = ''; % add password for copernicus marine data system
@@ -34,28 +34,28 @@ source.MLD = 'CMEMS'; source.MSLP = 'NCEP';
 source.apCO2 = 'MBL'; source.Bathy = 'ETOPO';
 
 %% define the bounds of the eleven LMEs
-[lme_shape,lme_idx,region] = define_lme();
+[lme_shape,lme_idx,region] = define_lme(paths);
 
 %% run scripts to create RFR-LME
-load_socat(vrs);
-grid_socat(vrs,dpath,yr_end);
-import_vars(vrs,dpath,source,yr_end,pred_vars_arc,cmems,nasa,cds);
-extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region);
-define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region);
-cluster_lme(vrs,num_groups,region,'plot_option',0,'cluster_option',clust_opt);
+load_socat(vrs,paths);
+grid_socat(vrs,paths.dpath,yr_end,paths);
+import_vars(vrs,paths.dpath,source,yr_end,pred_vars_arc,cmems,nasa,cds,paths);
+extract_lme(vrs,pred_vars,pred_vars_arc,source,lme_shape,lme_idx,region,paths);
+define_x_y(vrs,clust_vars,pred_vars,clust_vars_arc,pred_vars_arc,clust_dims,pred_dims,region,paths);
+cluster_lme(vrs,num_groups,region,paths,'plot_option',0,'cluster_option',clust_opt);
 train_rfr(vrs,num_groups,pred_dims,pred_vars,pred_vars_arc,region,...
-    thresh,100,2,ceil((2/3)*length(pred_vars)));
-log_errs(vrs,num_groups,region);
-predict_fco2(vrs,num_groups,region,'plot_option',1);
-calculate_oa(vrs,region,num_groups,'plot_option',1);
-matlab_to_netcdf_new(vrs,region);
-regional_stats(vrs,lme_shape,lme_idx,region,yr_end);
-create_figures(vrs,lme_shape,lme_idx,region);
-region_wide_stats(vrs,date);
+    thresh,100,2,ceil((2/3)*length(pred_vars)),paths);
+log_errs(vrs,num_groups,region,paths);
+predict_fco2(vrs,num_groups,region,paths,'plot_option',1);
+calculate_oa(vrs,region,num_groups,paths,'plot_option',1);
+matlab_to_netcdf_new(vrs,region,paths);
+regional_stats(vrs,lme_shape,lme_idx,region,yr_end,paths);
+create_figures(vrs,lme_shape,lme_idx,region,paths);
+region_wide_stats(vrs,date,paths);
 
 %% test numbers of clusters
 num_groups = repelem((1:10),11,1);
 for ng = 1:size(num_groups,1)
     train_rfr(vrs,num_groups(:,ng),pred_dims,pred_vars,pred_vars_arc,region,...
-        thresh,100,2,ceil((2/3)*length(pred_vars)));
+        thresh,100,2,ceil((2/3)*length(pred_vars)),paths);
 end

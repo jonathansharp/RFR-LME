@@ -1,9 +1,9 @@
 % Convert MATLAB RFR-LME files to NetCDFs
 
-function matlab_to_netcdf(vrs,region)
+function matlab_to_netcdf(vrs,region,paths)
 
 % load SOCAT grid
-load(['Data/' vrs '_gridded'],'SOCAT_grid');
+load([paths.data '/' vrs '_gridded'],'SOCAT_grid');
 
 % copy variables to US LME file
 US_RFR_LME.lim = SOCAT_grid.lim;
@@ -70,8 +70,8 @@ end
 for n = 1:length(region)
 
     %% load gridded fCO2 and predictors
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
-    load(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/RFR-LME/' vrs '_' region{n}],'RFR_LME');
 
     %% define LME mask
     idx_lon = US_RFR_LME.lon >= min(LME.lon) & US_RFR_LME.lon <= max(LME.lon);
@@ -123,10 +123,10 @@ end
 time = datenum([repmat(1998,US_RFR_LME.dim.z,1),...
     double(US_RFR_LME.month+0.5),repmat(15,US_RFR_LME.dim.z,1)]);
 % create folder
-if ~isfolder([pwd '/Data/NetCDFs_' date]); mkdir(['Data/NetCDFs_' date]); end
+if ~isfolder([paths.data '/NetCDFs_' date]); mkdir([paths.data '/NetCDFs_' date]); end
 for v = 1:length(Vars_pred)
     % define file name
-    filename = ['Data/NetCDFs_' date '/US_RFR_LME_' Vars_pred{v} '.nc'];
+    filename = [paths.data '/NetCDFs_' date '/US_RFR_LME_' Vars_pred{v} '.nc'];
     % delete old file if it exists
     if isfile(filename); delete(filename); end
     % longitude
@@ -192,10 +192,10 @@ end
 time = datenum([repmat(1998,US_RFR_LME.dim.z,1),...
     double(US_RFR_LME.month+0.5),repmat(15,US_RFR_LME.dim.z,1)]);
 % create folder
-if ~isfolder([pwd '/Data/NetCDFs_' date]); mkdir(['Data/NetCDFs_' date]); end
+if ~isfolder([paths.data '/NetCDFs_' date]); mkdir([paths.data '/NetCDFs_' date]); end
 for v = 1:length(Vars_OA)
     % define file name
-    filename = ['Data/NetCDFs_' date '/US_RFR_LME_' Vars_OA{v} '.nc'];
+    filename = [paths.data '/NetCDFs_' date '/US_RFR_LME_' Vars_OA{v} '.nc'];
     % delete old file if it exists
     if isfile(filename); delete(filename); end
     % longitude
@@ -259,7 +259,7 @@ for v = 1:length(Vars_OA)
 end
 
 % %% save predictors as NetCDFs
-% filename = ['Data/US_RFR_LME_Preds_' date '.nc'];
+% filename = [paths.data '/US_RFR_LME_Preds_' date '.nc'];
 % time = datenum([repmat(1998,US_RFR_LME.dim.z,1) US_RFR_LME.month+0.5, ...
 %     repmat(15,US_RFR_LME.dim.z,1)]);
 % nccreate(filename,'Lon','Dimensions',{'Lon',US_RFR_LME.dim.x});
@@ -281,7 +281,7 @@ end
 % end
 % 
 % %% save OA indicators as NetCDFs
-% filename = ['Data/US_RFR_LME_Inds_' date '.nc'];
+% filename = [paths.data '/US_RFR_LME_Inds_' date '.nc'];
 % time = datenum([repmat(1998,US_RFR_LME.dim.z,1) US_RFR_LME.month+0.5, ...
 %     repmat(15,US_RFR_LME.dim.z,1)]);
 % nccreate(filename,'Lon','Dimensions',{'Lon',US_RFR_LME.dim.x});
@@ -299,7 +299,7 @@ end
 % end
 % 
 % %% save OA indicator uncertainties as NetCDFs
-% filename = ['Data/US_RFR_LME_Inds_Uncer_' date '.nc'];
+% filename = [paths.data '/US_RFR_LME_Inds_Uncer_' date '.nc'];
 % time = datenum([repmat(1998,US_RFR_LME.dim.z,1) US_RFR_LME.month+0.5, ...
 %     repmat(15,US_RFR_LME.dim.z,1)]);
 % nccreate(filename,'Lon','Dimensions',{'Lon',US_RFR_LME.dim.x});

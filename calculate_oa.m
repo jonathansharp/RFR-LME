@@ -1,5 +1,5 @@
 
-function calculate_oa(vrs,region,num_groups,varargin)
+function calculate_oa(vrs,region,num_groups,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -15,10 +15,10 @@ for n = 1:length(region)
     disp(['Calculating CO2 System (' region{n} ')']);
 
     % load gridded fCO2, predictors, and models
-    load(['Data/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
-    load(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME');
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
-    load(['Models/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))],'rfr');
+    load([paths.data '/LME_Data/' vrs '_prediction_arrays_' region{n}],'LME_prediction');
+    load([paths.data '/RFR-LME/' vrs '_' region{n}],'RFR_LME');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.models '/' region{n} '/us_lme_models_' vrs '_c' num2str(num_groups(n))],'rfr');
 
     %% predict TA (and nutrients) using ESPER
     % process ESPER predictors
@@ -92,7 +92,7 @@ for n = 1:length(region)
 
     %% scale uncertainty over time
     % load gridded fco2 values
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
     % determine annual scaling factors (3-yr to 5-yr periods)
     ann_obs = nan(length(unique(LME.year)),1);
     ann_tot = nan(length(unique(LME.year)),1);
@@ -165,7 +165,7 @@ for n = 1:length(region)
         RFR_LME.month_of_year,15),scaler);
     ylabel('Uncertainty Scaler');
     datetick('x');
-    exportgraphics(gcf,['Figures/err_scalers_' region{n} '.png']);
+    exportgraphics(gcf,[paths.figures '/err_scalers_' region{n} '.png']);
     close
 
     % clean up
@@ -231,8 +231,8 @@ for n = 1:length(region)
     RFR_LME.uRF(LME_prediction.idx) = u_carb_system(:,9);
 
     %% save estimated indicators
-    if ~isfolder('Data/RFR-LME/'); mkdir('Data/RFR-LME/'); end
-    save(['Data/RFR-LME/' vrs '_' region{n}],'RFR_LME','-v7.3');
+    if ~isfolder(fullfile(paths.data,'RFR-LME')); mkdir(fullfile(paths.data,'RFR-LME')); end
+    save([paths.data '/RFR-LME/' vrs '_' region{n}],'RFR_LME','-v7.3');
 
 end
 

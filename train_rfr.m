@@ -1,14 +1,14 @@
 % This function 
 
 function train_rfr(vrs,num_groups,pred_dims,pred_vars,pred_vars_arc,...
-    region,thresh,nTrees,minLeafSize,numpredictors)
+    region,thresh,nTrees,minLeafSize,numpredictors,paths)
 
 for n = 1:length(region)
 
     % load variables for training
-    load(['Data/LME_Data/' vrs '_' region{n}],'LME');
-    load(['Data/LME_Data/' vrs '_GMM_' region{n}],'LME_GMM');
-    load(['Data/LME_Data/' vrs '_training_arrays_' region{n}],'LME_training');
+    load([paths.data '/LME_Data/' vrs '_' region{n}],'LME');
+    load([paths.data '/LME_Data/' vrs '_GMM_' region{n}],'LME_GMM');
+    load([paths.data '/LME_Data/' vrs '_training_arrays_' region{n}],'LME_training');
 
     % define indices
     idx_mod = ~isnan(LME.fco2_ave_wtd) & LME.idxspc;
@@ -104,9 +104,9 @@ for n = 1:length(region)
             xlabel('Number of Grown Trees');
             ylabel('Out-of-Bag Root Mean Squared Error');
             % save figure
-            if ~isfolder(['Figures/rfr_validate/' region{n}])
-                mkdir(['Figures/rfr_validate/' region{n}]); end
-            export_fig(gcf,['Figures/rfr_validate/' region{n} '/' clab '_OOB_RMSE.png'],'-transparent');
+            if ~isfolder([paths.figures '/rfr_validate/' region{n}])
+                mkdir([paths.figures '/rfr_validate/' region{n}]); end
+            export_fig(gcf,[paths.figures '/rfr_validate/' region{n} '/' clab '_OOB_RMSE.png'],'-transparent');
             close
             
             % Plot importance of each predictor
@@ -125,7 +125,7 @@ for n = 1:length(region)
                 xticklabels([pred_dims pred_vars]);
             end
             % export figure
-            export_fig(gcf,['Figures/rfr_validate/' region{n} '/' clab '_Pred_Imp.png'],'-transparent');
+            export_fig(gcf,[paths.figures '/rfr_validate/' region{n} '/' clab '_Pred_Imp.png'],'-transparent');
             close
     
         else
@@ -175,7 +175,7 @@ x_mids = 2.5:5:997.5;
 y_edges = -1000:10:1000;
 y_mids = -995:10:995;
 plot_delta(x_edges,x_mids,y_edges,y_mids,rfr.Y_fit.all(:,end),...
-    rfr.delta.all(:,end),region{n},[200 800],[-300 300],'RFR',c);
+    rfr.delta.all(:,end),region{n},[200 800],[-300 300],'RFR',c,paths);
 
 %% plot 2D histogram of pco2 vs. pco2 for RFRs
 x_edges = 0:5:1000;
@@ -184,11 +184,11 @@ y_edges = 0:5:1000;
 y_mids = 0:5:1000;
 plot_mod_v_meas(x_edges,x_mids,y_edges,y_mids,LME_training.y,...
     rfr.Y_fit.all(:,end), rfr.delta.all(:,end),...
-    region{n},[200 600],[200 600],'RFR',c);
+    region{n},[200 600],[200 600],'RFR',c,paths);
 
 % save rfr model and error statistics
-if ~isfolder(['Models/' region{n}]); mkdir(['Models/' region{n}]); end
-save(['Models/' region{n} '/us_lme_models_' vrs '_c' num2str(c)],'rfr');
+if ~isfolder([paths.models '/' region{n}]); mkdir([paths.models '/' region{n}]); end
+save([paths.models '/' region{n} '/us_lme_models_' vrs '_c' num2str(c)],'rfr');
 
 % display information
 disp(['RFR trained for ' region{n}]);

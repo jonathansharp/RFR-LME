@@ -1,5 +1,5 @@
 % import SSS
-function data_interp = import_SSS(dpath,vrs,type,lat,lon,time,yr_end,cmems,varargin)
+function data_interp = import_SSS(dpath,vrs,type,lat,lon,time,yr_end,cmems,paths,varargin)
 
 % process optional inputs
 plot_option = 0;
@@ -10,7 +10,7 @@ for i = 1:2:length(varargin)
 end
 
 % check for existence of file
-if ~isfile(['Data/SSS_' type '_' vrs '.nc'])
+if ~isfile([paths.data '/SSS_' type '_' vrs '.nc'])
 
 % Import based on "type"
 if strcmp(type,'CMEMS')
@@ -22,21 +22,21 @@ else
 end
 
 % save data file
-ncsave_3d(['Data/SSS_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
+ncsave_3d([paths.data '/SSS_' type '_' vrs '.nc'],{'lon' lon 'longitude' 'degrees east'},...
     {'lat' lat 'latitude' 'degrees north'},...
     {'time' time(1:(yr_end-1997)*12)-datenum(1950,1,1) 'time' 'days since 1950-1-1'},...
     {'SSS' data_interp 'sea surface salinity' ''});
 
 else
 
-data_interp = ncread(['Data/SSS_' type '_' vrs '.nc'],'SSS');
+data_interp = ncread([paths.data '/SSS_' type '_' vrs '.nc'],'SSS');
 
 end
 
 % create sst animation
 if plot_option == 1
-    create_animation('SSS',type,time,lat,lon,data_interp,cmocean('haline'),[32 37],'Salinity','');
-    create_animation('SSS_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Salinity Anomaly','');
+    create_animation('SSS',type,time,lat,lon,data_interp,cmocean('haline'),[32 37],'Salinity','',paths);
+    create_animation('SSS_anom',type,time,lat,lon,data_interp-mean(data_interp,3,'omitnan'),cmocean('balance'),[-2 2],'Salinity Anomaly','',paths);
     if strcmp(type,'BASS')
         % create_animation('uSSS',time,lat,lon,data_uncer_interp,cmocean('haline'),[33 37],'Salinity');
     end
